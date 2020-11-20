@@ -137,7 +137,7 @@ const Helpers = {
   checkImageLink: checkImageLink,
   EMAIL: config.email,    
   PASSWORD: config.password, 
-  MAIN_URL: config.resolve+":"+config.port+"/"
+  MAIN_URL: config.resolve+config.port
 };
 
 module.exports = Helpers;

@@ -1,7 +1,7 @@
 module.exports = {
 	secret: "wocman-technology-api-justice-auth-0-security",
-	resolve: "https://wocman-node-api-8080.herokuapp.com/",
-	port: 8080,
+	resolve: "https://wocman-node-api-8080.herokuapp.com",
+	port: '/',
 	version: "/api/v1/",
 	coreRootFolder: "",
 	coreImageFloder: "app/uploads/",
