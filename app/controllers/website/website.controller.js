@@ -115,7 +115,7 @@ exports.locationData = (req, res, next) => {
                     data: {
                         location: locationName,
                         data: locationResult,
-                        wocmans: result.count,
+                        wocman: isWocman,
                         active: isWocmanActive
                     }
                 });
