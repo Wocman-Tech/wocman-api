@@ -154,7 +154,7 @@ exports.signUpWocman = (req, res, next) => {
                             let response = {
                                 body: {
                                   name: req.body.username,
-                                  intro: "Welcome to Wocman Technology! We're very excited to have you on board. Click or Copy this link to any browser to procees with your registration: "+verification_link,
+                                  intro: "Welcome to Wocman Technology! We're very excited to have you on board. Click or Copy this link to any browser to procees  your registration: "+verification_link,
                                 },
                             };
 

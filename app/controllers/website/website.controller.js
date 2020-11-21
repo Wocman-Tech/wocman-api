@@ -79,30 +79,35 @@ exports.locationData = (req, res, next) => {
             .then(result => {
                 var isWocman = 0;
                 var isWocmanActive = 0;
-
-                UserRole.findOne({
-                    where: {userid: result.id}
-                }).then(wocmanrole => {
-                    if (wocmanrole && (wocmanrole.roleid == 2) ) {
-                        isWocman = isWocman + 1;
-                    }
-                }).catch((err) => {
-                    //should not be checked
-                });
-                Projects.findAndCountAll({
-                    where: {wocmanid: result.id}
-                }).then(doneProject => {
-                    if (doneProject) {
-                        for (var i = 0; i < doneProject.length; i++) {
-                            doneProject[i]
-                            if (doneProject[i].projectcomplete == 1) {
-                                isWocmanActive = isWocmanActive + 1;
+                if (result) {
+                    for (var i = 0; i < result.length; i++) {
+                        UserRole.findOne({
+                            where: {userid: result[i].id}
+                        }).then(wocmanrole => {
+                            if (wocmanrole && (wocmanrole.roleid == 2) ) {
+                                isWocman = isWocman + 1;
                             }
-                        }
+                        }).catch((err) => {
+                            //should not be checked
+                        });
+                        Projects.findAndCountAll({
+                            where: {wocmanid: result[i].id}
+                        }).then(doneProject => {
+                            if (doneProject) {
+                                var singleComplete = 0;
+                                for (var i = 0; i < doneProject.length; i++) {
+                                    if (doneProject[i].projectcomplete == 1) {
+                                        singleComplete = 1;
+                                    }
+                                }
+                                isWocmanActive = isWocmanActive +  singleComplete;
+                            }
+                        }).catch((err) => {
+                            //should not be checked
+                        });
                     }
-                }).catch((err) => {
-                    //should not be checked
-                });
+                }
+
                 res.status(200).send({
                     statusCode: 200,
                     status: true,
