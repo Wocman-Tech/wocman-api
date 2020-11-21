@@ -2,15 +2,6 @@
 
 ## Node.js(express.js) – JWT Authentication & Authorization, Sequelize(mysql)
 
-## Project setup
-```
-npm install
-```
-
-### Run
-```
-node server.js
-```
 
 ### API DOCs
 ```
