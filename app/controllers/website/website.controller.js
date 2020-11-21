@@ -73,10 +73,36 @@ exports.locationData = (req, res, next) => {
 
         let geoCoder = nodeGeocoder(options);geoCoder.geocode(locationName)
         .then((locationResult)=> {
-            UserRole.findAndCountAll({
-                where: {roleid: 2}
+            User.findAndCountAll({
+                where: {address: locationName}
             })
             .then(result => {
+                var isWocman = 0;
+                var isWocmanActive = 0;
+
+                UserRole.findOne({
+                    where: {userid: result.id}
+                }).then(wocmanrole => {
+                    if (wocmanrole && (wocmanrole.roleid == 2) ) {
+                        isWocman = isWocman + 1;
+                    }
+                }).catch((err) => {
+                    //should not be checked
+                });
+                Projects.findAndCountAll({
+                    where: {wocmanid: result.id}
+                }).then(doneProject => {
+                    if (doneProject) {
+                        for (var i = 0; i < doneProject.length; i++) {
+                            doneProject[i]
+                            if (doneProject[i].projectcomplete == 1) {
+                                isWocmanActive = isWocmanActive + 1;
+                            }
+                        }
+                    }
+                }).catch((err) => {
+                    //should not be checked
+                });
                 res.status(200).send({
                     statusCode: 200,
                     status: true,
@@ -84,7 +110,8 @@ exports.locationData = (req, res, next) => {
                     data: {
                         location: locationName,
                         data: locationResult,
-                        wocmans:result.count
+                        wocmans: result.count,
+                        active: isWocmanActive
                     }
                 });
             })
