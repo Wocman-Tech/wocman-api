@@ -565,23 +565,28 @@ exports.wocmanProfile = (req, res, next) => {
                                 );
                             }
                             var authorities = 'wocman';
-                            res.send({
-                                Username: users.username,
-                                Email: users.email,
-                                Firstname: users.firstname,
-                                Lastname: users.lastname,
-                                Address: users.address,
-                                Country: users.country,
-                                State: users.state,
-                                Province: users.province,
-                                Phone: users.phone,
-                                Role: authorities,
-                                verify_email: verified,
-                                Profile_picture: profilePictures,
-                                Certificates: certificates,
-                                Projects: wprojects,
-                                Wallet: wallet,
-                                AccessToken: req.token
+                            res.status(200).send({
+                                statusCode: 200,
+                                status: true,
+                                message: "Found a wocmna user",
+                                data: {
+                                    Username: users.username,
+                                    Email: users.email,
+                                    Firstname: users.firstname,
+                                    Lastname: users.lastname,
+                                    Address: users.address,
+                                    Country: users.country,
+                                    State: users.state,
+                                    Province: users.province,
+                                    Phone: users.phone,
+                                    Role: authorities,
+                                    verify_email: verified,
+                                    Profile_picture: profilePictures,
+                                    Certificates: certificates,
+                                    Projects: wprojects,
+                                    Wallet: wallet,
+                                    AccessToken: req.token
+                                }
                             });
                         })
                         .catch(err => {
