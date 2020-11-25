@@ -45,7 +45,7 @@ var storageProfile = multer.diskStorage({
         cb(null, file.fieldname + '-' + uniqueSuffix)
     }
 });
-var upload = multer({ 
+var uploadPicture = multer({ 
     storage: storageProfile, 
     fileFilter : (req, file, cb) => {
         if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg" || file.mimetype == "image/gif") {
@@ -106,11 +106,11 @@ module.exports = function(app) {
         logoutController.wocmanLogout
     );
 
-    app.post(
-        Helpers.apiVersion7() + "auth/wocman-profile-picture", 
-        [authJwt.verifyToken, authJwt.isWocman, upload.single('avatar')], 
-        profilepictureController.uploadProfilePictureWocman
-    );
+    // app.post(
+    //     Helpers.apiVersion7() + "auth/wocman-profile-picture", 
+    //     [authJwt.verifyToken, authJwt.isWocman, uploadPicture.single('avatar')], 
+    //     profilepictureController.uploadProfilePictureWocman
+    // );
     //certificate
 
     app.post(
