@@ -1,7 +1,7 @@
 const { authJwt } = require("../middleware");
 const { verifySignUp } = require("../middleware");
 
-const confirmpasswordresetController = require("../controllers/website/user/wocman/confirmpasswordresetemail.controller");
+// const confirmpasswordresetController = require("../controllers/website/user/wocman/confirmpasswordresetemail.controller");
 // const emailverifyController = require("../controllers/website/user/wocman/emailverify.controller");
 // const resetpasswordController = require("../controllers/website/user/wocman/resetpassword.controller");
 // const sendchangepasswordController = require("../controllers/website/user/wocman/sendchangepasswordemail.controller");
