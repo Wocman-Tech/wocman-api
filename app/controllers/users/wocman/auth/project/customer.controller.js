@@ -1,6 +1,6 @@
 const pathRoot = '../../../../../';
 const db = require(pathRoot+"models");
-const config = require(pathRoot"config/auth.config");
+const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
 const User = db.user;
 const Role = db.role;
