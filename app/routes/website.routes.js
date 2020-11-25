@@ -1,6 +1,16 @@
 const { authJwt } = require("../middleware");
 
-const websiteController = require("../controllers/website/website.controller");
+const confirmpasswordresetController = require("../controllers/website/user/wocman/confirmpassword.controller");
+const emailverifyController = require("../controllers/website/user/wocman/emailverify.controller");
+const resetpasswordController = require("../controllers/website/user/wocman/resetpassword.controller");
+const sendchangepasswordController = require("../controllers/website/user/wocman/sendchangepassword.controller");
+const signinController = require("../controllers/website/user/wocman/signin.controller");
+const signupController = require("../controllers/website/user/wocman/signup.controller");
+
+const addnewsletterController = require("../controllers/website/addnewsletter.controller");
+const contactController = require("../controllers/website/contact.controller");
+const newsletterController = require("../controllers/website/newsletter.controller");
+const searchController = require("../controllers/website/search.controller");
 
 const Helpers = require("../helpers/helper.js");
 
@@ -41,48 +51,62 @@ module.exports = function(app) {
     app.get(
         Helpers.apiVersion7() + "get-location/:location", 
         [], 
-        websiteController.locationData
+        searchController.locationData
     );
 
     app.get(
         Helpers.apiVersion7() + "get-news-letters-subscribers", 
         [], 
-        websiteController.newsletter
+        newsletterController.newsletter
     );
 
     app.post(
         Helpers.apiVersion7() + "subscribe-news-letters", 
         [], 
-        websiteController.subscribenewsletter
+        addnewsletterController.subscribenewsletter
     );
 
     app.post(
         Helpers.apiVersion7() + "contact-us",
         [], 
-        websiteController.contactus
+        contactController.contactus
     );
 
     app.get(
         Helpers.apiVersion7()+"wocman-signup-verification/:link",
         [],
-        websiteController.checkVerifyEmailLinkWocman
+        emailverifyController.checkVerifyEmailLinkWocman
     );
 
     app.post(
         Helpers.apiVersion7()+"password-reset-wocman",
         [],
-        websiteController.wocmanResetPassword
+        sendchangepasswordController.wocmanResetPassword
     );
 
     app.get(
         Helpers.apiVersion7()+"wocman-password-reset/:link",
         [],
-        websiteController.wocmanResetPasswordConfirm
+        confirmpasswordresetController.wocmanResetPasswordConfirm
     );
 
     app.post(
         Helpers.apiVersion7()+"wocman-password-reset",
         [],
-        websiteController.wocmanStartResetPassword
+        resetpasswordController.wocmanStartResetPassword
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/wocman-signin",
+        [
+            verifySignUp.checkRolesExisted
+        ],
+        signinController.signInWocman
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "auth/wocman-signup",
+        [],
+        signupController.signUpWocman
     );
 };
