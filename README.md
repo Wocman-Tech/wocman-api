@@ -12,3 +12,20 @@ https://red-meadow-5256.postman.co/collections/10053626-374bb4b3-ee60-46ff-a7d3-
 ```
 https://wocman-node-api-8080.herokuapp.com/
 ```
+
+
+### Offline API Resolve
+```
+http://localhost:8080/
+```
+
+
+#Want to work offline ?
+
+### Offline API Settings
+```
+1.  Open config folder and open both files
+2.  Set webAuth = false in  auth.config.js
+3.  Set webDb = false in  db.config.js
+4.  Modify the local db credentials to suite your need in db.config.js file inside the config folder
+```
