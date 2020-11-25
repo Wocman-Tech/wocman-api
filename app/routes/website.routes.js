@@ -2,16 +2,16 @@ const { authJwt } = require("../middleware");
 const { verifySignUp } = require("../middleware");
 
 const confirmpasswordresetController = require("../controllers/website/user/wocman/confirmpasswordresetemail.controller");
-const emailverifyController = require("../controllers/website/user/wocman/emailverify.controller");
-const resetpasswordController = require("../controllers/website/user/wocman/resetpassword.controller");
-const sendchangepasswordController = require("../controllers/website/user/wocman/sendchangepasswordemail.controller");
-const signinController = require("../controllers/website/user/wocman/signin.controller");
-const signupController = require("../controllers/website/user/wocman/signup.controller");
+// const emailverifyController = require("../controllers/website/user/wocman/emailverify.controller");
+// const resetpasswordController = require("../controllers/website/user/wocman/resetpassword.controller");
+// const sendchangepasswordController = require("../controllers/website/user/wocman/sendchangepasswordemail.controller");
+// const signinController = require("../controllers/website/user/wocman/signin.controller");
+// const signupController = require("../controllers/website/user/wocman/signup.controller");
 
-const addnewsletterController = require("../controllers/website/addnewsletter.controller");
-const contactController = require("../controllers/website/contact.controller");
-const newsletterController = require("../controllers/website/newsletter.controller");
-const searchController = require("../controllers/website/search.controller");
+// const addnewsletterController = require("../controllers/website/addnewsletter.controller");
+// const contactController = require("../controllers/website/contact.controller");
+// const newsletterController = require("../controllers/website/newsletter.controller");
+// const searchController = require("../controllers/website/search.controller");
 
 const Helpers = require("../helpers/helper.js");
 
@@ -49,68 +49,68 @@ module.exports = function(app) {
     });
 
     //website endpoints
-    app.get(
-        Helpers.apiVersion7() + "get-location/:location", 
-        [], 
-        searchController.locationData
-    );
+    // app.get(
+    //     Helpers.apiVersion7() + "get-location/:location", 
+    //     [], 
+    //     searchController.locationData
+    // );
 
-    app.get(
-        Helpers.apiVersion7() + "get-news-letters-subscribers", 
-        [], 
-        newsletterController.newsletter
-    );
+    // app.get(
+    //     Helpers.apiVersion7() + "get-news-letters-subscribers", 
+    //     [], 
+    //     newsletterController.newsletter
+    // );
 
-    app.post(
-        Helpers.apiVersion7() + "subscribe-news-letters", 
-        [], 
-        addnewsletterController.subscribenewsletter
-    );
+    // app.post(
+    //     Helpers.apiVersion7() + "subscribe-news-letters", 
+    //     [], 
+    //     addnewsletterController.subscribenewsletter
+    // );
 
-    app.post(
-        Helpers.apiVersion7() + "contact-us",
-        [], 
-        contactController.contactus
-    );
+    // app.post(
+    //     Helpers.apiVersion7() + "contact-us",
+    //     [], 
+    //     contactController.contactus
+    // );
 
 
-    app.get(
-        Helpers.apiVersion7()+"wocman-signup-verification/:link",
-        [],
-        emailverifyController.checkVerifyEmailLinkWocman
-    );
+    // app.get(
+    //     Helpers.apiVersion7()+"wocman-signup-verification/:link",
+    //     [],
+    //     emailverifyController.checkVerifyEmailLinkWocman
+    // );
 
-    app.post(
-        Helpers.apiVersion7()+"password-reset-wocman",
-        [],
-        sendchangepasswordController.wocmanResetPassword
-    );
+    // app.post(
+    //     Helpers.apiVersion7()+"password-reset-wocman",
+    //     [],
+    //     sendchangepasswordController.wocmanResetPassword
+    // );
 
-    app.get(
-        Helpers.apiVersion7()+"wocman-password-reset/:link",
-        [],
-        confirmpasswordresetController.wocmanResetPasswordConfirm
-    );
+    // app.get(
+    //     Helpers.apiVersion7()+"wocman-password-reset/:link",
+    //     [],
+    //     confirmpasswordresetController.wocmanResetPasswordConfirm
+    // );
 
-    app.post(
-        Helpers.apiVersion7()+"wocman-password-reset",
-        [],
-        resetpasswordController.wocmanStartResetPassword
-    );
+    // app.post(
+    //     Helpers.apiVersion7()+"wocman-password-reset",
+    //     [],
+    //     resetpasswordController.wocmanStartResetPassword
+    // );
 
-    app.post(
-        Helpers.apiVersion7()+"auth/wocman-signin",
-        [
-            verifySignUp.checkRolesExisted
-        ],
-        signinController.signInWocman
-    );
+    // app.post(
+    //     Helpers.apiVersion7()+"auth/wocman-signin",
+    //     [
+    //         verifySignUp.checkRolesExisted
+    //     ],
+    //     signinController.signInWocman
+    // );
 
-    app.post(
-        Helpers.apiVersion7() + "auth/wocman-signup",
-        [
+    // app.post(
+    //     Helpers.apiVersion7() + "auth/wocman-signup",
+    //     [
             
-        ],
-        signupController.signUpWocman
-    );
+    //     ],
+    //     signupController.signUpWocman
+    // );
 };
