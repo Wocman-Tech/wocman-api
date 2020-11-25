@@ -1,4 +1,5 @@
 const { authJwt } = require("../middleware");
+const { verifySignUp } = require("../middleware");
 
 const confirmpasswordresetController = require("../controllers/website/user/wocman/confirmpasswordresetemail.controller");
 const emailverifyController = require("../controllers/website/user/wocman/emailverify.controller");
@@ -71,6 +72,7 @@ module.exports = function(app) {
         [], 
         contactController.contactus
     );
+    
 
     app.get(
         Helpers.apiVersion7()+"wocman-signup-verification/:link",

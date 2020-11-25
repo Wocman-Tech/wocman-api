@@ -53,7 +53,6 @@ let MailGenerator = new Mailgen({
 
 const Op = db.Sequelize.Op;
 
-
 exports.wocmanResetPasswordConfirm = (req, res, next) => {
     var email_link =  req.params.link;
     var SearchemailLink = {};
