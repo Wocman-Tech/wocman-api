@@ -107,9 +107,7 @@ module.exports = function(app) {
 
     app.post(
         Helpers.apiVersion7() + "auth/wocman-signup",
-        [
-
-        ],
+        [],
         signupController.signUpWocman
     );
 };
