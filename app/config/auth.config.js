@@ -1,4 +1,4 @@
-const webAuth = false;
+const webAuth = true;
 
 if (webAuth === true) {
     module.exports = {

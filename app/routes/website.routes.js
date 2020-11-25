@@ -47,7 +47,6 @@ module.exports = function(app) {
         next();
     });
 
-    website endpoints
     app.get(
         Helpers.apiVersion7() + "get-location/:location", 
         [], 

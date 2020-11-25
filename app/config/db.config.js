@@ -1,4 +1,4 @@
-const webDb = false;
+const webDb = true;
 
 if (webDb === true) {
     module.exports = {
@@ -19,7 +19,7 @@ if (webDb === true) {
         HOST: "localhost",
         USER: "root",
         PASSWORD: "",
-        DB: "express-api",
+        DB: "express_api_1",
         dialect: "mysql",
         pool: {
             max: 5,
