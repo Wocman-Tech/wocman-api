@@ -1,5 +1,6 @@
-const db = require("../../../../models");
-const config = require("../../../../config/auth.config");
+const pathRoot = '../../../../../';
+const db = require(pathRoot+"models");
+const config = require(pathRoot"config/auth.config");
 const fs = require('fs');
 const User = db.user;
 const Role = db.role;
@@ -16,22 +17,21 @@ const WAChat = db.waChat;
 const WCChat = db.wcChat;
 const WWallet = db.wWallet;
 
-const {v4 : uuidv4} = require('uuid');
-const Helpers = require("../../../../helpers/helper.js");
-const { verifySignUp } = require("../../../../middleware");
+const Helpers = require(pathRoot+"helpers/helper.js");
+const { verifySignUp } = require(pathRoot+"middleware");
+const { EMAIL, PASSWORD, MAIN_URL } = require(pathRoot+"helpers/helper.js");
 
+const {v4 : uuidv4} = require('uuid');
+const Joi = require('joi'); 
 let nodeGeocoder = require('node-geocoder');
+const nodemailer = require("nodemailer");
+const Mailgen = require("mailgen");
+var jwt = require("jsonwebtoken");
+var bcrypt = require("bcryptjs");
  
 let options = {
   provider: 'openstreetmap'
 };
-
-
-const nodemailer = require("nodemailer");
-const Mailgen = require("mailgen");
-const Joi = require('joi'); 
-
-const { EMAIL, PASSWORD, MAIN_URL } = require("../../../../helpers/helper.js");
 
 let transporter = nodemailer.createTransport({
   service: config.message_server,
@@ -51,29 +51,24 @@ let MailGenerator = new Mailgen({
 });
 
 
-
-
 const Op = db.Sequelize.Op;
 
-var jwt = require("jsonwebtoken");
-var bcrypt = require("bcryptjs");
 
-// chat routes
-exports.wocmanChatProjectCustomer = (req, res, next) => {
+exports.wocmanStartProject = (req, res, next) => {
     // Username
     var projectid =  req.body.projectid;
-    
+    var projectstarttime = new Date();
+
     if (typeof projectid === "undefined") {
         return res.status(400).send(
             {
-                statusCode: 400,
+                 statusCode: 400,
                 status: false,
-                message: "project is undefined.",
+                message: "project  is undefined." ,
                 data: []
             }
         );
     }else{
-
         const joiClean = Joi.object().keys({ 
             projectid: Joi.number().integer().min(1), 
         }); 
@@ -82,21 +77,19 @@ exports.wocmanChatProjectCustomer = (req, res, next) => {
         } 
         const result = Joi.validate(dataToValidate, joiClean);
         if (result.error == null) {
-
-            // result.error == null means valid
-            
+       
             User.findByPk(req.userId).then(user => {
                 if (!user) {
                   res.status(404).send({
-                    statusCode: 404,
+                     statusCode: 404,
                     status: false,
                     message: "User Not Found",
                     data: []
                   });
                   return;
                 }
-                Projects.findByPk(projectid).then(projectBase => {
-                    if (!projectBase) {
+                Projects.findByPk(projectid).then(project => {
+                    if (!project) {
                       res.status(404).send({
                         statusCode: 404,
                         status: false,
@@ -105,72 +98,37 @@ exports.wocmanChatProjectCustomer = (req, res, next) => {
                       });
                       return;
                     }
-                    if (!(projectBase.wocmanid == user.id)) {
-                      res.status(404).send({
-                        statusCode: 404,
-                        status: false,
-                        message: "Project Not awarded to you",
-                        data: []
-                      });
-                      return;
-                    }
-                    var chat = [];
-
-                    WCChat.findAll({
-                        
-                        where: { 
-                            senderid: user.id,
-                            [Op.or]: {receiverid: user.id}
-                        }
-                    }).then(chats => {
-                        for (var i = 0; i < chats.length; i++) {
-                            if (((chats[i].senderid == user.id) && (chats[i].receiverid == projectBase.customerid)) || ((chats[i].senderid == projectBase.customerid) && (chats[i].receiverid == user.id))) {
-                                chat.push(chats[i].message);
-                            }
-                        }
-                   
-                        // console.log(projectBase.projectid);
-                        Project.findByPk(projectBase.projectid).then(projecttypes => {
-                            if (!projecttypes) {
-                              res.status(404).send({
-                                statusCode: 404,
-                                status: false,
-                                message: "Project Type Not Found",
-                                data: []
-                              });
-                              return;
-                            }
-                       
+                    if (parseInt(project.wocmanid, 10) !== parseInt(req.userId, 10)) {
+                        res.status(404).send({
+                            statusCode: 404,
+                            status: false,
+                            message: "Project Not Owner not resolved",
+                            data: []
+                          });
+                          return;
+                    }else{
+                        project.update({
+                            wocmanaccept:3,
+                            wocmanstartdatetime: projectstarttime.toString()
+                        }).then(() => {
                             res.status(200).send({
                                 statusCode: 200,
                                 status: true,
-                                message: "Chat Saved",
+                                message: "Project Started",
                                 data: {
-                                    accessToken: req.token,
-                                    project_type_name: projecttypes.name,
-                                    project_type_description: projecttypes.description,
-                                    customerid: projectBase.customerid,
-                                    chat: chat
+                                    accessToken: req.token
                                 }
                             });
                         })
                         .catch(err => {
-                            res.status(500).send({ 
+                            res.status(500).send({
                                 statusCode: 500,
                                 status: false, 
                                 message: err.message,
                                 data: [] 
                             });
                         });
-                    })
-                    .catch(err => {
-                        res.status(500).send({
-                            statusCode: 500,
-                            status: false, 
-                            message: err.message,
-                            data: [] 
-                        });
-                    });
+                    }
                 })
                 .catch(err => {
                     res.status(500).send({

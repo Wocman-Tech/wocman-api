@@ -20,6 +20,7 @@ const Op = db.Sequelize.Op;
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
+const Joi = require('joi'); 
 
 const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");

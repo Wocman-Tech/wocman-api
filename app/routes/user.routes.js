@@ -3,13 +3,9 @@ const { authJwt } = require("../middleware");
 const authController = require("../controllers/auth.controller");
 
 const wocmanAuthUserController = require("../controllers/users/wocman/auth/user.controller");
-const wocmanAuthProjectController = require("../controllers/users/wocman/auth/project.controller");
 const wocmanAuthChatController = require("../controllers/users/wocman/auth/chat.controller");
-
 const wocmanUserController = require("../controllers/users/wocman/wocman.controller");
-
 const websiteController = require("../controllers/website/website.controller");
-
 
 const Helpers = require("../helpers/helper.js");
 
@@ -122,44 +118,5 @@ module.exports = function(app) {
         Helpers.apiVersion7() + "wocman-remove-certificate", 
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmanAuthUserController.wocmanRemoveCertificate
-    );
-
-   
-
-    //project routes
-    app.post(
-        Helpers.apiVersion7() + "wocman-accept-project", 
-        [authJwt.verifyToken, authJwt.isWocman], 
-        wocmanAuthProjectController.wocmanAcceptProject
-    );
-    app.post(
-        Helpers.apiVersion7() + "wocman-reject-project", 
-        [authJwt.verifyToken, authJwt.isWocman], 
-        wocmanAuthProjectController.wocmanRejectProject
-    );
-    app.post(
-        Helpers.apiVersion7() + "wocman-start-project", 
-        [authJwt.verifyToken, authJwt.isWocman], 
-        wocmanAuthProjectController.wocmanStartProject
-    );
-    app.post(
-        Helpers.apiVersion7() + "wocman-stop-project", 
-        [authJwt.verifyToken, authJwt.isWocman], 
-        wocmanAuthProjectController.wocmanStopProject
-    );
-    app.post(
-        Helpers.apiVersion7() + "wocman-complete-project", 
-        [authJwt.verifyToken, authJwt.isWocman], 
-        wocmanAuthProjectController.wocmanCompleteProject
-    );
-    app.post(
-        Helpers.apiVersion7() + "wocman-project-customer", 
-        [authJwt.verifyToken, authJwt.isWocman], 
-        wocmanAuthProjectController.wocmanProjectCustomer
-    );
-    app.post(
-        Helpers.apiVersion7() + "wocman-project-type", 
-        [authJwt.verifyToken, authJwt.isWocman], 
-        wocmanAuthProjectController.wocmanProjectProject
     );
 };

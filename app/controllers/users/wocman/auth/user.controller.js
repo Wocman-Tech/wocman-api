@@ -19,6 +19,7 @@ const WWallet = db.wWallet;
 const {v4 : uuidv4} = require('uuid');
 const Helpers = require("../../../../helpers/helper.js");
 const { verifySignUp } = require("../../../../middleware");
+const Joi = require('joi'); 
 
 let nodeGeocoder = require('node-geocoder');
  
