@@ -1,14 +1,6 @@
 const { authJwt } = require("../middleware");
 
-const authController = require("../controllers/auth.controller");
-
-const wocmanAuthUserController = require("../controllers/users/wocman/auth/user.controller");
-const wocmanAuthChatController = require("../controllers/users/wocman/auth/chat.controller");
-
-const wocmanUserController = require("../controllers/users/wocman/wocman.controller");
-
 const websiteController = require("../controllers/website/website.controller");
-
 
 const Helpers = require("../helpers/helper.js");
 
@@ -68,5 +60,29 @@ module.exports = function(app) {
         Helpers.apiVersion7() + "contact-us",
         [], 
         websiteController.contactus
+    );
+
+    app.get(
+        Helpers.apiVersion7()+"wocman-signup-verification/:link",
+        [],
+        websiteController.checkVerifyEmailLinkWocman
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"password-reset-wocman",
+        [],
+        websiteController.wocmanResetPassword
+    );
+
+    app.get(
+        Helpers.apiVersion7()+"wocman-password-reset/:link",
+        [],
+        websiteController.wocmanResetPasswordConfirm
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"wocman-password-reset",
+        [],
+        websiteController.wocmanStartResetPassword
     );
 };

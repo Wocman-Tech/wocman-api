@@ -1,11 +1,13 @@
 const { authJwt } = require("../middleware");
 
-const authController = require("../controllers/auth.controller");
-
-const wocmanAuthUserController = require("../controllers/users/wocman/auth/user.controller");
-const wocmanAuthChatController = require("../controllers/users/wocman/auth/chat.controller");
-const wocmanUserController = require("../controllers/users/wocman/wocman.controller");
-const websiteController = require("../controllers/website/website.controller");
+const addcertificateController = require("../controllers/users/wocman/auth/user/addcertificate.controller");
+const changepasswordController = require("../controllers/users/wocman/auth/user/changepassword.controller");
+const completeController = require("../controllers/users/wocman/auth/user/complete.controller");
+const logoutController = require("../controllers/users/wocman/auth/user/logout.controller");
+const profileController = require("../controllers/users/wocman/auth/user/profile.controller");
+const removecertificateController = require("../controllers/users/wocman/auth/user/removecertificate.controller");
+const reusepictureController = require("../controllers/users/wocman/auth/user/reusepicture.controller");
+const updateprofileController = require("../controllers/users/wocman/auth/user/updateprofile.controller");
 
 const Helpers = require("../helpers/helper.js");
 
@@ -42,68 +44,42 @@ module.exports = function(app) {
         next();
     });
 
-    //wocman end points
-
-    app.get(
-        Helpers.apiVersion7()+"wocman-signup-verification/:link",
-        [],
-        wocmanUserController.checkVerifyEmailLinkWocman
-    );
-
-    app.post(
-        Helpers.apiVersion7()+"password-reset-wocman",
-        [],
-        wocmanUserController.wocmanResetPassword
-    );
-
-    app.get(
-        Helpers.apiVersion7()+"wocman-password-reset/:link",
-        [],
-        wocmanUserController.wocmanResetPasswordConfirm
-    );
-
-    app.post(
-        Helpers.apiVersion7()+"wocman-password-reset",
-        [],
-        wocmanUserController.wocmanStartResetPassword
-    );
-
     //auth
 
     app.post(
         Helpers.apiVersion7()+"complete-profile-wocman",
         [authJwt.verifyToken, authJwt.isWocman],
-        wocmanAuthUserController.checkCompleteProfileWocman
+        completeController.checkCompleteProfileWocman
     );
 
     app.post(
         Helpers.apiVersion7()+"profile-wocman",
         [authJwt.verifyToken, authJwt.isWocman],
-        wocmanAuthUserController.wocmanProfile
+        profileController.wocmanProfile
     );
 
     app.post(
         Helpers.apiVersion7()+"update-profile-wocman",
         [authJwt.verifyToken, authJwt.isWocman],
-        wocmanAuthUserController.wocmanProfileUpdate
+        updateprofileController.wocmanProfileUpdate
     );
 
     app.post(
         Helpers.apiVersion7()+"password-change-wocman",
         [authJwt.verifyToken, authJwt.isWocman],
-        wocmanAuthUserController.wocmanChangePassword
+        changepasswordController.wocmanChangePassword
     );
 
     app.post(
         Helpers.apiVersion7() + "wocman-reuse-profile-picture", 
         [authJwt.verifyToken, authJwt.isWocman], 
-        wocmanAuthUserController.wocmanReuseProfilePicture
+        reusepictureController.wocmanReuseProfilePicture
     );
 
     app.post(
         Helpers.apiVersion7() + "wocman-logout", 
         [authJwt.verifyToken, authJwt.isWocman], 
-        wocmanAuthUserController.wocmanLogout
+        logoutController.wocmanLogout
     );
 
     //certificate
@@ -111,12 +87,12 @@ module.exports = function(app) {
     app.post(
         Helpers.apiVersion7() + "wocman-add-certificate", 
         [authJwt.verifyToken, authJwt.isWocman, uploadCert.single('avatar')], 
-        wocmanAuthUserController.wocmanAddCertificate
+        addcertificateController.wocmanAddCertificate
     );
 
     app.post(
         Helpers.apiVersion7() + "wocman-remove-certificate", 
         [authJwt.verifyToken, authJwt.isWocman], 
-        wocmanAuthUserController.wocmanRemoveCertificate
+        removecertificateController.wocmanRemoveCertificate
     );
 };
