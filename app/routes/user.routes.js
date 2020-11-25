@@ -8,7 +8,7 @@ const profileController = require("../controllers/users/wocman/auth/user/profile
 const removecertificateController = require("../controllers/users/wocman/auth/user/removecertificate.controller");
 const reusepictureController = require("../controllers/users/wocman/auth/user/reusepicture.controller");
 const updateprofileController = require("../controllers/users/wocman/auth/user/updateprofile.controller");
-const profilepictureController = require("../controllers/users/wocman/auth/user/profilepicture.controller");
+// const profilepictureController = require("../controllers/users/wocman/auth/user/profilepicture.controller");
 
 const Helpers = require("../helpers/helper.js");
 
