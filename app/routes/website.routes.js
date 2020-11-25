@@ -48,67 +48,69 @@ module.exports = function(app) {
         next();
     });
 
-    //website endpoints
-    app.get(
-        Helpers.apiVersion7() + "get-location/:location", 
-        [], 
-        searchController.locationData
-    );
+    // //website endpoints
+    // app.get(
+    //     Helpers.apiVersion7() + "get-location/:location", 
+    //     [], 
+    //     searchController.locationData
+    // );
 
-    app.get(
-        Helpers.apiVersion7() + "get-news-letters-subscribers", 
-        [], 
-        newsletterController.newsletter
-    );
+    // app.get(
+    //     Helpers.apiVersion7() + "get-news-letters-subscribers", 
+    //     [], 
+    //     newsletterController.newsletter
+    // );
 
-    app.post(
-        Helpers.apiVersion7() + "subscribe-news-letters", 
-        [], 
-        addnewsletterController.subscribenewsletter
-    );
+    // app.post(
+    //     Helpers.apiVersion7() + "subscribe-news-letters", 
+    //     [], 
+    //     addnewsletterController.subscribenewsletter
+    // );
 
-    app.post(
-        Helpers.apiVersion7() + "contact-us",
-        [], 
-        contactController.contactus
-    );
-    
+    // app.post(
+    //     Helpers.apiVersion7() + "contact-us",
+    //     [], 
+    //     contactController.contactus
+    // );
 
-    app.get(
-        Helpers.apiVersion7()+"wocman-signup-verification/:link",
-        [],
-        emailverifyController.checkVerifyEmailLinkWocman
-    );
 
-    app.post(
-        Helpers.apiVersion7()+"password-reset-wocman",
-        [],
-        sendchangepasswordController.wocmanResetPassword
-    );
+    // app.get(
+    //     Helpers.apiVersion7()+"wocman-signup-verification/:link",
+    //     [],
+    //     emailverifyController.checkVerifyEmailLinkWocman
+    // );
 
-    app.get(
-        Helpers.apiVersion7()+"wocman-password-reset/:link",
-        [],
-        confirmpasswordresetController.wocmanResetPasswordConfirm
-    );
+    // app.post(
+    //     Helpers.apiVersion7()+"password-reset-wocman",
+    //     [],
+    //     sendchangepasswordController.wocmanResetPassword
+    // );
 
-    app.post(
-        Helpers.apiVersion7()+"wocman-password-reset",
-        [],
-        resetpasswordController.wocmanStartResetPassword
-    );
+    // app.get(
+    //     Helpers.apiVersion7()+"wocman-password-reset/:link",
+    //     [],
+    //     confirmpasswordresetController.wocmanResetPasswordConfirm
+    // );
 
-    app.post(
-        Helpers.apiVersion7()+"auth/wocman-signin",
-        [
-            verifySignUp.checkRolesExisted
-        ],
-        signinController.signInWocman
-    );
+    // app.post(
+    //     Helpers.apiVersion7()+"wocman-password-reset",
+    //     [],
+    //     resetpasswordController.wocmanStartResetPassword
+    // );
 
-    app.post(
-        Helpers.apiVersion7() + "auth/wocman-signup",
-        [],
-        signupController.signUpWocman
-    );
+    // app.post(
+    //     Helpers.apiVersion7()+"auth/wocman-signin",
+    //     [
+    //         verifySignUp.checkRolesExisted
+    //     ],
+    //     signinController.signInWocman
+    // );
+
+    // app.post(
+    //     Helpers.apiVersion7() + "auth/wocman-signup",
+    //     [
+            
+    //     ],
+    //     signupController.signUpWocman
+    // );
 };
