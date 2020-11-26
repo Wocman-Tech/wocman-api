@@ -5,11 +5,11 @@ const emailverifyController = require("../controllers/website/user/wocman/emailv
 const resetpasswordController = require("../controllers/website/user/wocman/resetpassword.controller");
 const sendchangepasswordController = require("../controllers/website/user/wocman/sendchangepasswordemail.controller");
 const signinController = require("../controllers/website/user/wocman/signin.controller");
+const adminSigninController = require("../controllers/website/user/admin/signin.controller");
 const signupController = require("../controllers/website/user/wocman/signup.controller");
 
 const addnewsletterController = require("../controllers/website/addnewsletter.controller");
 const contactController = require("../controllers/website/contact.controller");
-const newsletterController = require("../controllers/website/newsletter.controller");
 const searchController = require("../controllers/website/search.controller");
 
 const Helpers = require("../helpers/helper.js");
@@ -51,12 +51,6 @@ module.exports = function(app) {
         Helpers.apiVersion7() + "get-location/:location", 
         [], 
         searchController.locationData
-    );
-
-    app.get(
-        Helpers.apiVersion7() + "get-news-letters-subscribers", 
-        [], 
-        newsletterController.newsletter
     );
 
     app.post(
@@ -102,6 +96,14 @@ module.exports = function(app) {
             verifySignUp.isEmailVerify, verifySignUp.isPasswordVerify, verifySignUp.checkRolesExisted 
         ],
         signinController.signInWocman
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/admin-signin",
+        [
+            verifySignUp.isEmailVerify, verifySignUp.isPasswordVerify, verifySignUp.checkRolesExisted 
+        ],
+        adminSigninController.signInWocman
     );
 
     app.post(

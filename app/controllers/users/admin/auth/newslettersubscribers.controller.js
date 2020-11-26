@@ -1,4 +1,4 @@
-const pathRoot = '../../';
+const pathRoot = '../../../../';
 const db = require(pathRoot+"models");
 const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
@@ -50,10 +50,7 @@ let MailGenerator = new Mailgen({
   },
 });
 
-
-const Op = db.Sequelize.Op;
-
-exports.newsletter = (req, res, next) => {
+exports.newslettersubscribers = (req, res, next) => {
     Nletter.findAndCountAll()
     .then(result => {
         res.status(200).send({

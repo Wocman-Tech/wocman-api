@@ -88,7 +88,7 @@ verifyToken = (req, res, next) => {
 
 isAdmin = (req, res, next) => {
 
-   User.findByPk(req.userId).then(users => {
+    User.findByPk(req.userId).then(users => {
         if (!users) {
             res.status(403).send({
                 statusCode: 403,

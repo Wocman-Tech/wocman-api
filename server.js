@@ -17,9 +17,11 @@ const uuid = require('uuid');
 const fs = require('fs');
 var http = require('http').Server(app);
 var io = require("socket.io")(http);
+const { resolve, port }  = require("./app/config/auth.config");
+
 
 var corsOptions = {
-    origin: "http://localhost:8081"
+    origin: resolve+port
 };
 
 app.use(cors(corsOptions));

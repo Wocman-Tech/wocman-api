@@ -1,6 +1,6 @@
-const webAuth = true;
+const { workstation }  = require("./env.config");
 
-if (webAuth === true) {
+if (workstation.toLowerCase() === "web") {
     module.exports = {
         secret: "wocman-technology-api-justice-auth-0-security",
 		resolve: "https://wocman-node-api-8080.herokuapp.com",
@@ -14,11 +14,13 @@ if (webAuth === true) {
 		password: "rrilmtbqmsduewpy",
 		name: "Wocman Technology"
     }
-}else{
+}
+
+if(workstation.toLowerCase() === "localhost"){
     module.exports = {
         secret: "wocman-technology-api-justice-auth-0-security",
 		resolve: "http://localhost",
-		port: '8080/',
+		port: ':8080/',
 		version: "/api/v1/",
 		coreRootFolder: "",
 		coreImageFloder: "app/uploads/",

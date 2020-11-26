@@ -24,8 +24,13 @@ http://localhost:8080/
 
 ### Offline API Settings
 ```
-1.  Open config folder and open both files
-2.  Set webAuth = false in  auth.config.js
-3.  Set webDb = false in  db.config.js
-4.  Modify the local db credentials to suite your need in db.config.js file inside the config folder
+
+1.  Open config folder
+
+2.  In env.config.js file Set 
+```
+workstation : "localhost"
+```
+
+3.  You may Modify the local db credentials to suite your need in db.config.js file inside the config folder
 ```

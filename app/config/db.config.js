@@ -1,6 +1,6 @@
-const webDb = true;
+const { workstation }  = require("./env.config");
 
-if (webDb === true) {
+if (workstation.toLowerCase() == "web") {
     module.exports = {
         HOST: "us-cdbr-east-02.cleardb.com",
         USER: "bdddac9b8448ab",
@@ -14,7 +14,9 @@ if (webDb === true) {
             idle: 10000
         }
     }
-}else{
+}
+
+if(workstation.toLowerCase() == "localhost"){
     module.exports = {
         HOST: "localhost",
         USER: "root",
