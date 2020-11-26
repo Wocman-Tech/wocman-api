@@ -137,17 +137,19 @@ var pastDate= new Date(firstDay.getTime() - 7 * 24 * 60 * 60 * 1000).toLocaleStr
                             if (doneProject) {
                                 for (var i = 0; i < doneProject.length; i++) {
                                     var Rowid = Helpers.getJsondata(doneProject[i].dataValues, 'wocmanid');
-                                    dic1.push(Rowid);
+                                    dic1.indexOf(Rowid) === -1 ? dic1.push(Rowid):''
                                 }
                             }
+                            var c = dic.concat(dic2);
+                            var dicresult = c.filter((item, pos) => c.indexOf(item) === pos)
 
-                            dicresult = [];
+                            // dicresult = [];
 
-                            dicresult = dic.filter(function(item){
-                              if ( dic2.indexOf(item) !== -1 ) return item;
-                            });
+                            // dicresult = dic.filter(function(item){
+                            //   if ( dic2.indexOf(item) !== -1 ) return item;
+                            // });
 
-                            console.log(dicresult);
+                            // console.log(dicresult);
 
                             var todate = [];
                             var alldate = [];
