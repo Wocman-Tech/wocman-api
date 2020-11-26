@@ -6,11 +6,12 @@ const UserRole = db.userRole;
 const Role = db.role;
 const Cert = db.cert;
 const Helpers = require("../helpers/helper.js");
-
+const Joi = require('joi');
 
 verifyToken = (req, res, next) => {
     // console.log(req.headers.authorization);
     // let token = req.headers["x-access-token"];
+
     let token = req.headers.authorization;
     // console.log(token);
 
@@ -22,6 +23,24 @@ verifyToken = (req, res, next) => {
             data: []
         });
     }
+
+    const { headers, body, params } = req; 
+    const joyvalidateSchema = Joi.object().keys({ 
+        authorization: Joi.string().required().min(100)
+    }).options({ allowUnknown: true }) 
+    const joyresult = joyvalidateSchema.validate(headers);
+    const { value, error } = joyresult;
+    if (!(typeof error === 'undefined')) { 
+        var msg = Helpers.getJsondata(error, 'details')[0];
+        var msgs = Helpers.getJsondata(msg, 'message');
+        return res.status(422).json({
+            statusCode: 422,
+            status: false,
+            message: msgs,
+            data:[]
+        })
+    }
+
     token = token.replace('Bearer ', '');
 
     jwt.verify(token, config.secret, (err, decoded) => {

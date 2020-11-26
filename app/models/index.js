@@ -1,6 +1,8 @@
 const config = require("../config/db.config.js");
 
 const Sequelize = require("sequelize");
+var op = Sequelize.Op;
+
 const sequelize = new Sequelize(
     config.DB,
     config.USER,

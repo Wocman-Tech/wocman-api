@@ -5,6 +5,7 @@ const Role = db.role;
 const UserRole = db.userRole;
 const Cert = db.cert;
 const {v4 : uuidv4} = require('uuid');
+const joi = require('joi');
 
 const Op = db.Sequelize.Op;
 
@@ -122,6 +123,12 @@ filterFile = (req, file, cb) => {
     }
 };
 
+getJsondata = (stringValue, key) => {
+    var string = JSON.stringify(stringValue);
+    var objectValue = JSON.parse(string);
+    return objectValue[key];
+}
+
 const Helpers = {
   getRoleById: getRoleById,
   getRoleByName: getRoleByName,
@@ -137,7 +144,8 @@ const Helpers = {
   checkImageLink: checkImageLink,
   EMAIL: config.email,    
   PASSWORD: config.password, 
-  MAIN_URL: config.resolve+config.port
+  MAIN_URL: config.resolve+config.port,
+  getJsondata: getJsondata
 };
 
 module.exports = Helpers;

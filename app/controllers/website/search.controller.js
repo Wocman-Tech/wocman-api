@@ -28,7 +28,8 @@ const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
- 
+var async = require("async");
+
 let options = {
   provider: 'openstreetmap'
 };
@@ -54,6 +55,18 @@ let MailGenerator = new Mailgen({
 const Op = db.Sequelize.Op;
 
 exports.locationData = (req, res, next) => {
+//Get today's date using the JavaScript Date object.
+const newDate = new Date().toLocaleString('en-US', {
+  timeZone: 'Africa/Lagos'
+});
+const ourDate = new Date().toLocaleString('en-US', {
+  timeZone: 'Africa/Lagos'
+});
+var firstDay = new Date(newDate.split(',')[0]);
+var pastDate= new Date(firstDay.getTime() - 7 * 24 * 60 * 60 * 1000).toLocaleString('en-US', {
+  timeZone: 'Africa/Lagos'
+});
+
     var locationName =  req.params.location;
     if (typeof locationName === "undefined") {
         return res.status(400).send(
@@ -66,54 +79,160 @@ exports.locationData = (req, res, next) => {
         );
     }else{
 
+        const schemaJoiSearchLocation = Joi.object({
+            location: Joi.string()
+                .alphanum()
+                .min(3)
+                .max(100)
+                .required()
+        });
+
+        var joyresult = schemaJoiSearchLocation.validate({ location: req.params.location });
+        var { value, error } = joyresult;
+        if (!(typeof error === 'undefined')) { 
+            var msg = Helpers.getJsondata(error, 'details')[0];
+            var msgs = Helpers.getJsondata(msg, 'message');
+            return res.status(422).json({
+                statusCode: 422,
+                status: false,
+                message: msgs,
+                data: []
+            })
+        }
+
         let geoCoder = nodeGeocoder(options);geoCoder.geocode(locationName)
         .then((locationResult)=> {
-            User.findAndCountAll({
+
+            User.findAll({
+                attributes: ['id'],
                 where: {address: locationName}
             })
             .then(result => {
-                var isWocman = 0;
-                var isWocmanActive = 0;
+                const dic = [];
                 if (result) {
                     for (var i = 0; i < result.length; i++) {
-                        UserRole.findOne({
-                            where: {userid: result[i].id}
-                        }).then(wocmanrole => {
-                            if (wocmanrole && (wocmanrole.roleid == 2) ) {
-                                isWocman = isWocman + 1;
+                        var Rowid = Helpers.getJsondata(result[i].dataValues, 'id');
+                        dic.push(Rowid);
+                    }
+                    
+                    var dic2 = [];
+
+                    UserRole.findAll({
+                        attributes: ['userid'],
+                        where: {roleid: 2 }
+                    }).then(wocmanrole => {
+
+                        if (wocmanrole) {
+                            for (var i = 0; i < wocmanrole.length; i++) {
+                                var Rowid = Helpers.getJsondata(wocmanrole[i].dataValues, 'userid');
+                                dic2.push(Rowid);
                             }
-                        }).catch((err) => {
-                            //should not be checked
-                        });
-                        Projects.findAndCountAll({
-                            where: {wocmanid: result[i].id}
+                        }
+
+                        var dic1 = [];
+                        Projects.findAll({
+                            attributes: ['wocmanid'],
+                            where: {projectcomplete : 1}
                         }).then(doneProject => {
                             if (doneProject) {
-                                var singleComplete = 0;
                                 for (var i = 0; i < doneProject.length; i++) {
-                                    if (doneProject[i].projectcomplete == 1) {
-                                        singleComplete = 1;
+                                    var Rowid = Helpers.getJsondata(doneProject[i].dataValues, 'wocmanid');
+                                    dic1.push(Rowid);
+                                }
+                            }
+
+                            dicresult = [];
+
+                            dicresult = dic.filter(function(item){
+                              if ( dic2.indexOf(item) !== -1 ) return item;
+                            });
+
+                            console.log(dicresult);
+
+                            var todate = [];
+                            var alldate = [];
+                            UserRole.findAll({
+                                attributes: ['userid'],
+                                where: {
+                                    createdAt: {
+                                        [Op.between]: [pastDate, newDate]
+                                    },
+                                    roleid: 2
+                                }
+                            })
+                            .then(resultbydate => {
+                                if (resultbydate) {
+                                    for(var i = 0; i < resultbydate.length; i++) {
+                                        var Rowid = Helpers.getJsondata(resultbydate[i].dataValues, 'userid');
+                                        todate.push(Rowid);
                                     }
                                 }
-                                isWocmanActive = isWocmanActive +  singleComplete;
-                            }
-                        }).catch((err) => {
-                            //should not be checked
-                        });
-                    }
-                }
 
-                res.status(200).send({
-                    statusCode: 200,
-                    status: true,
-                    message: "Location mapped",
-                    data: {
-                        location: locationName,
-                        data: locationResult,
-                        wocman: isWocman,
-                        active: isWocmanActive
-                    }
-                });
+                              
+                                UserRole.findAll({
+                                    attributes: ['userid'],
+                                    where: {roleid: 2}
+                                })
+                                .then(userroleresult => {
+                                    if (userroleresult) {
+                                        for(var i = 0; i < userroleresult.length; i++) {
+                                            var Rowid = Helpers.getJsondata(userroleresult[i].dataValues, 'userid');
+                                            alldate.push(Rowid);
+                                        }
+                                    }
+
+                                    const weekratio = (todate.length/alldate.length) * 100; //1;
+                                    res.status(200).send({
+                                        statusCode: 200,
+                                        status: true,
+                                        message: "Location mapped",
+                                        data: {
+                                            location: locationName,
+                                            data: locationResult,
+                                            wocman: dicresult.length,
+                                            active: dic1.length,
+                                            weekly_percentage_increase: weekratio
+                                        }
+                                    })
+                                })
+                                .catch((err)=> {
+                                    res.status(500).send({
+                                        statusCode: 500,
+                                        status: false, 
+                                        message: err.message,
+                                        data: [] 
+                                    });
+                                });
+                               
+                            })
+                            .catch((err)=> {
+                                res.status(500).send({
+                                    statusCode: 500,
+                                    status: false, 
+                                    message: err.message,
+                                    data: [] 
+                                });
+                            });
+
+                        })
+                        .catch((err)=> {
+                            res.status(500).send({
+                                statusCode: 500,
+                                status: false, 
+                                message: err.message,
+                                data: [] 
+                            });
+                        });
+                    })
+                    .catch((err)=> {
+                        res.status(500).send({
+                            statusCode: 500,
+                            status: false, 
+                            message: err.message,
+                            data: [] 
+                        });
+                    });
+                } 
             })
             .catch((err)=> {
                 res.status(500).send({

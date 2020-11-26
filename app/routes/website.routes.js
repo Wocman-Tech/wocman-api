@@ -99,7 +99,7 @@ module.exports = function(app) {
     app.post(
         Helpers.apiVersion7()+"auth/wocman-signin",
         [
-            verifySignUp.checkRolesExisted
+            verifySignUp.isEmailVerify, verifySignUp.isPasswordVerify, verifySignUp.checkRolesExisted 
         ],
         signinController.signInWocman
     );

@@ -4,6 +4,101 @@ const UserRole = db.userRole;
 const Role = db.role;
 const Cert = db.cert;
 const Helpers = require("../helpers/helper.js");
+const Joi = require('joi');
+
+const schemaJoiEmail = Joi.object({
+    email: Joi.string()
+        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required()
+});
+const schemaJoiPassword = Joi.object({
+    password: Joi.string()
+        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required()
+
+});
+const schemaJoiUsername = Joi.object({
+    username: Joi.string()
+        .alphanum()
+        .min(3)
+        .max(30)
+        .required()
+});
+
+const schemaJoiMatchPassword = Joi.object({
+
+    password: Joi.string()
+        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
+
+    repeat_password: Joi.ref('password')
+});
+
+
+isEmailVerify = (req, res, next) => {
+    var joyresult = schemaJoiEmail.validate({ email: req.body.email });
+    var { value, error } = joyresult;
+    if (!(typeof error === 'undefined')) { 
+        var msg = Helpers.getJsondata(error, 'details')[0];
+        var msgs = Helpers.getJsondata(msg, 'message');
+        return res.status(422).json({
+            statusCode: 422,
+            status: false,
+            message: msgs,
+            data: []
+        })
+    }else{
+        next();
+    }
+};
+
+isUsernameVerify = (req, res, next) => {
+    var joyresult = schemaJoiUsername.validate({ username: req.body.username });
+    var { value, error } = joyresult;
+    if (!(typeof error === 'undefined')) { 
+         var msg = Helpers.getJsondata(error, 'details')[0];
+        var msgs = Helpers.getJsondata(msg, 'message');
+        return res.status(422).json({
+            statusCode: 422,
+            status: false,
+            message: msgs,
+            data: []
+        })
+    }else{
+        next();
+    }
+};
+
+isPasswordVerify = (req, res, next) => {
+    var joyresult = schemaJoiPassword.validate({ password: req.body.password});
+    var { value, error } = joyresult;
+    if (!(typeof error === 'undefined')) { 
+        var msg = Helpers.getJsondata(error, 'details')[0];
+        var msgs = Helpers.getJsondata(msg, 'message');
+        return res.status(422).json({
+            statusCode: 422,
+            status: false,
+            message: msgs,
+            data: []
+        })
+    }else{
+        next();
+    }
+};
+
+isPasswordConfirmed = (req, res, next) => {
+    var joyresult = schema.validate({ password: req.body.password, repeat_password: req.body.repeat_password });
+    var { value, error } = joyresult;
+    if (!(typeof error === 'undefined')) { 
+        var msg = Helpers.getJsondata(error, 'details')[0];
+        var msgs = Helpers.getJsondata(msg, 'message');
+        return res.status(422).json({
+            statusCode: 422,
+            status: false,
+            message: msgs,
+            data: []
+        })
+    }else{
+        next();
+    }
+};
 
 checkDuplicateUsernameOrEmail = (req, res, next) => {
     // Username
@@ -130,7 +225,11 @@ checkRolesExisted = (req, res, next) => {
 
 const verifySignUp = {
     checkDuplicateUsernameOrEmail: checkDuplicateUsernameOrEmail,
-    checkRolesExisted: checkRolesExisted
+    checkRolesExisted: checkRolesExisted,
+    isEmailVerify: isEmailVerify,
+    isUsernameVerify: isUsernameVerify,
+    isPasswordVerify: isPasswordVerify,
+    isPasswordConfirmed: isPasswordConfirmed
 };
 
 module.exports = verifySignUp;
