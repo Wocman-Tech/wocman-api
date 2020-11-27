@@ -119,17 +119,13 @@ var pastDate= new Date(firstDay.getTime() - 7 * 24 * 60 * 60 * 1000).toLocaleStr
                                     dic1.indexOf(Rowid) === -1 ? dic1.push(Rowid):''
                                 }
                             }
-                            var c = dic.concat(dic2);
-                            var dicresult = c.filter((item, pos) => c.indexOf(item) === pos)
-
-                            // dicresult = [];
-
-                            // dicresult = dic.filter(function(item){
-                            //   if ( dic2.indexOf(item) !== -1 ) return item;
-                            // });
-
-                            // console.log(dicresult);
-
+                            var merge  = 0;
+                            for (var i = 0; i < dic2.length; i++) {
+                                if(dic.includes(dic2[i]) === true){
+                                    merge = merge + 1;
+                                }
+                            }
+                            
                             var todate = [];
                             var alldate = [];
                             UserRole.findAll({
@@ -170,7 +166,7 @@ var pastDate= new Date(firstDay.getTime() - 7 * 24 * 60 * 60 * 1000).toLocaleStr
                                         data: {
                                             location: locationName,
                                             data: locationResult,
-                                            wocman: dicresult.length,
+                                            wocman: merge,
                                             active: dic1.length,
                                             weekly_percentage_increase: weekratio
                                         }
