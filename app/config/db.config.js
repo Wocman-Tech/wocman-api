@@ -2,10 +2,10 @@ const { workstation }  = require("./env.config");
 
 if (workstation.toLowerCase() == "web") {
     module.exports = {
-        HOST: "us-cdbr-east-02.cleardb.com",
-        USER: "bdddac9b8448ab",
-        PASSWORD: "f851bc55",
-        DB: "heroku_a9bd7ce27cad867",
+        HOST: "",
+        USER: "",
+        PASSWORD: "",
+        DB: "",
         dialect: "mysql",
         pool: {
             max: 5,
@@ -18,10 +18,10 @@ if (workstation.toLowerCase() == "web") {
 
 if(workstation.toLowerCase() == "localhost"){
     module.exports = {
-        HOST: "localhost",
-        USER: "root",
+        HOST: "",
+        USER: "",
         PASSWORD: "",
-        DB: "express_api_1",
+        DB: "",
         dialect: "mysql",
         pool: {
             max: 5,
