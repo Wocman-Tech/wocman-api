@@ -79,27 +79,6 @@ var pastDate= new Date(firstDay.getTime() - 7 * 24 * 60 * 60 * 1000).toLocaleStr
         );
     }else{
 
-        const schemaJoiSearchLocation = Joi.object({
-            location: Joi.string()
-                .alphanum()
-                .min(3)
-                .max(100)
-                .required()
-        });
-
-        var joyresult = schemaJoiSearchLocation.validate({ location: req.params.location });
-        var { value, error } = joyresult;
-        if (!(typeof error === 'undefined')) { 
-            var msg = Helpers.getJsondata(error, 'details')[0];
-            var msgs = Helpers.getJsondata(msg, 'message');
-            return res.status(422).json({
-                statusCode: 422,
-                status: false,
-                message: msgs,
-                data: []
-            })
-        }
-
         let geoCoder = nodeGeocoder(options);geoCoder.geocode(locationName)
         .then((locationResult)=> {
 

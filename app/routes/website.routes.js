@@ -1,5 +1,8 @@
 const { verifySignUp } = require("../middleware");
 
+const { contactUs, search, addNewsLetter } = require("../middleware/website");
+const { verifyWocmanSignUp, verifyWocmanSignIn, verifySignUpLink } = require("../middleware/website/user/wocman");
+
 const confirmpasswordresetController = require("../controllers/website/user/wocman/confirmpasswordresetemail.controller");
 const emailverifyController = require("../controllers/website/user/wocman/emailverify.controller");
 const resetpasswordController = require("../controllers/website/user/wocman/resetpassword.controller");
@@ -49,26 +52,26 @@ module.exports = function(app) {
 
     app.get(
         Helpers.apiVersion7() + "get-location/:location", 
-        [], 
+        [search.isSearchVerify], 
         searchController.locationData
     );
 
     app.post(
         Helpers.apiVersion7() + "subscribe-news-letters", 
-        [], 
+        [addNewsLetter.isEmailVerify], 
         addnewsletterController.subscribenewsletter
     );
 
     app.post(
         Helpers.apiVersion7() + "contact-us",
-        [], 
+        [contactUs.isEmailVerify, contactUs.isNameVerify, contactUs.isInquiryVerify, contactUs.isPhoneVerify, contactUs.isMessageVerify], 
         contactController.contactus
     );
 
 
     app.get(
         Helpers.apiVersion7()+"wocman-signup-verification/:link",
-        [],
+        [verifySignUpLink.isLinkVerify],
         emailverifyController.checkVerifyEmailLinkWocman
     );
 
@@ -91,9 +94,21 @@ module.exports = function(app) {
     );
 
     app.post(
+        Helpers.apiVersion7() + "auth/wocman-signup",
+        [
+            verifyWocmanSignUp.isEmailVerify, 
+            verifyWocmanSignUp.isPasswordVerify, 
+            verifyWocmanSignUp.isPasswordConfirmed,
+            verifyWocmanSignUp.isUsernameVerify, 
+            verifyWocmanSignUp.checkDuplicateUsernameOrEmail
+        ],
+        signupController.signUpWocman
+    );
+
+    app.post(
         Helpers.apiVersion7()+"auth/wocman-signin",
         [
-            verifySignUp.isEmailVerify, verifySignUp.isPasswordVerify, verifySignUp.checkRolesExisted 
+            verifyWocmanSignIn.isEmailVerify, verifyWocmanSignIn.isPasswordVerify, verifyWocmanSignIn.checkRole
         ],
         signinController.signInWocman
     );
@@ -101,14 +116,8 @@ module.exports = function(app) {
     app.post(
         Helpers.apiVersion7()+"auth/admin-signin",
         [
-            verifySignUp.isEmailVerify, verifySignUp.isPasswordVerify, verifySignUp.checkRolesExisted 
+            
         ],
         adminSigninController.signInWocman
-    );
-
-    app.post(
-        Helpers.apiVersion7() + "auth/wocman-signup",
-        [],
-        signupController.signUpWocman
     );
 };

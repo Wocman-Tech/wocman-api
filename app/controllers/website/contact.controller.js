@@ -112,9 +112,11 @@ exports.contactus = (req, res, next) => {
                             }
                         );
                     }else{
+
+
                         Contactus.create({
-                            name: emailAddress,
-                            email: name,
+                            name: name,
+                            email: emailAddress,
                             phone: phone,
                             enquiry: inquiry,
                             message: message
