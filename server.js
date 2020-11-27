@@ -21,8 +21,8 @@ const { resolve, port }  = require("./app/config/auth.config");
 
 
 var corsOptions = {
-    origin: "*"
-    // origin: resolve+port
+    origin: [resolve+port, "http://localhost:3000", "http://localhost:8081"],
+    default: resolve+port
 };
 
 app.use(cors(corsOptions));
