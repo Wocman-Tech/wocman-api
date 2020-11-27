@@ -32,8 +32,8 @@ isLinkVerify = (req, res, next) => {
     }
 };
 
-const verifySignUpLink = {
+const verifyChangePasswordEmail = {
     isLinkVerify: isLinkVerify
 };
 
-module.exports = verifySignUpLink;
+module.exports = verifyChangePasswordEmail;

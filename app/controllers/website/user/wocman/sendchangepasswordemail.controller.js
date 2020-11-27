@@ -83,18 +83,27 @@ exports.wocmanResetPassword = (req, res, next) => {
           where: Searchemail 
         })
         .then(dfg43 => {
-            if (dfg43) {
-                
+            if (!dfg43) {
+                return res.status(404).send(
+                {
+                    statusCode: 404,
+                    status: false,
+                    message: "Email does not  exist",
+                    data: []
+                });
+            }else{
+
                 dfg43.update({
                     changepassword: verify_email
                 })
                 .then(tht => {
+                    // console.log("yes");
                     //source:https://medium.com/javascript-in-plain-english/how-to-send-emails-with-node-js-1bb282f334fe
                     var verification_link = MAIN_URL.slice(0, -1)+Helpers.apiVersion7()+"wocman-password-reset/" + dfg43.changepassword;
                     let response = {
                         body: {
                           name: dfg43.username,
-                          intro: "You have requested that your passwordbe changed. If not you, kindly contact us from the contact us page. Click or Copy this link to any browser to procees with your request to change your password: "+verification_link,
+                          intro: "You have requested that your password be changed. If not you, kindly disregard this message. Click or Copy this link to any browser to procees with your request to change your password: "+verification_link,
                         },
                     };
 
@@ -112,10 +121,10 @@ exports.wocmanResetPassword = (req, res, next) => {
                         res.status(200).send({
                             statusCode: 200,
                             status: true,
-                            message: "User registered successfully!", 
+                            message: "Password Reset Request", 
                             data: {
                                 link: verification_link, 
-                                email : user.email, 
+                                email : dfg43.email, 
                                 role: 'wocman' 
                             }
                         });
@@ -137,14 +146,6 @@ exports.wocmanResetPassword = (req, res, next) => {
                         message: err.message,
                         data: [] 
                     });
-                });
-            }else{
-                return res.status(404).send(
-                {
-                    statusCode: 404,
-                    status: false,
-                    message: "Email does not  exist",
-                    data: []
                 });
             }
         })

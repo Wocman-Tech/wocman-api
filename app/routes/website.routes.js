@@ -1,7 +1,7 @@
 const { verifySignUp } = require("../middleware");
 
 const { contactUs, search, addNewsLetter } = require("../middleware/website");
-const { verifyWocmanSignUp, verifyWocmanSignIn, verifySignUpLink } = require("../middleware/website/user/wocman");
+const { verifyWocmanSignUp, verifyWocmanSignIn, verifySignUpLink, verifySendPasswordEmail , verifyChangePasswordEmail , verifyResetIn } = require("../middleware/website/user/wocman");
 
 const confirmpasswordresetController = require("../controllers/website/user/wocman/confirmpasswordresetemail.controller");
 const emailverifyController = require("../controllers/website/user/wocman/emailverify.controller");
@@ -77,19 +77,19 @@ module.exports = function(app) {
 
     app.post(
         Helpers.apiVersion7()+"password-reset-wocman",
-        [],
+        [verifySendPasswordEmail.isEmailVerify],
         sendchangepasswordController.wocmanResetPassword
     );
 
     app.get(
         Helpers.apiVersion7()+"wocman-password-reset/:link",
-        [],
+        [verifyChangePasswordEmail.isLinkVerify],
         confirmpasswordresetController.wocmanResetPasswordConfirm
     );
 
     app.post(
         Helpers.apiVersion7()+"wocman-password-reset",
-        [],
+        [verifyResetIn.isEmailVerify, verifyResetIn.isPasswordVerify],
         resetpasswordController.wocmanStartResetPassword
     );
 

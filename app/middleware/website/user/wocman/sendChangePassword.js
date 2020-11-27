@@ -8,15 +8,13 @@ const Helpers = require(baseUrl+"helpers/helper.js");
 const Joi = require('joi');
 
 
-const schemaJoiLink = Joi.object({
-    link: Joi.string()
-        .min(50)
-        .max(1000)
-        .required()
+const schemaJoiEmail = Joi.object({
+    email: Joi.string()
+        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required()
 });
 
-isLinkVerify = (req, res, next) => {
-    var joyresult = schemaJoiLink.validate({ link: req.params.link });
+isEmailVerify = (req, res, next) => {
+    var joyresult = schemaJoiEmail.validate({ email: req.body.email });
     var { value, error } = joyresult;
     if (!(typeof error === 'undefined')) { 
         var msg = Helpers.getJsondata(error, 'details')[0];
@@ -32,8 +30,8 @@ isLinkVerify = (req, res, next) => {
     }
 };
 
-const verifySignUpLink = {
-    isLinkVerify: isLinkVerify
+const sendChangePassword = {
+    isEmailVerify: isEmailVerify
 };
 
-module.exports = verifySignUpLink;
+module.exports = sendChangePassword;
