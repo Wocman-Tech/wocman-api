@@ -21,7 +21,8 @@ const { resolve, port }  = require("./app/config/auth.config");
 
 
 var corsOptions = {
-    origin: resolve+port
+    origin: "*"
+    // origin: resolve+port
 };
 
 app.use(cors(corsOptions));
