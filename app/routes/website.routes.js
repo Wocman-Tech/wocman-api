@@ -1,7 +1,15 @@
 const { verifySignUp } = require("../middleware");
 
 const { contactUs, search, addNewsLetter } = require("../middleware/website");
-const { verifyWocmanSignUp, verifyWocmanSignIn, verifySignUpLink, verifySendPasswordEmail , verifyChangePasswordEmail , verifyResetIn } = require("../middleware/website/user/wocman");
+const 
+    {   
+        verifyWocmanSignUp, 
+        verifyWocmanSignIn, 
+        verifySignUpLink, 
+        verifySendPasswordEmail, 
+        verifyChangePasswordEmail, 
+        verifyResetIn 
+    } = require("../middleware/website/user/wocman");
 
 const confirmpasswordresetController = require("../controllers/website/user/wocman/confirmpasswordresetemail.controller");
 const emailverifyController = require("../controllers/website/user/wocman/emailverify.controller");
@@ -64,7 +72,13 @@ module.exports = function(app) {
 
     app.post(
         Helpers.apiVersion7() + "contact-us",
-        [contactUs.isEmailVerify, contactUs.isNameVerify, contactUs.isInquiryVerify, contactUs.isPhoneVerify, contactUs.isMessageVerify], 
+        [
+            contactUs.isEmailVerify, 
+            contactUs.isNameVerify, 
+            contactUs.isInquiryVerify, 
+            contactUs.isPhoneVerify, 
+            contactUs.isMessageVerify
+        ], 
         contactController.contactus
     );
 
@@ -108,7 +122,9 @@ module.exports = function(app) {
     app.post(
         Helpers.apiVersion7()+"auth/wocman-signin",
         [
-            verifyWocmanSignIn.isEmailVerify, verifyWocmanSignIn.isPasswordVerify, verifyWocmanSignIn.checkRole
+            verifyWocmanSignIn.isEmailVerify, 
+            verifyWocmanSignIn.isPasswordVerify, 
+            verifyWocmanSignIn.checkRole
         ],
         signinController.signInWocman
     );

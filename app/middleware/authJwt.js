@@ -9,9 +9,6 @@ const Helpers = require("../helpers/helper.js");
 const Joi = require('joi');
 
 verifyToken = (req, res, next) => {
-    // console.log(req.headers.authorization);
-    // let token = req.headers["x-access-token"];
-
     let token = req.headers.authorization;
     // console.log(token);
 

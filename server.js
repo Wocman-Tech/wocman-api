@@ -21,7 +21,7 @@ const { resolve, port }  = require("./app/config/auth.config");
 
 
 var corsOptions = {
-    origin: [resolve+port, "http://localhost:3000", "http://localhost:8081"],
+    origin: [resolve+port, "http://localhost:3000", "http://localhost:8081", "https://wocman.netlify.app"],
     default: resolve+port
 };
 
