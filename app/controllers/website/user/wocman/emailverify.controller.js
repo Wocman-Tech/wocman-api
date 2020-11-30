@@ -46,7 +46,7 @@ let MailGenerator = new Mailgen({
   theme: "default",
   product: {
     name: config.name,
-    link: MAIN_URL,
+    link: config.website,
   },
 });
 
@@ -103,7 +103,7 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
             
             res.status(200).send({
                 statusCode: 200,
-                status: false,
+                status: true,
                 message: "Link available",
                 data: {
                     accessToken: token

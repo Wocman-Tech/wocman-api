@@ -1,4 +1,6 @@
 const baseUrl = "../../";
+const jwt = require("jsonwebtoken");
+const config = require(baseUrl+"config/auth.config.js");
 const db = require(baseUrl+"models");
 const User = db.user;
 const UserRole = db.userRole;
@@ -7,20 +9,19 @@ const Cert = db.cert;
 const Helpers = require(baseUrl+"helpers/helper.js");
 const Joi = require('joi');
 
-const schemaJoiSearchLocation = Joi.object({
-    location: Joi.string()
-        .alphanum()
-        .pattern(new RegExp('/^[ A-Za-z0-9_@./#&+-]*$/'))
-        .min(3)
-        .max(100)
+const schemaJoiId = Joi.object({
+    id: Joi.number()
+        .integer()
+        .min(1)
+        .max(1000)
         .required()
 });
 
-isSearchVerify = (req, res, next) => {
-    var joyresult = schemaJoiSearchLocation.validate({ location: req.params.location });
+isIdVerify = (req, res, next) => {
+    var joyresult = schemaJoiId.validate({ id: req.params.id });
     var { value, error } = joyresult;
     if (!(typeof error === 'undefined')) { 
-        var msg = Helpers.getJsondata(error, 'details')[0];
+         var msg = Helpers.getJsondata(error, 'details')[0];
         var msgs = Helpers.getJsondata(msg, 'message');
         return res.status(422).json({
             statusCode: 422,
@@ -31,10 +32,10 @@ isSearchVerify = (req, res, next) => {
     }else{
         next();
     }
-}
-   
-const search = {
-    isSearchVerify: isSearchVerify
 };
 
-module.exports = search;
+
+const VerifyId = {
+  isIdVerify: isIdVerify
+};
+module.exports = VerifyId;

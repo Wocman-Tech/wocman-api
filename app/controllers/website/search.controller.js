@@ -47,7 +47,7 @@ let MailGenerator = new Mailgen({
   theme: "default",
   product: {
     name: config.name,
-    link: MAIN_URL,
+    link: config.website,
   },
 });
 

@@ -17,11 +17,11 @@ const uuid = require('uuid');
 const fs = require('fs');
 var http = require('http').Server(app);
 var io = require("socket.io")(http);
-const { resolve, port }  = require("./app/config/auth.config");
+const { resolve, port, website }  = require("./app/config/auth.config");
 
 
 var corsOptions = {
-    origin: [resolve+port, "http://localhost:3000", "http://localhost:8081", "https://wocman.netlify.app"],
+    origin: [resolve+port, "http://localhost:3000", "http://localhost:8081", website ],
     default: resolve+port
 };
 
@@ -55,6 +55,7 @@ require('./app/routes/user.routes')(app);
 require('./app/routes/chat.routes')(app);
 require('./app/routes/website.routes')(app);
 require('./app/routes/project.routes')(app);
+require('./app/routes/adminuser.routes')(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
@@ -65,7 +66,7 @@ app.listen(PORT, () => {
 function initial() {
     Role.create({
         id: 1,
-        name: "customer"
+        name: "admin"
     });
  
     Role.create({
@@ -75,7 +76,7 @@ function initial() {
  
     Role.create({
         id: 3,
-        name: "admin"
+        name: "customer"
     });
 }
 

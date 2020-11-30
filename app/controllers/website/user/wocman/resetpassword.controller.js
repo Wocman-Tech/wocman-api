@@ -46,7 +46,7 @@ let MailGenerator = new Mailgen({
   theme: "default",
   product: {
     name: config.name,
-    link: MAIN_URL,
+    link: config.website,
   },
 });
 
@@ -138,8 +138,11 @@ exports.wocmanStartResetPassword = (req, res, next) => {
 
                 transporter.sendMail(message)
                 .then(() => {
+                    var sentMail = true;
                 })
                 .catch(err => {
+                    var sentMail = false;
+
                 });
                 
                 res.status(200).send({
@@ -151,7 +154,8 @@ exports.wocmanStartResetPassword = (req, res, next) => {
                         email: users.email,
                         password: users.password,
                         changepassword: users.changepassword,
-                        roles: authorities
+                        roles: authorities,
+                        sentMail: sentMail
                     }
                 });
             })

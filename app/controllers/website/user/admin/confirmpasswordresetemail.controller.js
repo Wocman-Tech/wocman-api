@@ -46,7 +46,7 @@ let MailGenerator = new Mailgen({
   theme: "default",
   product: {
     name: config.name,
-    link: MAIN_URL,
+    link: config.website,
   },
 });
 
@@ -109,7 +109,7 @@ exports.wocmanResetPasswordConfirm = (req, res, next) => {
 
             var authorities = [];
 
-            authorities.push("ROLE_" + "wocman".toUpperCase());
+            authorities.push("ROLE_" + "admin".toUpperCase());
             
             res.status(200).send({
                 statusCode: 200,

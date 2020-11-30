@@ -1,4 +1,4 @@
-const pathRoot = '../../../../';
+const pathRoot = '../../../../../';
 const db = require(pathRoot+"models");
 const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
@@ -46,78 +46,66 @@ let MailGenerator = new Mailgen({
   theme: "default",
   product: {
     name: config.name,
-    link: config.website,
+    link: MAIN_URL,
   },
 });
 
-
-const Op = db.Sequelize.Op;
-
-exports.checkVerifyEmailLinkWocman = (req, res) => {
-    var email_link =  req.params.link;
-
-    var whereQuery = {};
-
-    var SearchemailLink = {};
-    // console.log(email_link);
-    if (typeof email_link === "undefined") {
-        return res.status(400).send(
-            {
-                statusCode: 400,
+exports.oneWocman = (req, res, next) => {
+    var id = req.params.id;
+    UserRole.findOne({
+        where: {userid: id}
+    })
+    .then(resultRole => {
+        if (!resultRole) {
+            return res.status(404).send({
+                statusCode: 404,
                 status: false,
-                message: "Email link is undefined.",
+                message: "User Not Found",
                 data: []
-            }
-          );
-    }else{
-
-        if(email_link && email_link !== ''){
-            SearchemailLink = {'verify_email': email_link};
-        }else{
-            SearchemailLink = {'verify_email': {$not: null}};
+            });
         }
-        whereQuery = SearchemailLink;
-
+        if (!(resultRole.roleid == 2 )) {
+            return res.status(404).send({
+                statusCode: 404,
+                status: false,
+                message: "User Not a wocman",
+                data: []
+            });
+        }
         User.findOne({
-            where: whereQuery 
+            where: {id: id}
         })
-        .then(users => {
-            if (!users) {
-                return res.status(404).send(
-                {
+        .then(resultUser => {
+            if (!resultUser) {
+                 return res.status(404).send({
                     statusCode: 404,
                     status: false,
-                    message: "Email link does not exist.",
-                     data: []
+                    message: "User Not Found",
+                    data: []
                 });
-          
             }
-      
-            var token = jwt.sign({ id: users.id }, config.secret, {
-                expiresIn: 86400 // 24 hours
-            });
-
-            var authorities = [];
-
-            authorities.push("ROLE_" + "admin".toUpperCase());
-            
             res.status(200).send({
                 statusCode: 200,
                 status: true,
-                message: "Link available",
-                data: {
-                    accessToken: token
-                }
-                
-            });
+                message: "Wocman was found",
+                data: resultUser
+            }); 
         })
-        .catch(err => {
-            return  res.status(500).send({
+        .catch((err)=> {
+            res.status(500).send({
                 statusCode: 500,
                 status: false, 
                 message: err.message,
                 data: [] 
             });
-        }); 
-    }
+        });
+    })
+    .catch((err)=> {
+        res.status(500).send({
+            statusCode: 500,
+            status: false, 
+            message: err.message,
+            data: [] 
+        });
+    });
 };

@@ -1,6 +1,14 @@
 const { authJwt } = require("../middleware");
+const { isIdVerify } = require("../middleware/admin");
 
-const getSubscribersController = require("../controllers/users/admin/auth/newslettersubscribers.controller");
+const newsletterController = require("../controllers/users/admin/auth/newslettersubscribers.controller");
+const contactController = require("../controllers/users/admin/auth/contactus.controller");
+
+const adminAllAdminController = require("../controllers/users/admin/auth/admin/alladmin.controller");
+const adminOneAdminController = require("../controllers/users/admin/auth/admin/oneadmin.controller");
+
+const adminAllWocmanController = require("../controllers/users/admin/auth/wocman/allwocman.controller");
+const adminOneWocmanController = require("../controllers/users/admin/auth/wocman/onewocman.controller");
 
 const Helpers = require("../helpers/helper.js");
 
@@ -61,10 +69,51 @@ module.exports = function(app) {
     });
 
     //auth
+    app.get(
+        Helpers.apiVersion7() + "get-all-newsletterssubscribers", 
+        [authJwt.verifyToken, authJwt.isAdmin], 
+        newsletterController.AllNewsletter
+    );
 
     app.get(
-        Helpers.apiVersion7() + "get-news-letters-subscribers", 
+        Helpers.apiVersion7() + "get-one-newsletterssubscribers/:id", 
+        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify], 
+        newsletterController.oneNewsletter
+    );
+
+     app.get(
+        Helpers.apiVersion7() + "get-all-contactus", 
         [authJwt.verifyToken, authJwt.isAdmin], 
-        newsletterController.newsletter
+        contactController.allContacts
+    );
+
+    app.get(
+        Helpers.apiVersion7() + "get-one-contactus/:id", 
+        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify], 
+        contactController.oneContact
+    );
+
+    app.get(
+        Helpers.apiVersion7() + "get-all-wocman",
+        [authJwt.verifyToken, authJwt.isAdmin],
+        adminAllWocmanController.allWocman
+    );
+
+    app.get(
+        Helpers.apiVersion7() + "get-one-wocman/:id",
+        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify],
+        adminOneWocmanController.oneWocman
+    );
+
+    app.get(
+        Helpers.apiVersion7() + "get-all-admin",
+        [authJwt.verifyToken, authJwt.isAdmin],
+        adminAllAdminController.allAdmin
+    );
+
+    app.get(
+        Helpers.apiVersion7() + "get-one-admin/:id", 
+        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify],
+        adminOneAdminController.oneAdmin
     );
 };

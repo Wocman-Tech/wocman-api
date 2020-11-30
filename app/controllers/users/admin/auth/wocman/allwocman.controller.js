@@ -1,4 +1,4 @@
-const pathRoot = '../../../../';
+const pathRoot = '../../../../../';
 const db = require(pathRoot+"models");
 const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
@@ -46,78 +46,73 @@ let MailGenerator = new Mailgen({
   theme: "default",
   product: {
     name: config.name,
-    link: config.website,
+    link: MAIN_URL,
   },
 });
 
-
-const Op = db.Sequelize.Op;
-
-exports.checkVerifyEmailLinkWocman = (req, res) => {
-    var email_link =  req.params.link;
-
-    var whereQuery = {};
-
-    var SearchemailLink = {};
-    // console.log(email_link);
-    if (typeof email_link === "undefined") {
-        return res.status(400).send(
-            {
-                statusCode: 400,
+exports.allWocman = (req, res, next) => {
+    var userid = [];
+    var id = [];
+    UserRole.findAll({
+        where: {roleid: 2}
+    })
+    .then(resultRole => {
+        if (!resultRole) {
+            return res.status(401).send({
+                statusCode: 401,
                 status: false,
-                message: "Email link is undefined.",
+                message: "User role not found",
                 data: []
-            }
-          );
-    }else{
-
-        if(email_link && email_link !== ''){
-            SearchemailLink = {'verify_email': email_link};
-        }else{
-            SearchemailLink = {'verify_email': {$not: null}};
-        }
-        whereQuery = SearchemailLink;
-
-        User.findOne({
-            where: whereQuery 
-        })
-        .then(users => {
-            if (!users) {
-                return res.status(404).send(
-                {
-                    statusCode: 404,
-                    status: false,
-                    message: "Email link does not exist.",
-                     data: []
-                });
-          
-            }
-      
-            var token = jwt.sign({ id: users.id }, config.secret, {
-                expiresIn: 86400 // 24 hours
             });
+        }
+        for (var i = 0; i < resultRole.length; i++) {
+            userid.push(resultRole[i].userid);
+        }
+        User.findAll({
+            where: {verify_email: 1}
+        })
+        .then(resultUser => {
+            if (!resultUser) {
+                return res.status(401).send({
+                    statusCode: 401,
+                    status: false,
+                    message: "User not found",
+                    data: []
+                });
+            }
+            for (var i = 0; i < resultUser.length; i++) {
+                id.push(resultUser[i].id);
+            }
+            var pure = [];
+            for (var i = 0; i < id.length; i++) {
+                if(userid.includes(id[i]) === true){
+                    pure.push(id[i]);
+                }
+            }
 
-            var authorities = [];
-
-            authorities.push("ROLE_" + "admin".toUpperCase());
-            
+            var msg = "Found "+pure.length+ " Wocman";
             res.status(200).send({
                 statusCode: 200,
                 status: true,
-                message: "Link available",
-                data: {
-                    accessToken: token
-                }
-                
-            });
+                message: msg,
+                data: pure
+            }); 
         })
-        .catch(err => {
-            return  res.status(500).send({
+         .catch((err)=> {
+            res.status(500).send({
                 statusCode: 500,
                 status: false, 
                 message: err.message,
                 data: [] 
             });
-        }); 
-    }
+        });
+    })
+    .catch((err)=> {
+        res.status(500).send({
+            statusCode: 500,
+            status: false, 
+            message: err.message,
+            data: [] 
+        });
+    });
 };

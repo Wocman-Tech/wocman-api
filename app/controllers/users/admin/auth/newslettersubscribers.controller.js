@@ -46,11 +46,11 @@ let MailGenerator = new Mailgen({
   theme: "default",
   product: {
     name: config.name,
-    link: MAIN_URL,
+    link: config.website,
   },
 });
 
-exports.newslettersubscribers = (req, res, next) => {
+exports.AllNewsletter = (req, res, next) => {
     Nletter.findAndCountAll()
     .then(result => {
         res.status(200).send({
@@ -58,6 +58,27 @@ exports.newslettersubscribers = (req, res, next) => {
             status: true,
             message: "Found news letters",
             data: result.rows
+        });
+    })
+    .catch((err)=> {
+        res.status(500).send({
+            statusCode: 500,
+            status: false, 
+            message: err.message,
+            data: [] 
+        });
+    });
+};
+
+exports.oneNewsletter = (req, res, next) => {
+    var id =  req.params.id;
+    Nletter.findByPk(id)
+    .then(result => {
+        res.status(200).send({
+            statusCode: 200,
+            status: true,
+            message: "Found news letters",
+            data: result
         });
     })
     .catch((err)=> {

@@ -46,7 +46,7 @@ let MailGenerator = new Mailgen({
   theme: "default",
   product: {
     name: config.name,
-    link: MAIN_URL,
+    link: config.website,
   },
 });
 
@@ -103,7 +103,7 @@ exports.wocmanResetPassword = (req, res, next) => {
                     let response = {
                         body: {
                           name: dfg43.username,
-                          intro: "You have requested that your password be changed. If not you, kindly disregard this message. Click or Copy this link to any browser to procees with your request to change your password: "+verification_link,
+                          intro: "You have requested that your password be changed. If not you, kindly disregard this message. Click or Copy this link to any browser to proceed with your request to change your password: "+verification_link,
                         },
                     };
 

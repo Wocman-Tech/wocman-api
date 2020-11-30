@@ -46,7 +46,7 @@ let MailGenerator = new Mailgen({
   theme: "default",
   product: {
     name: config.name,
-    link: MAIN_URL,
+    link: config.website,
   },
 });
 
@@ -178,7 +178,7 @@ exports.signUpWocman = (req, res, next) => {
                                 let response = {
                                     body: {
                                       name: req.body.username,
-                                      intro: "Welcome to Wocman Technology! We're very excited to have you on board. Click or Copy this link to any browser to procees  your registration: "+verification_link,
+                                      intro: "Welcome to Wocman Technology! We're very excited to have you on board. Click or Copy this link to any browser to process your registration: "+verification_link,
                                     },
                                 };
 

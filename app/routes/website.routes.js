@@ -11,13 +11,30 @@ const
         verifyResetIn 
     } = require("../middleware/website/user/wocman");
 
+const 
+    {   
+        verifyAdminSignUp, 
+        verifyAdminSignIn, 
+        verifyAdminSignUpLink, 
+        verifyAdminSendPasswordEmail, 
+        verifyAdminChangePasswordEmail, 
+        verifyAdminResetIn 
+    } = require("../middleware/website/user/admin");
+
 const confirmpasswordresetController = require("../controllers/website/user/wocman/confirmpasswordresetemail.controller");
 const emailverifyController = require("../controllers/website/user/wocman/emailverify.controller");
 const resetpasswordController = require("../controllers/website/user/wocman/resetpassword.controller");
 const sendchangepasswordController = require("../controllers/website/user/wocman/sendchangepasswordemail.controller");
 const signinController = require("../controllers/website/user/wocman/signin.controller");
-const adminSigninController = require("../controllers/website/user/admin/signin.controller");
 const signupController = require("../controllers/website/user/wocman/signup.controller");
+
+
+const adminconfirmpasswordresetController = require("../controllers/website/user/admin/confirmpasswordresetemail.controller");
+const adminemailverifyController = require("../controllers/website/user/admin/emailverify.controller");
+const adminresetpasswordController = require("../controllers/website/user/admin/resetpassword.controller");
+const adminsendchangepasswordController = require("../controllers/website/user/admin/sendchangepasswordemail.controller");
+const adminsignupController = require("../controllers/website/user/admin/signup.controller");
+const adminSigninController = require("../controllers/website/user/admin/signin.controller");
 
 const addnewsletterController = require("../controllers/website/addnewsletter.controller");
 const contactController = require("../controllers/website/contact.controller");
@@ -81,7 +98,7 @@ module.exports = function(app) {
         ], 
         contactController.contactus
     );
-
+    //wocman
 
     app.get(
         Helpers.apiVersion7()+"wocman-signup-verification/:link",
@@ -128,11 +145,50 @@ module.exports = function(app) {
         ],
         signinController.signInWocman
     );
+    //admin
+
+    app.get(
+        Helpers.apiVersion7()+"admin-signup-verification/:link",
+        [verifyAdminSignUpLink.isLinkVerify],
+        adminemailverifyController.checkVerifyEmailLinkWocman
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"password-reset-admin",
+        [verifyAdminSendPasswordEmail.isEmailVerify],
+        adminsendchangepasswordController.wocmanResetPassword
+    );
+
+    app.get(
+        Helpers.apiVersion7()+"admin-password-reset/:link",
+        [verifyAdminChangePasswordEmail.isLinkVerify],
+        adminconfirmpasswordresetController.wocmanResetPasswordConfirm
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"admin-password-reset",
+        [verifyAdminResetIn.isEmailVerify, verifyAdminResetIn.isPasswordVerify],
+        adminresetpasswordController.wocmanStartResetPassword
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "auth/admin-signup",
+        [
+            verifyAdminSignUp.isEmailVerify, 
+            verifyAdminSignUp.isPasswordVerify, 
+            verifyAdminSignUp.isPasswordConfirmed,
+            verifyAdminSignUp.isUsernameVerify, 
+            verifyAdminSignUp.checkDuplicateUsernameOrEmail
+        ],
+        adminsignupController.signUpWocman
+    );
 
     app.post(
         Helpers.apiVersion7()+"auth/admin-signin",
         [
-            
+            verifyAdminSignIn.isEmailVerify, 
+            verifyAdminSignIn.isPasswordVerify, 
+            verifyAdminSignIn.checkRole
         ],
         adminSigninController.signInWocman
     );

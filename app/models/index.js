@@ -46,4 +46,5 @@ db.nletter = require("../models/nletter.model.js")(sequelize, Sequelize);
 
 db.contactus = require("../models/contactus.model.js")(sequelize, Sequelize);
 
+
 module.exports = db;

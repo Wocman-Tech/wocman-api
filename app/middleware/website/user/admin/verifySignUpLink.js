@@ -1,4 +1,4 @@
-const baseUrl = "../../";
+const baseUrl = "../../../../";
 const db = require(baseUrl+"models");
 const User = db.user;
 const UserRole = db.userRole;
@@ -7,17 +7,16 @@ const Cert = db.cert;
 const Helpers = require(baseUrl+"helpers/helper.js");
 const Joi = require('joi');
 
-const schemaJoiSearchLocation = Joi.object({
-    location: Joi.string()
-        .alphanum()
-        .pattern(new RegExp('/^[ A-Za-z0-9_@./#&+-]*$/'))
-        .min(3)
-        .max(100)
+
+const schemaJoiLink = Joi.object({
+    link: Joi.string()
+        .min(50)
+        .max(1000)
         .required()
 });
 
-isSearchVerify = (req, res, next) => {
-    var joyresult = schemaJoiSearchLocation.validate({ location: req.params.location });
+isLinkVerify = (req, res, next) => {
+    var joyresult = schemaJoiLink.validate({ link: req.params.link });
     var { value, error } = joyresult;
     if (!(typeof error === 'undefined')) { 
         var msg = Helpers.getJsondata(error, 'details')[0];
@@ -31,10 +30,10 @@ isSearchVerify = (req, res, next) => {
     }else{
         next();
     }
-}
-   
-const search = {
-    isSearchVerify: isSearchVerify
 };
 
-module.exports = search;
+const verifySignUpLink = {
+    isLinkVerify: isLinkVerify
+};
+
+module.exports = verifySignUpLink;
