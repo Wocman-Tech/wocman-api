@@ -107,8 +107,6 @@ exports.signUpWocman = (req, res, next) => {
 
                     var  SearchUsername = {};
                     var Searchemail = {};
-                    var whereQuery = {};
-                    var userId = {};
                     if(req.body.username && req.body.username !== ''){
                         SearchUsername = {'username': req.body.username};
                     }else{

@@ -69,7 +69,6 @@ exports.allAdmin = (req, res, next) => {
             userid.push(resultRole[i].userid);
         }
         User.findAll({
-            where: {verify_email: 1}
         })
         .then(resultUser => {
             if (!resultUser) {
