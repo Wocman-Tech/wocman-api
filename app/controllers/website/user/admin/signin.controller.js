@@ -128,13 +128,14 @@ exports.signInWocman = (req, res, next) => {
                     loginlogout:0,
                     weblogintoken:token
                 });
+
                 UserRole.findOne({
                     where: {userid: user.id}
                 })
                 .then(userrole => {
                     Role.findOne({
                         where: {id: userrole.roleid}
-                    }).then(role => {
+                    }).then(roles => {
 
                         var authorities = [];
                         authorities.push("ROLE_" + "admin".toUpperCase());
@@ -144,7 +145,7 @@ exports.signInWocman = (req, res, next) => {
                             message: "Login successful",
                             data: {
                                 accessToken: token,
-                                role: role.name
+                                role: roles.name
                             }
                         })
                         .catch(err => {
