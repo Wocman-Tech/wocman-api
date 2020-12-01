@@ -133,7 +133,7 @@ exports.signInWocman = (req, res, next) => {
                 })
                 .then(userrole => {
                     Role.findOne({
-                        id: userrole.roleid
+                        where: {id: userrole.roleid}
                     }).then(role => {
 
                         var authorities = [];
