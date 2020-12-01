@@ -52,19 +52,52 @@ let MailGenerator = new Mailgen({
 
 exports.deleteAdmin = (req, res, next) => {
     var ids = req.params.id;
-    UserRole.destroy({
+    UserRole.findOne({
         where: {userid: ids}
     })
-    .then(result => {
-        User.destroy({
-            where: {id: ids}
-        })
-        .then(result => {
-            res.status(200).send({
-                statusCode: 200,
-                status: true,
-                message: "Deleted Admin Profile",
-                data: []
+    .then(userrole => {
+        Role.findOne({
+            where: {id: userrole.roleid}
+        }).then(roles => {
+            if (!(roles.name == 'admin')) {
+                return res.status(400).send({
+                    statusCode: 400,
+                    status: false,
+                    message: "Not An Admin Profile",
+                    data: []
+                });
+            }
+            UserRole.destroy({
+                where: {userid: ids}
+            })
+            .then(result => {
+                User.destroy({
+                    where: {id: ids}
+                })
+                .then(result => {
+                    res.status(200).send({
+                        statusCode: 200,
+                        status: true,
+                        message: "Deleted Admin Profile",
+                        data: []
+                    });
+                })
+                .catch((err)=> {
+                    res.status(500).send({
+                        statusCode: 500,
+                        status: false, 
+                        message: err.message,
+                        data: [] 
+                    });
+                });
+            })
+            .catch((err)=> {
+                res.status(500).send({
+                    statusCode: 500,
+                    status: false, 
+                    message: err.message,
+                    data: [] 
+                });
             });
         })
         .catch((err)=> {
