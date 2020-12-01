@@ -153,16 +153,8 @@ exports.signUpWocman = (req, res, next) => {
                                 verify_email: verify_email
                             })
                             .then(user => {
-
-                                if(user.id && user.id !== ''){
-                                    userId = {'userid': user.id}
-                                }else{
-                                    userId = {'userid': {$not: null}};
-                                }
-                                whereQuery = userId;
-
                                 UserRole.findOne({
-                                    where: whereQuery
+                                    where: {userid: user.id}
                                 })
                                 .then(userrole => {
                                   if (!userrole) {
