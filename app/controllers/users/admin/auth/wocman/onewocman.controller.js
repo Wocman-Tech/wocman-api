@@ -51,16 +51,16 @@ let MailGenerator = new Mailgen({
 });
 
 exports.oneWocman = (req, res, next) => {
-    var id = req.params.id;
+    var idf = req.params.id;
     UserRole.findOne({
-        where: {userid: id}
+        where: {userid: idf}
     })
     .then(resultRole => {
         if (!resultRole) {
             return res.status(404).send({
                 statusCode: 404,
                 status: false,
-                message: "User Not Found",
+                message: "User role Not Found",
                 data: []
             });
         }
@@ -73,7 +73,7 @@ exports.oneWocman = (req, res, next) => {
             });
         }
         User.findOne({
-            where: {id: id}
+            where: {id: idf}
         })
         .then(resultUser => {
             if (!resultUser) {

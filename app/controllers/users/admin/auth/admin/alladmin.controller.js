@@ -51,13 +51,13 @@ let MailGenerator = new Mailgen({
 });
 
 exports.allAdmin = (req, res, next) => {
-    var useridData = [];
+    var userid = [];
     var id = [];
     UserRole.findAll({
         where: {roleid: 1}
     })
     .then(resultRole => {
-        if (!resultRole) {
+       if (!resultRole) {
             return res.status(401).send({
                 statusCode: 401,
                 status: false,
@@ -66,7 +66,7 @@ exports.allAdmin = (req, res, next) => {
             });
         }
         for (var i = 0; i < resultRole.length; i++) {
-            useridData.push(resultRole[i].userid);
+            userid.push(resultRole[i].userid);
         }
         User.findAll({
             where: {verify_email: 1}
