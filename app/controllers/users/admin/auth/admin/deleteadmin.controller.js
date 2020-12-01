@@ -1,4 +1,4 @@
-const pathRoot = '../../../../';
+const pathRoot = '../../../../../';
 const db = require(pathRoot+"models");
 const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
@@ -46,62 +46,34 @@ let MailGenerator = new Mailgen({
   theme: "default",
   product: {
     name: config.name,
-    link: config.website,
+    link: MAIN_URL,
   },
 });
 
-exports.AllNewsletter = (req, res, next) => {
-    Nletter.findAndCountAll()
-    .then(result => {
-        res.status(200).send({
-            statusCode: 200,
-            status: true,
-            message: "Found news letters",
-            data: result.rows
-        });
-    })
-    .catch((err)=> {
-        res.status(500).send({
-            statusCode: 500,
-            status: false, 
-            message: err.message,
-            data: [] 
-        });
-    });
-};
-
-exports.oneNewsletter = (req, res, next) => {
-    var id =  req.params.id;
-    Nletter.findByPk(id)
-    .then(result => {
-        res.status(200).send({
-            statusCode: 200,
-            status: true,
-            message: "Found news letters",
-            data: result
-        });
-    })
-    .catch((err)=> {
-        res.status(500).send({
-            statusCode: 500,
-            status: false, 
-            message: err.message,
-            data: [] 
-        });
-    });
-};
-
-exports.deleteNewsletter = (req, res, next) => {
+exports.deleteAdmin = (req, res, next) => {
     var ids = req.param.id;
-    Nletter.destroy({
-        where: {id: ids}
+    UserRole.destroy({
+        where: {userid: ids}
     })
     .then(result => {
-        res.status(200).send({
-            statusCode: 200,
-            status: true,
-            message: "Deleted news letters",
-            data: []
+        User.destroy({
+            where: {id: ids}
+        })
+        .then(result => {
+            res.status(200).send({
+                statusCode: 200,
+                status: true,
+                message: "Deleted Admin Profile",
+                data: []
+            });
+        })
+        .catch((err)=> {
+            res.status(500).send({
+                statusCode: 500,
+                status: false, 
+                message: err.message,
+                data: [] 
+            });
         });
     })
     .catch((err)=> {

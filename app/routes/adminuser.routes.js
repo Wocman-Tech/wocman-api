@@ -6,9 +6,11 @@ const contactController = require("../controllers/users/admin/auth/contactus.con
 
 const adminAllAdminController = require("../controllers/users/admin/auth/admin/alladmin.controller");
 const adminOneAdminController = require("../controllers/users/admin/auth/admin/oneadmin.controller");
+const adminDeleteOneAdminController = require("../controllers/users/admin/auth/admin/deleteadmin.controller");
 
 const adminAllWocmanController = require("../controllers/users/admin/auth/wocman/allwocman.controller");
 const adminOneWocmanController = require("../controllers/users/admin/auth/wocman/onewocman.controller");
+const adminDeleteOneWocmanController = require("../controllers/users/admin/auth/wocman/deletewocman.controller");
 
 const Helpers = require("../helpers/helper.js");
 
@@ -81,7 +83,13 @@ module.exports = function(app) {
         newsletterController.oneNewsletter
     );
 
-     app.get(
+    app.get(
+        Helpers.apiVersion7() + "delete-one-newsletterssubscribers/:id", 
+        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify], 
+        newsletterController.deleteNewsletter
+    );
+
+    app.get(
         Helpers.apiVersion7() + "get-all-contactus", 
         [authJwt.verifyToken, authJwt.isAdmin], 
         contactController.allContacts
@@ -91,6 +99,12 @@ module.exports = function(app) {
         Helpers.apiVersion7() + "get-one-contactus/:id", 
         [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify], 
         contactController.oneContact
+    );
+
+    app.get(
+        Helpers.apiVersion7() + "delete-one-contactus/:id", 
+        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify], 
+        contactController.deleteContact
     );
 
     app.get(
@@ -106,6 +120,12 @@ module.exports = function(app) {
     );
 
     app.get(
+        Helpers.apiVersion7() + "delete-one-wocman/:id",
+        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify],
+        adminDeleteOneWocmanController.deleteWocman
+    );
+
+    app.get(
         Helpers.apiVersion7() + "get-all-admin",
         [authJwt.verifyToken, authJwt.isAdmin],
         adminAllAdminController.allAdmin
@@ -115,5 +135,11 @@ module.exports = function(app) {
         Helpers.apiVersion7() + "get-one-admin/:id", 
         [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify],
         adminOneAdminController.oneAdmin
+    );
+
+    app.get(
+        Helpers.apiVersion7() + "delete-one-admin/:id", 
+        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify],
+        adminDeleteOneAdminController.deleteAdmin
     );
 };

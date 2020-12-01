@@ -90,3 +90,26 @@ exports.oneContact = (req, res, next) => {
         });
     });
 };
+
+exports.deleteContact = (req, res, next) => {
+    var ids = req.param.id;
+    Contactus.destroy({
+        where: {id: ids}
+    })
+    .then(result => {
+        res.status(200).send({
+            statusCode: 200,
+            status: true,
+            message: "Deleted Contact Us Message",
+            data: []
+        });
+    })
+    .catch((err)=> {
+        res.status(500).send({
+            statusCode: 500,
+            status: false, 
+            message: err.message,
+            data: [] 
+        });
+    });
+};
