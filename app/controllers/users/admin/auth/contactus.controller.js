@@ -92,7 +92,7 @@ exports.oneContact = (req, res, next) => {
 };
 
 exports.deleteContact = (req, res, next) => {
-    var ids = req.param.id;
+    var ids = req.params.id;
     Contactus.destroy({
         where: {id: ids}
     })

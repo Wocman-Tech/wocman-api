@@ -51,7 +51,7 @@ let MailGenerator = new Mailgen({
 });
 
 exports.deleteAdmin = (req, res, next) => {
-    var ids = req.param.id;
+    var ids = req.params.id;
     UserRole.destroy({
         where: {userid: ids}
     })

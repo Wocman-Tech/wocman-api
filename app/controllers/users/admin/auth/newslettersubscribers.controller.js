@@ -92,7 +92,7 @@ exports.oneNewsletter = (req, res, next) => {
 };
 
 exports.deleteNewsletter = (req, res, next) => {
-    var ids = req.param.id;
+    var ids = req.params.id;
     Nletter.destroy({
         where: {id: ids}
     })
