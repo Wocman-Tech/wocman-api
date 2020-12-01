@@ -51,10 +51,10 @@ app.get("/", (req, res) => {
 });
 
 // routes
-require('./app/routes/user.routes')(app);
+require('./app/routes/wocmanuser.routes')(app);
 require('./app/routes/chat.routes')(app);
 require('./app/routes/website.routes')(app);
-require('./app/routes/project.routes')(app);
+require('./app/routes/wocmanproject.routes')(app);
 require('./app/routes/adminuser.routes')(app);
 
 // set port, listen for requests

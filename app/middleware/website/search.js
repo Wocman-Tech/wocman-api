@@ -9,8 +9,6 @@ const Joi = require('joi');
 
 const schemaJoiSearchLocation = Joi.object({
     location: Joi.string()
-        .alphanum()
-        .pattern(new RegExp('/^[ A-Za-z0-9_@./#&+-]*$/'))
         .min(3)
         .max(100)
         .required()
