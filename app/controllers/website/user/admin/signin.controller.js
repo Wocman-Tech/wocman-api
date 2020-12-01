@@ -128,17 +128,42 @@ exports.signInWocman = (req, res, next) => {
                     loginlogout:0,
                     weblogintoken:token
                 });
+                UserRole.findOne({
+                    where: {userid: user.id}
+                })
+                .then(userrole => {
+                    Role.findOne({
+                        id: userrole.roleid
+                    }).then(role => {
 
-                var authorities = [];
-                authorities.push("ROLE_" + "admin".toUpperCase());
-                res.status(200).send({
-                    statusCode: 200,
-                    status: true,
-                    message: "Login successful",
-                    data: {
-                        accessToken: token
-                    }
-                    
+                        var authorities = [];
+                        authorities.push("ROLE_" + "admin".toUpperCase());
+                        res.status(200).send({
+                            statusCode: 200,
+                            status: true,
+                            message: "Login successful",
+                            data: {
+                                accessToken: token,
+                                role: role.name
+                            }
+                        })
+                        .catch(err => {
+                            res.status(500).send({
+                                statusCode: 500,
+                                status: false, 
+                                message: err.message,
+                                data: [] 
+                            });
+                        });
+                    })
+                    .catch(err => {
+                        res.status(500).send({
+                            statusCode: 500,
+                            status: false, 
+                            message: err.message,
+                            data: [] 
+                        });
+                    });
                 });
             })
             .catch(err => {
