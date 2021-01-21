@@ -17,6 +17,10 @@ const uuid = require('uuid');
 const fs = require('fs');
 var http = require('http').Server(app);
 var io = require("socket.io")(http);
+
+const passport = require('passport');
+const cookieSession = require('cookie-session');
+
 const { resolve, port, website }  = require("./app/config/auth.config");
 
 
@@ -32,6 +36,17 @@ app.use(bodyParser.json());
 
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
+
+
+// session variables
+app.use(cookieSession({
+    name: 'tuto-session',
+    keys: ['key1', 'key2']
+}))
+
+// Initializes passport and passport sessions
+app.use(passport.initialize());
+app.use(passport.session());
 
 // database
 const db = require("./app/models");

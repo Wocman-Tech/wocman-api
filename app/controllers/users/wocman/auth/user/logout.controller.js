@@ -65,6 +65,7 @@ exports.wocmanLogout = (req, res, next) => {
           });
           return;
         }
+        req.session = null;
         user.update({
             loginlogout:1,
             weblogintoken:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImlhdCI6MTYwNDYyOTY3NSwiZXhwIjoxNjA0NzE2MDc1fQ.w9OuLfh-BohX7stJGQyuvXsaKViDMLzqhYwMNaq_0fs'

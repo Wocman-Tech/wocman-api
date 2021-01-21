@@ -1,3 +1,3 @@
 module.exports = {
-    workstation: "localhost"//web or localhost
+    workstation: "web"//web or localhost
 }

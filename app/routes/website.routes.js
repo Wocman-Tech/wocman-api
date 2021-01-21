@@ -1,4 +1,10 @@
 const { verifySignUp } = require("../middleware");
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const cookieSession = require('cookie-session');
+require("../config/passportgoogle.config.js");
+
+
 
 const { contactUs, search, addNewsLetter } = require("../middleware/website");
 const 
@@ -21,11 +27,14 @@ const
         verifyAdminResetIn 
     } = require("../middleware/website/user/admin");
 
+
+
 const confirmpasswordresetController = require("../controllers/website/user/wocman/confirmpasswordresetemail.controller");
 const emailverifyController = require("../controllers/website/user/wocman/emailverify.controller");
 const resetpasswordController = require("../controllers/website/user/wocman/resetpassword.controller");
 const sendchangepasswordController = require("../controllers/website/user/wocman/sendchangepasswordemail.controller");
 const signinController = require("../controllers/website/user/wocman/signin.controller");
+const signinPassportGoogleController = require("../controllers/website/user/wocman/passportgoogleauth.controller");
 const signupController = require("../controllers/website/user/wocman/signup.controller");
 
 
@@ -41,6 +50,9 @@ const contactController = require("../controllers/website/contact.controller");
 const searchController = require("../controllers/website/search.controller");
 
 const Helpers = require("../helpers/helper.js");
+const { EMAIL, PASSWORD, MAIN_URL } = require("../helpers/helper.js");
+
+const failUrl =  Helpers.apiVersion7()+"google-auth/wocman-signin-failed"
 
 const path = require("path");
 const multer = require("multer");
@@ -145,6 +157,33 @@ module.exports = function(app) {
         ],
         signinController.signInWocman
     );
+
+    app.get(
+        Helpers.apiVersion7()+'google-auth/wocman-signin',
+        passport.authenticate('google',
+            { scope: ['profile', 'email'] }
+        )
+    );
+
+    // localhost:8080/api/v1/google-auth/wocman-signin
+    app.get(
+        Helpers.apiVersion7()+'google-auth/wocman-signin-callback',
+        passport.authenticate('google', { failureRedirect: failUrl } ),
+        function(req, res) {
+            res.redirect(Helpers.apiVersion7()+"google-auth/wocman-signin-proceed");
+        }
+    );
+
+    app.get(
+        Helpers.apiVersion7()+"google-auth/wocman-signin-failed",
+        signinPassportGoogleController.failedSignIn
+    );
+
+    app.get(
+        Helpers.apiVersion7()+"google-auth/wocman-signin-proceed",
+        signinPassportGoogleController.proceedSignIn
+    );
+
     //admin
 
     app.get(
