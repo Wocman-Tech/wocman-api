@@ -45,7 +45,7 @@ const adminsendchangepasswordController = require("../controllers/website/user/a
 const adminsignupController = require("../controllers/website/user/admin/signup.controller");
 const adminSigninController = require("../controllers/website/user/admin/signin.controller");
 
-const addnewsletterController = require("../controllers/website/addnewsletter.controller");
+const newsletterController = require("../controllers/website/addnewsletter.controller");
 const contactController = require("../controllers/website/contact.controller");
 const searchController = require("../controllers/website/search.controller");
 
@@ -86,7 +86,7 @@ module.exports = function(app) {
         );
         next();
     });
-
+    //Website Endpoints
     app.get(
         Helpers.apiVersion7() + "get-location/:location", 
         [search.isSearchVerify], 
@@ -94,9 +94,9 @@ module.exports = function(app) {
     );
 
     app.post(
-        Helpers.apiVersion7() + "subscribe-news-letters", 
-        [addNewsLetter.isEmailVerify], 
-        addnewsletterController.subscribenewsletter
+        Helpers.apiVersion7() + "subscribe-news-letters",
+        [addNewsLetter.isEmailVerify],
+        newsletterController.subscribenewsletter
     );
 
     app.post(
@@ -110,31 +110,13 @@ module.exports = function(app) {
         ], 
         contactController.contactus
     );
-    //wocman
 
-    app.get(
-        Helpers.apiVersion7()+"wocman-signup-verification/:link",
-        [verifySignUpLink.isLinkVerify],
-        emailverifyController.checkVerifyEmailLinkWocman
-    );
+    //wocman Website Endpoints
 
-    app.post(
-        Helpers.apiVersion7()+"password-reset-wocman",
-        [verifySendPasswordEmail.isEmailVerify],
-        sendchangepasswordController.wocmanResetPassword
-    );
 
-    app.get(
-        Helpers.apiVersion7()+"wocman-password-reset/:link",
-        [verifyChangePasswordEmail.isLinkVerify],
-        confirmpasswordresetController.wocmanResetPasswordConfirm
-    );
-
-    app.post(
-        Helpers.apiVersion7()+"wocman-password-reset",
-        [verifyResetIn.isEmailVerify, verifyResetIn.isPasswordVerify],
-        resetpasswordController.wocmanStartResetPassword
-    );
+    //a wocman user wants to register,
+    //they would hit this endpoint once they submit their data(email, username and password) for registration.
+    //this sends an email to them with a registration verification link
 
     app.post(
         Helpers.apiVersion7() + "auth/wocman-signup",
@@ -148,6 +130,22 @@ module.exports = function(app) {
         signupController.signUpWocman
     );
 
+    //a wocman user signs up, an email is sent to him/her, once they click on the link in the email,
+    //they would hit this endpoint which returns an access token(prove of temporary login)
+    //then they should be sent to profile completion page if access token returned is not null
+    //the profile completion endpiont(complete-profile-wocman) is in the wocmanuser.routes.js routes 
+
+    app.get(
+        Helpers.apiVersion7()+"wocman-signup-verification/:link",
+        [verifySignUpLink.isLinkVerify],
+        emailverifyController.checkVerifyEmailLinkWocman
+    );
+
+    //a wocman user signs up, wants to login,
+    //they would hit this endpoint once to submit login form which returns an access token(prove of temporary login)
+    //then they should be sent to dashboard page if access token returned is not null
+    //immediatelly they are sent to dashboard, you call the dashboard endpoint to retrieve all the wocman data(very complex array of profile info, wallet info, job info and settings info)
+    //the dashboard endpoint(profile-wocman) is in the wocmanuser.routes.js routes 
     app.post(
         Helpers.apiVersion7()+"auth/wocman-signin",
         [
@@ -157,7 +155,9 @@ module.exports = function(app) {
         ],
         signinController.signInWocman
     );
-
+    //a wocman user signs up, wants to login using google,
+    //they would hit this endpoint once to login with google button
+    //they would be sent to google plattform
     app.get(
         Helpers.apiVersion7()+'google-auth/wocman-signin',
         passport.authenticate('google',
@@ -165,7 +165,9 @@ module.exports = function(app) {
         )
     );
 
-    // localhost:8080/api/v1/google-auth/wocman-signin
+    
+    //google would redirect them to hit this endpoint once the user login credential with google is true
+    //they would be sent to google-auth/wocman-signin-proceed endpoint
     app.get(
         Helpers.apiVersion7()+'google-auth/wocman-signin-callback',
         passport.authenticate('google', { failureRedirect: failUrl } ),
@@ -179,12 +181,42 @@ module.exports = function(app) {
         signinPassportGoogleController.failedSignIn
     );
 
+    //this servers as auth/wocman-signin endpoint
+    //then they should be sent to dashboard page if access token returned is not null
+    //immediatelly they are sent to dashboard, you call the dashboard endpoint to retrieve all the wocman data(very complex array of profile info, wallet info, job info and settings info)
+    //the dashboard endpoint(profile-wocman) is in the wocmanuser.routes.js routes 
     app.get(
         Helpers.apiVersion7()+"google-auth/wocman-signin-proceed",
         signinPassportGoogleController.proceedSignIn
     );
 
-    //admin
+    //a wocman user forgot his/her password,
+    //they would hit this endpoint to start password reset process.
+    //this sends an email to them with a password recovery link
+    app.post(
+        Helpers.apiVersion7()+"password-reset-wocman",
+        [verifySendPasswordEmail.isEmailVerify],
+        sendchangepasswordController.wocmanResetPassword
+    );
+
+    //a wocman user requested to reset password,
+    //they would hit this endpoint once they click on the link in the recover password email sent to them.
+    //this would verify the email is valid and actually requested to reset password
+    app.get(
+        Helpers.apiVersion7()+"wocman-password-reset/:link",
+        [verifyChangePasswordEmail.isLinkVerify],
+        confirmpasswordresetController.wocmanResetPasswordConfirm
+    );
+    //a wocman user clicks the link in reset password email and got confired,
+    //they would hit this endpoint once they submit the new password details.
+    //this would reset their password for them
+    app.post(
+        Helpers.apiVersion7()+"wocman-password-reset",
+        [verifyResetIn.isEmailVerify, verifyResetIn.isPasswordVerify],
+        resetpasswordController.wocmanStartResetPassword
+    );
+
+    //admin Website Endpoints
 
     app.get(
         Helpers.apiVersion7()+"admin-signup-verification/:link",

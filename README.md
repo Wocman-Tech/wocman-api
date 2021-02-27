@@ -16,7 +16,15 @@ https://wocman-node-api-8080.herokuapp.com/
 
 ### Offline API Resolve
 ```
-http://localhost:8080/
+http://localhost:8081/
+
+or
+
+http://localhost:3000/
+
+or
+
+https://wocman.netlify.app
 ```
 
 
@@ -25,12 +33,14 @@ http://localhost:8080/
 ### Offline API Settings
 ```
 
-1.  Open config folder
+1.  Open app folder
 
-2.  In env.config.js file Set 
+2.  Open config folder
+
+3.  In env.config.js file and Set 
 ```
 workstation : "localhost"
 ```
 
-3.  You may Modify the local db credentials to suite your need in db.config.js file inside the config folder
+4.  You may Modify the local db credentials to suite your need in db.config.js file inside the config folder inside the app folder
 ```
