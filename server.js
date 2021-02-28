@@ -69,6 +69,7 @@ app.get("/", (req, res) => {
 require('./app/routes/wocmanuser.routes')(app);
 require('./app/routes/chat.routes')(app);
 require('./app/routes/website.routes')(app);
+require('./app/routes/wocmandashboard.routes')(app);
 require('./app/routes/wocmanproject.routes')(app);
 require('./app/routes/adminuser.routes')(app);
 

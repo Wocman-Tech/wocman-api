@@ -136,7 +136,8 @@ exports.signInWocman = (req, res, next) => {
                     status: true,
                     message: "Login successful",
                     data: {
-                        accessToken: token
+                        accessToken: token,
+                        unboard: user.unboard
                     }
                     
                 });

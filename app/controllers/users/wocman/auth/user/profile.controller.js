@@ -16,6 +16,9 @@ const Wshear = db.wshear;
 const WAChat = db.waChat;
 const WCChat = db.wcChat;
 const WWallet = db.wWallet;
+const wWalletH = db.wWalletH;
+const Wrate = db.wrate;
+const WNotice = db.wNotice;
 
 const Helpers = require(pathRoot+"helpers/helper.js");
 const { verifySignUp } = require(pathRoot+"middleware");
@@ -83,6 +86,47 @@ exports.wocmanProfile = (req, res, next) => {
                 Searchuserid = {'userid': {$not: null}};
                 Searchwocmanid = {'wocmanid': {$not: null}};
             }
+            var rateUser = 0;
+            var rateUserCount = 0;
+            Wrate.findAll({
+                where: Searchuserid
+            })
+            .then(wrate => {
+                if (!wrate) {}else{
+
+                    for (let i = 0; i < wrate.length; i++) {
+                        rateUserCount = rateUserCount + 1;
+                        rateUser = rateUser + parseInt(wrate[i].rateUser, 10);
+                    }
+                }
+            });
+            if (rateUser > 0 && rateUserCount > 0) {
+                rateUserWocman = rateUser/rateUserCount;
+            }else{
+                rateUserWocman = 0;
+            }
+
+            var notice = [];
+            
+            WNotice.findAll({
+                where: Searchuserid
+            })
+            .then(wnotice => {
+                if (!wnotice) {}else{
+
+                    for (let i = 0; i < wnotice.length; i++) {
+                        if (parseInt(wnotice[i].seen, 10) == 0) {
+                            notice.push(
+                                {
+                                    notice: wnotice[i].notice, 
+                                    type: wnotice[i].type,
+                                    date: wnotice[i].date
+                                }
+                            );
+                        }
+                    }
+                }
+            });
 
             var profilePictures = [];
             var otherImages = [];
@@ -196,7 +240,12 @@ exports.wocmanProfile = (req, res, next) => {
                                 balance: parseInt(wwallet.amount, 10), 
                                 witdrawal: parseInt(wwallet.totalwitdralamount, 10), 
                                 totalIncome: (parseInt(wwallet.amount, 10) + parseInt(wwallet.totalwitdralamount, 10)),
-                                lastWitdrawal: parseInt(wwallet.currentwitdralamount, 10)
+                                lastWitdrawal: parseInt(wwallet.currentwitdralamount, 10),
+                                walletId: wwallet.walletid,
+                                accountType: wwallet.accType,
+                                bankName: wwallet.bankName,
+                                accountNumber: wwallet.accNumber,
+                                accountName: wwallet.accName
                             }
                         );
                     }
@@ -422,7 +471,10 @@ exports.wocmanProfile = (req, res, next) => {
                                     Certificates: certificates,
                                     Projects: wprojects,
                                     Wallet: wallet,
-                                    AccessToken: req.token
+                                    Notice: notice,
+                                    AccessToken: req.token,
+                                    Unboard: users.unboard,
+                                    Rate: rateUserWocman
                                 }
                             });
                         })

@@ -28,6 +28,11 @@ module.exports = (sequelize, Sequelize) => {
             defaultValue: null,
             allowNull: true
         },
+        unboard: {
+            type: Sequelize.STRING,
+            defaultValue: null,
+            allowNull: true
+        },
         address: {
             type: Sequelize.STRING,
             defaultValue: null,

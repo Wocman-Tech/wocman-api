@@ -124,6 +124,4 @@ module.exports = function(app) {
         [authJwt.verifyToken, authJwt.isWocman], 
         removecertificateController.wocmanRemoveCertificate
     );
-
-
 };

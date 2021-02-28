@@ -80,7 +80,6 @@ exports.proceedSignIn = (req, res, next) => {
 
         User.findOne({
             where: searchemail
-            
         })
         .then(user => {
             if (!user) {
@@ -109,7 +108,8 @@ exports.proceedSignIn = (req, res, next) => {
                 status: true,
                 message: "Login successful",
                 data: {
-                    accessToken: token
+                    accessToken: token,
+                    unboard: user.unboard
                 }
                 
             });

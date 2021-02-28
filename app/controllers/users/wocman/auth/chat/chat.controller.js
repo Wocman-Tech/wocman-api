@@ -1,5 +1,7 @@
-const db = require("../../../../models");
-const config = require("../../../../config/auth.config");
+const pathRoot = '../../../../../';
+
+const db = require(pathRoot+"models");
+const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
 const User = db.user;
 const Role = db.role;
@@ -17,8 +19,8 @@ const WCChat = db.wcChat;
 const WWallet = db.wWallet;
 
 const {v4 : uuidv4} = require('uuid');
-const Helpers = require("../../../../helpers/helper.js");
-const { verifySignUp } = require("../../../../middleware");
+const Helpers = require(pathRoot+"helpers/helper.js");
+const { verifySignUp } = require(pathRoot+"middleware");
 
 let nodeGeocoder = require('node-geocoder');
  
@@ -31,7 +33,7 @@ const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
 const Joi = require('joi'); 
 
-const { EMAIL, PASSWORD, MAIN_URL } = require("../../../../helpers/helper.js");
+const { EMAIL, PASSWORD, MAIN_URL } = require(pathRoot+"helpers/helper.js");
 
 let transporter = nodemailer.createTransport({
   service: config.message_server,

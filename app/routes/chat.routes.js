@@ -1,6 +1,6 @@
 const { authJwt } = require("../middleware");
 
-const wocmanAuthChatController = require("../controllers/users/wocman/auth/chat.controller");
+const wocmanAuthChatController = require("../controllers/users/wocman/auth/chat/chat.controller");
 
 const Helpers = require("../helpers/helper.js");
 

@@ -67,12 +67,13 @@ exports.wocmanStartResetPassword = (req, res, next) => {
             }
         );
     }
-    if (password_link.length < 7 ) {
+    var linkMin = 7;
+    if (password_link.length < linkMin ) {
         return res.status(400).send(
             {
                 statusCode: 400,
                 status: false,
-                message: "Invalid password. Minimum of 9 characters link is undefined." ,
+                message: "Invalid password. Minimum of "+ linkMin +" characters link is required." ,
                 data: []
             }
         );
@@ -123,7 +124,7 @@ exports.wocmanStartResetPassword = (req, res, next) => {
                 let response = {
                     body: {
                       name: users.username,
-                      intro: "Welcome to Wocman Technology! We're very excited to have you on board. Thank you for completing your signup. Click or Copy this link to any browser to login: "+verification_link,
+                      intro: "Welcome to Wocman Technology! We're very excited to have you on board. Thank you for completing your signup. Click or Copy this link below to any browser to login: "+verification_link,
                     },
                 };
 
@@ -132,7 +133,7 @@ exports.wocmanStartResetPassword = (req, res, next) => {
                 let message = {
                     from: EMAIL,
                     to:  users.email,
-                    subject: "Sign-up successful",
+                    subject: "Reset Password successful",
                     html: mail,
                 };
 
@@ -142,13 +143,12 @@ exports.wocmanStartResetPassword = (req, res, next) => {
                 })
                 .catch(err => {
                     var sentMail = false;
-
                 });
                 
                 res.status(200).send({
                     statusCode: 200,
                     status: true,
-                    message: "Password Reset successfully",
+                    message: "Password Reset successful",
                     data: {
                         username: users.username,
                         email: users.email,
