@@ -89,7 +89,6 @@ exports.walletDetails = (req, res, next) => {
                             witdrawal: parseInt(wwallet.totalwitdralamount, 10), 
                             totalIncome: (parseInt(wwallet.amount, 10) + parseInt(wwallet.totalwitdralamount, 10)),
                             lastWitdrawal: parseInt(wwallet.currentwitdralamount, 10),
-                            walletId: wwallet.walletid,
                             accountType: wwallet.accType,
                             bankName: wwallet.bankName,
                             accountNumber: wwallet.accNumber,
