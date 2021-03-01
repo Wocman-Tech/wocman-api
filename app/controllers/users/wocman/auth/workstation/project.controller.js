@@ -66,13 +66,15 @@ exports.wocmanProjectProject = (req, res, next) => {
             }
         );
     }else{
+        //schema
         const joiClean = Joi.object().keys({ 
             projectid: Joi.number().integer().min(1), 
         }); 
         const dataToValidate = { 
           projectid: projectid 
-        } 
-        const result = Joi.validate(dataToValidate, joiClean);
+        }
+        // const result = Joi.validate(dataToValidate, joiClean);
+        const result = joiClean.validate(dataToValidate);
         if (result.error == null) {
             User.findByPk(req.userId).then(user => {
                 if (!user) {
@@ -94,6 +96,14 @@ exports.wocmanProjectProject = (req, res, next) => {
                       });
                       return;
                     }
+                    if (parseInt(project.wocmanid, 10) !== parseInt(req.userId, 10)) {
+                        return res.status(404).send({
+                            statusCode: 404,
+                            status: false,
+                            Project: "Project  Owner not resolved",
+                            data: []
+                        });
+                    }
 
                     Project.findByPk(project.projectid).then(projecttype => {
                         if (!projecttype) {
@@ -105,12 +115,10 @@ exports.wocmanProjectProject = (req, res, next) => {
                           });
                           return;
                         }
-                    })
-                    .then(() => {
                         res.send({
                             accessToken: req.token,
-                            project_type_name: projecttype.name,
-                            project_type_description: projecttype.description
+                            project: project,
+                            project_type: projecttype
                         });
                     })
                     .catch(err => {

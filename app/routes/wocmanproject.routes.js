@@ -1,12 +1,12 @@
 const { authJwt } = require("../middleware");
 
-const acceptController = require("../controllers/users/wocman/auth/project/accept.controller");
-const completeController = require("../controllers/users/wocman/auth/project/complete.controller");
-const customerController = require("../controllers/users/wocman/auth/project/customer.controller");
-const projectController = require("../controllers/users/wocman/auth/project/project.controller");
-const rejectController = require("../controllers/users/wocman/auth/project/reject.controller");
-const startController = require("../controllers/users/wocman/auth/project/start.controller");
-const stopController = require("../controllers/users/wocman/auth/project/stop.controller");
+const acceptController = require("../controllers/users/wocman/auth/workstation/accept.controller");
+const completeController = require("../controllers/users/wocman/auth/workstation/complete.controller");
+const customerController = require("../controllers/users/wocman/auth/workstation/customer.controller");
+const projectController = require("../controllers/users/wocman/auth/workstation/project.controller");
+const rejectController = require("../controllers/users/wocman/auth/workstation/reject.controller");
+const startController = require("../controllers/users/wocman/auth/workstation/start.controller");
+const stopController = require("../controllers/users/wocman/auth/workstation/stop.controller");
 
 
 const Helpers = require("../helpers/helper.js");
@@ -45,6 +45,19 @@ module.exports = function(app) {
     });
 
     //project routes
+
+    app.post(
+        Helpers.apiVersion7() + "wocman-project", 
+        [authJwt.verifyToken, authJwt.isWocman], 
+        projectController.wocmanProjectProject
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "wocman-project-customer", 
+        [authJwt.verifyToken, authJwt.isWocman], 
+        customerController.wocmanProjectCustomer
+    );
+
     app.post(
         Helpers.apiVersion7() + "wocman-accept-project", 
         [authJwt.verifyToken, authJwt.isWocman], 
@@ -69,15 +82,5 @@ module.exports = function(app) {
         Helpers.apiVersion7() + "wocman-complete-project", 
         [authJwt.verifyToken, authJwt.isWocman], 
         completeController.wocmanCompleteProject
-    );
-    app.post(
-        Helpers.apiVersion7() + "wocman-project-customer", 
-        [authJwt.verifyToken, authJwt.isWocman], 
-        customerController.wocmanProjectCustomer
-    );
-    app.post(
-        Helpers.apiVersion7() + "wocman-project-type", 
-        [authJwt.verifyToken, authJwt.isWocman], 
-        projectController.wocmanProjectProject
     );
 };

@@ -1,14 +1,14 @@
 const { authJwt } = require("../middleware");
 
-const addcertificateController = require("../controllers/users/wocman/auth/user/addcertificate.controller");
-const changepasswordController = require("../controllers/users/wocman/auth/user/changepassword.controller");
-const completeController = require("../controllers/users/wocman/auth/user/complete.controller");
-const logoutController = require("../controllers/users/wocman/auth/user/logout.controller");
-const profileController = require("../controllers/users/wocman/auth/user/profile.controller");
-const removecertificateController = require("../controllers/users/wocman/auth/user/removecertificate.controller");
-const reusepictureController = require("../controllers/users/wocman/auth/user/reusepicture.controller");
-const updateprofileController = require("../controllers/users/wocman/auth/user/updateprofile.controller");
-const profilepictureController = require("../controllers/users/wocman/auth/user/profilepicture.controller");
+const addcertificateController = require("../controllers/users/wocman/auth/profile/addcertificate.controller");
+const changepasswordController = require("../controllers/users/wocman/auth/profile/changepassword.controller");
+const completeController = require("../controllers/users/wocman/auth/profile/complete.controller");
+const logoutController = require("../controllers/users/wocman/auth/profile/logout.controller");
+const profileController = require("../controllers/users/wocman/auth/profile/profile.controller");
+const removecertificateController = require("../controllers/users/wocman/auth/profile/removecertificate.controller");
+const reusepictureController = require("../controllers/users/wocman/auth/profile/reusepicture.controller");
+const updateprofileController = require("../controllers/users/wocman/auth/profile/updateprofile.controller");
+const profilepictureController = require("../controllers/users/wocman/auth/profile/profilepicture.controller");
 
 const Helpers = require("../helpers/helper.js");
 

@@ -67,13 +67,15 @@ exports.wocmanProjectCustomer = (req, res, next) => {
         );
     }else{
 
-      const joiClean = Joi.object().keys({ 
+        //schema
+        const joiClean = Joi.object().keys({ 
             projectid: Joi.number().integer().min(1), 
         }); 
         const dataToValidate = { 
           projectid: projectid 
-        } 
-        const result = Joi.validate(dataToValidate, joiClean);
+        }
+        // const result = Joi.validate(dataToValidate, joiClean);
+        const result = joiClean.validate(dataToValidate);
         if (result.error == null) {
         
             User.findByPk(req.userId).then(user => {
@@ -96,6 +98,14 @@ exports.wocmanProjectCustomer = (req, res, next) => {
                       });
                       return;
                     }
+                    if (parseInt(project.wocmanid, 10) !== parseInt(req.userId, 10)) {
+                        return res.status(404).send({
+                            statusCode: 404,
+                            status: false,
+                            Project: "Project  Owner not resolved",
+                            data: []
+                        });
+                    }
 
                     User.findByPk(project.customerid).then(customeruser => {
                     if (!customeruser) {
@@ -107,8 +117,6 @@ exports.wocmanProjectCustomer = (req, res, next) => {
                       });
                       return;
                     }
-                    })
-                    .then(() => {
                         res.status(200).send({
                             statusCode: 200,
                             status: true,
@@ -118,6 +126,8 @@ exports.wocmanProjectCustomer = (req, res, next) => {
                                 custmer_username: customeruser.username,
                                 custmer_firstname: customeruser.firstname,
                                 custmer_lastname: customeruser.lastname,
+                                custmer_phone: customeruser.phone,
+                                custmer_email: customeruser.email,
                                 custmer_address: customeruser.address,
                                 custmer_country: customeruser.country
                             }

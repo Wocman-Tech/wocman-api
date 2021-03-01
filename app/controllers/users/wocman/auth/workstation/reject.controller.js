@@ -53,63 +53,69 @@ let MailGenerator = new Mailgen({
 
 const Op = db.Sequelize.Op;
 
-exports.wocmanAcceptProject = (req, res, next) => {
+exports.wocmanRejectProject = (req, res, next) => {
     // Username
     var projectid =  req.body.projectid;
     
+   
     if (typeof projectid === "undefined") {
         return res.status(400).send(
             {
                 statusCode: 400,
-                status: false, 
+                status: false,
                 message: "project  is undefined.",
                 data: []
             }
         );
     }else{
+
+        //schema
         const joiClean = Joi.object().keys({ 
             projectid: Joi.number().integer().min(1), 
         }); 
         const dataToValidate = { 
           projectid: projectid 
-        } 
-        const result = Joi.validate(dataToValidate, joiClean);
+        }
+        // const result = Joi.validate(dataToValidate, joiClean);
+        const result = joiClean.validate(dataToValidate);
         if (result.error == null) {
         
             User.findByPk(req.userId).then(user => {
                 if (!user) {
                   res.status(404).send({
-                     statusCode: 404,
-                        status: false,
-                        message: "User Not Found",
-                        data: []
+                    statusCode: 404,
+                    status: false,
+                    message: "User Not Found",
+                    data: []
                   });
+                  return;
                 }
                 Projects.findByPk(projectid).then(project => {
                     if (!project) {
                       res.status(404).send({
-                            statusCode: 404,
-                            status: false,
-                            message: "Project Not Found",
-                            data: []
+                         statusCode: 404,
+                        status: false,
+                        message: "Project Not Found",
+                        data: []
                       });
+                      return;
                     }
                     if (parseInt(project.wocmanid, 10) !== parseInt(req.userId, 10)) {
                         res.status(404).send({
                              statusCode: 404,
                             status: false,
-                            message: "Project Not Owner not resolved",
+                            message: "Project Owner not resolved",
                             data: []
                           });
                           return;
                     }else{
                         project.update({
-                            wocmanaccept:2
+                            wocmanaccept:1
                         }).then(() => {
                             res.status(200).send({
                                 statusCode: 200,
                                 status: true,
-                                message: "Project Accepted",
+                                message: "Project Rejected",
                                 data: {
                                     accessToken: req.token
                                 }
@@ -135,7 +141,7 @@ exports.wocmanAcceptProject = (req, res, next) => {
                 });
             })
             .catch(err => {
-                res.status(500).send({ 
+                res.status(500).send({
                     statusCode: 500,
                     status: false, 
                     message: err.message,

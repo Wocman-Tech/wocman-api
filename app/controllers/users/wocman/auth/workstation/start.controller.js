@@ -69,13 +69,15 @@ exports.wocmanStartProject = (req, res, next) => {
             }
         );
     }else{
+        //schema
         const joiClean = Joi.object().keys({ 
             projectid: Joi.number().integer().min(1), 
         }); 
         const dataToValidate = { 
           projectid: projectid 
-        } 
-        const result = Joi.validate(dataToValidate, joiClean);
+        }
+        // const result = Joi.validate(dataToValidate, joiClean);
+        const result = joiClean.validate(dataToValidate);
         if (result.error == null) {
        
             User.findByPk(req.userId).then(user => {
@@ -102,7 +104,7 @@ exports.wocmanStartProject = (req, res, next) => {
                         res.status(404).send({
                             statusCode: 404,
                             status: false,
-                            message: "Project Not Owner not resolved",
+                            message: "Project Owner not resolved",
                             data: []
                           });
                           return;

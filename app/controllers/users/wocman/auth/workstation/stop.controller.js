@@ -69,57 +69,77 @@ exports.wocmanStopProject = (req, res, next) => {
             }
         );
     }else{
+
+        //schema
+        const joiClean = Joi.object().keys({ 
+            projectid: Joi.number().integer().min(1), 
+        }); 
+        const dataToValidate = { 
+          projectid: projectid 
+        }
+        // const result = Joi.validate(dataToValidate, joiClean);
+        const result = joiClean.validate(dataToValidate);
+        if (result.error == null) {
         
-        User.findByPk(req.userId).then(user => {
-            if (!user) {
-              res.status(404).send({
-                 statusCode: 404,
-                status: false,
-                message: "User Not Found",
-                data: []
-              });
-              return;
-            }
-            Projects.findByPk(projectid).then(project => {
-                if (!project) {
+            User.findByPk(req.userId).then(user => {
+                if (!user) {
                   res.status(404).send({
                      statusCode: 404,
                     status: false,
-                    message: "Project Not Found",
+                    message: "User Not Found",
                     data: []
                   });
                   return;
                 }
-                if (parseInt(project.wocmanid, 10) !== parseInt(req.userId, 10)) {
-                    res.status(404).send({
+                Projects.findByPk(projectid).then(project => {
+                    if (!project) {
+                      res.status(404).send({
                          statusCode: 404,
                         status: false,
-                        message: "Project Not Owner not resolved",
+                        message: "Project Not Found",
                         data: []
                       });
                       return;
-                }else{
-                    project.update({
-                        wocmanstopdatetime: projectstarttime.toString()
-                    }).then(() => {
-                        res.status(200).send({
-                            statusCode: 200,
-                            status: true,
-                            message: "Project stopped",
-                            data: {
-                                accessToken: req.token
-                            }
+                    }
+                    if (parseInt(project.wocmanid, 10) !== parseInt(req.userId, 10)) {
+                        res.status(404).send({
+                             statusCode: 404,
+                            status: false,
+                            message: "Project Owner not resolved",
+                            data: []
+                          });
+                          return;
+                    }else{
+                        project.update({
+                            wocmanstopdatetime: projectstarttime.toString()
+                        }).then(() => {
+                            res.status(200).send({
+                                statusCode: 200,
+                                status: true,
+                                message: "Project stopped",
+                                data: {
+                                    accessToken: req.token
+                                }
+                            });
+                        })
+                        .catch(err => {
+                            res.status(500).send({
+                                statusCode: 500,
+                                status: false, 
+                                message: err.message,
+                                data: [] 
+                            });
                         });
-                    })
-                    .catch(err => {
-                        res.status(500).send({
-                            statusCode: 500,
-                            status: false, 
-                            message: err.message,
-                            data: [] 
-                        });
+                    }
+                })
+                .catch(err => {
+                    res.status(500).send({
+                        statusCode: 500,
+                        status: false, 
+                        message: err.message,
+                        data: [] 
                     });
-                }
+                });
             })
             .catch(err => {
                 res.status(500).send({
@@ -129,14 +149,6 @@ exports.wocmanStopProject = (req, res, next) => {
                     data: [] 
                 });
             });
-        })
-        .catch(err => {
-            res.status(500).send({
-                statusCode: 500,
-                status: false, 
-                message: err.message,
-                data: [] 
-            });
-        });
+        }
     }
 };
