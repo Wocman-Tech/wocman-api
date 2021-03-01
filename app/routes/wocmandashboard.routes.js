@@ -52,4 +52,14 @@ module.exports = function(app) {
         [authJwt.verifyToken, authJwt.isWocman],
         schedule.schedule
     );
+    app.post(
+        Helpers.apiVersion7()+"dashboard-project-type",
+        [authJwt.verifyToken, authJwt.isWocman],
+        schedule.producttype
+    );
+    app.post(
+        Helpers.apiVersion7()+"dashboard-project-customer",
+        [authJwt.verifyToken, authJwt.isWocman],
+        schedule.projectCustomer
+    );
 };

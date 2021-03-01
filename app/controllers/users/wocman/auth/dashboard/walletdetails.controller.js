@@ -70,42 +70,38 @@ exports.walletDetails = (req, res, next) => {
             }
             if(req.userId && req.userId !== ''){
                 Searchuserid = {'userid': req.userId};
-                Searchwocmanid = {'wocmanid': req.userId};
             }else{
                 Searchuserid = {'userid': {$not: null}};
-                Searchwocmanid = {'wocmanid': {$not: null}};
             }
 
-            var wallet = [];
 
             WWallet.findAll({
                 where: Searchuserid
             })
             .then(wwallet => {
-                if (!wwallet) {}else{
-                    wallet.push(
-                        {
-                            balance: parseInt(wwallet.amount, 10), 
-                            witdrawal: parseInt(wwallet.totalwitdralamount, 10), 
-                            totalIncome: (parseInt(wwallet.amount, 10) + parseInt(wwallet.totalwitdralamount, 10)),
-                            lastWitdrawal: parseInt(wwallet.currentwitdralamount, 10),
-                            accountType: wwallet.accType,
-                            bankName: wwallet.bankName,
-                            accountNumber: wwallet.accNumber,
-                            accountName: wwallet.accName
+                if (!wwallet) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "Wocman Wallet Not Found",
+                        data: {
+                            AccessToken: req.token,
+                            Unboard: users.unboard
                         }
-                    );
+                    });
+                }else{
+                    
+                    res.status(200).send({
+                        statusCode: 200,
+                        status: true,
+                        message: "Found a wocmna user",
+                        data: {
+                            Wallet: wwallet,
+                            AccessToken: req.token,
+                            Unboard: users.unboard
+                        }
+                    });
                 }
-                res.status(200).send({
-                    statusCode: 200,
-                    status: true,
-                    message: "Found a wocmna user",
-                    data: {
-                        Wallet: wallet,
-                        AccessToken: req.token,
-                        Unboard: users.unboard
-                    }
-                });
             })
             .catch(err => {
                 res.status(500).send({

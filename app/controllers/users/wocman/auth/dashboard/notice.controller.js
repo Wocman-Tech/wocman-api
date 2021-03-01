@@ -83,7 +83,17 @@ exports.notice = (req, res, next) => {
                 where: Searchuserid
             })
             .then(wnotice => {
-                if (!wnotice) {}else{
+                if (!wnotice) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "Wocman Notice Not Found",
+                        data: {
+                            AccessToken: req.token,
+                            Unboard: users.unboard
+                        }
+                    });
+                }else{
 
                     for (let i = 0; i < wnotice.length; i++) {
                         if (parseInt(wnotice[i].seen, 10) == 0) {

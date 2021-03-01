@@ -83,7 +83,17 @@ exports.completedProjects = (req, res, next) => {
             .then(projects => {
                 var  acceptedProjects = 0;
                 var  allProjects = 0;
-                if (!projects) {}else{
+                if (!projects) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "Wocman Project Not Found",
+                        data: {
+                            AccessToken: req.token,
+                            Unboard: users.unboard
+                        }
+                    });
+                }else{
 
                     for (let i = 0; i < projects.length; i++) {
                         allProjects = allProjects + 1;

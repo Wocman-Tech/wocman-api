@@ -81,7 +81,17 @@ exports.workDone = (req, res, next) => {
             })
             .then(projects => {
                 var workDone = 0;
-                if (!projects) {}else{
+                if (!projects) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "Wocman Project Not Found",
+                        data: {
+                            AccessToken: req.token,
+                            Unboard: users.unboard
+                        }
+                    });
+                }else{
                     for (let i = 0; i < projects.length; i++) {
                         if (parseInt(projects[i].wocmanaccept, 10) == 5) {
                             workDone = workDone + 1;
