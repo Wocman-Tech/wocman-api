@@ -106,7 +106,7 @@ exports.walletDetails = (req, res, next) => {
                 WWalletH.findAll({
                     where: {
                         userid: req.userId,
-                        createdAt: {
+                        wallethistorydate: {
                             [Op.like]: '%'+month+'%'
                         }
                     }
