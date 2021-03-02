@@ -6,6 +6,8 @@
 ### API DOCs
 ```
 https://documenter.getostman.com/view/10053626/TWDcGv7U
+&&
+https://documenter.getpostman.com/view/10053626/TWDfCt1m
 ```
 
 ### API Resolve
