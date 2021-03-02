@@ -100,10 +100,10 @@ exports.walletDetails = (req, res, next) => {
                
                 WWalletH.findAll({
                     where: {
-                        userid: req.userId
-                        // wallethistorydate: {
-                        //     [Op.like]: '%'+month+'%'
-                        // }
+                        userid: req.userId,
+                        wallethistorydate: {
+                            [Op.like]: '%'+month+'%'
+                        }
                     }
                 })
                 .then(wwallet => {
@@ -126,8 +126,7 @@ exports.walletDetails = (req, res, next) => {
                             data: {
                                 History: wwallet,
                                 AccessToken: req.token,
-                                Unboard: users.unboard,
-                                month: month
+                                Unboard: users.unboard
                             }
                         });
                     }
