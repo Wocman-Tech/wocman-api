@@ -7,6 +7,7 @@ const projectController = require("../controllers/users/wocman/auth/workstation/
 const rejectController = require("../controllers/users/wocman/auth/workstation/reject.controller");
 const startController = require("../controllers/users/wocman/auth/workstation/start.controller");
 const stopController = require("../controllers/users/wocman/auth/workstation/stop.controller");
+const chatController = require("../controllers/users/wocman/auth/workstation/chat.controller");
 
 
 const Helpers = require("../helpers/helper.js");
@@ -56,6 +57,17 @@ module.exports = function(app) {
         Helpers.apiVersion7() + "wocman-project-customer", 
         [authJwt.verifyToken, authJwt.isWocman], 
         customerController.wocmanProjectCustomer
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "wocman-project-customer-chat-log", 
+        [authJwt.verifyToken, authJwt.isWocman], 
+        chatController.chatLog
+    );
+    app.post(
+        Helpers.apiVersion7() + "wocman-project-customer-chat-save", 
+        [authJwt.verifyToken, authJwt.isWocman], 
+        chatController.chatSave
     );
 
     app.post(

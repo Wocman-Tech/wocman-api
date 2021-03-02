@@ -1,6 +1,9 @@
 const { authJwt } = require("../middleware");
 
-const wocmanAuthChatController = require("../controllers/users/wocman/auth/chat/chat.controller");
+const wallet = require("../controllers/users/wocman/auth/wallet/walletdetails.controller");
+const walletMHhistory = require("../controllers/users/wocman/auth/wallet/walletchartbymonth.controller");
+const walletHistory = require("../controllers/users/wocman/auth/wallet/wallethistory.controller");
+
 
 const Helpers = require("../helpers/helper.js");
 
@@ -37,11 +40,23 @@ module.exports = function(app) {
         next();
     });
 
-    //chat end points
+    //project routes
 
     app.post(
-        Helpers.apiVersion7() + "wocman-customer-chat", 
+        Helpers.apiVersion7() + "wocman-wallet", 
         [authJwt.verifyToken, authJwt.isWocman], 
-        wocmanAuthChatController.wocmanChatProjectCustomer
+        wallet.walletDetails
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "wocman-month-history", 
+        [authJwt.verifyToken, authJwt.isWocman], 
+        walletMHhistory.walletDetails
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "wocman-history",
+        [authJwt.verifyToken, authJwt.isWocman], 
+        walletHistory.walletDetailsHistory
     );
 };

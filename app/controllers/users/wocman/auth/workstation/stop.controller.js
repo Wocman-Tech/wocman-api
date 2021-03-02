@@ -103,7 +103,7 @@ exports.wocmanStopProject = (req, res, next) => {
                     }
                     if (parseInt(project.wocmanid, 10) !== parseInt(req.userId, 10)) {
                         res.status(404).send({
-                             statusCode: 404,
+                            statusCode: 404,
                             status: false,
                             message: "Project Owner not resolved",
                             data: []

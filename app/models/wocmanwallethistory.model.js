@@ -1,7 +1,7 @@
 module.exports = (sequelize, Sequelize) => {
     const WocmanWalletHistory = sequelize.define("wwallethistory", {
       	walletid: {
-            type: Sequelize.INTEGER
+            type: Sequelize.STRING
         },
         userid: {
             type: Sequelize.INTEGER

@@ -8,6 +8,12 @@ module.exports = (sequelize, Sequelize) => {
         },
         message: {
             type: Sequelize.STRING
+        },
+        seen: {
+            type: Sequelize.STRING
+        },
+        projectid: {
+            type: Sequelize.STRING
         }
     });
     return ChatWocmanCustomer;
