@@ -85,7 +85,7 @@ exports.walletDetails = (req, res, next) => {
         }else{
 
             var month = formatDate(date)[0]+"-"+ formatDate(date)[1];
-            console.log(month);
+            // console.log(month);
 
             User.findByPk(req.userId)
             .then(users => {
@@ -100,10 +100,8 @@ exports.walletDetails = (req, res, next) => {
                
                 WWalletH.findAll({
                     where: {
-                        userid: req.userId,
-                        wallethistorydate: {
-                            [Op.like]: '%'+month+'%'
-                        }
+                        userid: req.userId
+                        
                     }
                 })
                 .then(wwallet => {
