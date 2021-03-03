@@ -67,18 +67,19 @@ exports.wocmanReuseProfilePicture = (req, res, next) => {
             }
           );
     }else{
-
+        
         var theimaeg = Helpers.pathToImages() +  'wocman/picture/'+ image.replace(Helpers.coreProjectPath(), '');
+        // console.log(theimaeg);
         if (!fs.existsSync(theimaeg)) {
             
             return res.status(404).send(
-            {
-                statusCode: 404,
-                status: false,
-                message: "Image does not exist.",
-                data: []
-            }
-          );
+                {
+                    statusCode: 404,
+                    status: false,
+                    message: "Image does not exist.",
+                    data: []
+                }
+            );
         }else{
             User.findByPk(req.userId).then(user => {
                 if (!user) {

@@ -56,7 +56,6 @@ const Op = db.Sequelize.Op;
 exports.wocmanAddCertificate = (req, res, next) => {
     var cert_name =  req.body.name;
     var cert_issue_date =  req.body.issued_date;
-    var password_link =  req.body.password;
 
     if (typeof cert_name === "undefined") {
         return res.status(400).send(
@@ -100,6 +99,27 @@ exports.wocmanAddCertificate = (req, res, next) => {
             data: []
         });
     }
+
+    //schema
+    const joiCleanSchema = Joi.object().keys({ 
+        cert_name: Joi.string().min(1).max(225).required(), 
+        cert_issue_date: Joi.string().min(1).max(225).required(), 
+    }); 
+    const dataToValidate = {
+      cert_name: cert_name,
+      cert_issue_date: cert_issue_date
+    }
+    const joyResult = joiCleanSchema.validate(dataToValidate);
+    if (joyResult.error == null) {
+    }else{
+        return res.status(404).send({
+            statusCode: 400,
+            status: false,
+            message: joyResult.error,
+            data: []
+        });
+    }
+
     User.findByPk(user_id).then(users => {
         if (!users) {
             return res.status(404).send({
@@ -124,7 +144,6 @@ exports.wocmanAddCertificate = (req, res, next) => {
                         data: []
                     });
                 }
-
             }
 
             Cert.create({

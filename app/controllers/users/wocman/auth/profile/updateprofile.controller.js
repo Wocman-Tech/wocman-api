@@ -109,7 +109,7 @@ exports.wocmanProfileUpdate = (req, res, next) => {
             {
                 statusCode: 400,
                 status: false,
-                message: "Enter Your contact address",
+                message: "Enter Your phone number",
                 data: [] 
             });
         }
@@ -156,7 +156,39 @@ exports.wocmanProfileUpdate = (req, res, next) => {
             {
                 statusCode: 400,
                 status: false,
-                message: "Enter Your address username" ,
+                message: "Enter Your username" ,
+                data: []
+            });
+        }
+
+        //schema
+        const joiCleanSchema = Joi.object().keys({ 
+            firstname: Joi.string().alphanum().min(3).max(225).required(), 
+            lastname: Joi.string().alphanum().min(3).max(225).required(), 
+            address: Joi.string().min(10).max(225).required(), 
+            phone: Joi.string().min(6).max(225).required(), 
+            country: Joi.string().min(3).max(225).required(),
+            state: Joi.string().min(3).max(225).required(),
+            province: Joi.string().min(3).max(225).required(),
+            username: Joi.string().alphanum().min(3).max(225).required(),
+        }); 
+        const dataToValidate = {
+            firstname: firstname,
+            lastname: lastname,
+            address: address,
+            phone: phone,
+            country: country,
+            state: state,
+            province: province,
+            username: username
+        }
+        const joyResult = joiCleanSchema.validate(dataToValidate);
+        if (joyResult.error == null) {
+        }else{
+            return res.status(404).send({
+                statusCode: 400,
+                status: false,
+                message: joyResult.error,
                 data: []
             });
         }
@@ -173,44 +205,23 @@ exports.wocmanProfileUpdate = (req, res, next) => {
             }
 
             users.update({
-              firstname: firstname,
-              lastname: lastname,
-              address: address,
-              phone: phone,
-              country: country,
-              state: state,
-              province: province,
-              username:username
+                firstname: firstname,
+                lastname: lastname,
+                address: address,
+                phone: phone,
+                country: country,
+                state: state,
+                province: province,
+                username:username
             })
             .then( () => {
-
-                var certificates = [];
-                Cert.findAll({
-                    where: req.userId
-                })
-                .then(certs => {
-                    if (!certs) {
-                    }else{
-                        for (let i = 0; i < certs.length; i++) {
-                          certificates.push(certs[i].name+"::"+Helpers.coreProjectPath() + Helpers.pathToImages() +  'wocman/certificate/'+ certs[i].picture);
-                        }
+                res.status(200).send({
+                    statusCode: 200,
+                    status: true,
+                    message: "Profile Updated",
+                    data: {
+                        accessToken: req.token
                     }
-                    res.status(200).send({
-                        statusCode: 200,
-                        status: true,
-                        message: "Profile Updated",
-                        data: {
-                            accessToken: req.token
-                        }
-                    });
-                })
-                .catch(err => {
-                    res.status(500).send({
-                        statusCode: 500,
-                        status: false, 
-                        message: err.message,
-                        data: [] 
-                    });
                 });
             })
             .catch(err => {

@@ -78,6 +78,24 @@ exports.wocmanRemoveCertificate = (req, res, next) => {
         });
     }
 
+    //schema
+    const joiCleanSchema = Joi.object().keys({ 
+        cert_id: Joi.number().integer().min(1).max(225).required(),
+    }); 
+    const dataToValidate = {
+      cert_id: cert_id
+    }
+    const joyResult = joiCleanSchema.validate(dataToValidate);
+    if (joyResult.error == null) {
+    }else{
+        return res.status(404).send({
+            statusCode: 400,
+            status: false,
+            message: joyResult.error,
+            data: []
+        });
+    }
+
     
     User.findByPk(user_id).then(users => {
         if (!users) {

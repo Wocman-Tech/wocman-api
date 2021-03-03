@@ -67,7 +67,7 @@ app.get("/", (req, res) => {
 
 // routes
 require('./app/routes/website.routes')(app);
-require('./app/routes/wocmanuser.routes')(app);
+require('./app/routes/wocmanprofile.routes')(app);
 require('./app/routes/wocmanmessaging.routes')(app);
 require('./app/routes/wocmandashboard.routes')(app);
 require('./app/routes/wocmanproject.routes')(app);

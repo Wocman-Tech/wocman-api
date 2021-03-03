@@ -158,6 +158,50 @@ exports.checkCompleteProfileWocman = (req, res, next) => {
             });
         }
 
+        if(req.body.username && req.body.username !== ''){
+            var username = req.body.username;
+        }else{
+            return res.status(400).send(
+            {
+                statusCode: 400,
+                status: false,
+                message: "Enter Your address username" ,
+                data: []
+            });
+        }
+
+       //schema
+        const joiCleanSchema = Joi.object().keys({ 
+            firstname: Joi.string().alphanum().min(3).max(225).required(), 
+            lastname: Joi.string().alphanum().min(3).max(225).required(), 
+            address: Joi.string().min(10).max(225).required(), 
+            phone: Joi.string().min(6).max(225).required(), 
+            country: Joi.string().min(3).max(225).required(),
+            state: Joi.string().min(3).max(225).required(),
+            province: Joi.string().min(3).max(225).required(),
+            username: Joi.string().alphanum().min(3).max(225).required(),
+        });  
+        const dataToValidate = {
+            firstname: firstname,
+            lastname: lastname,
+            address: address,
+            phone: phone,
+            country: country,
+            state: state,
+            province: province,
+            username: username
+        }
+        const joyResult = joiCleanSchema.validate(dataToValidate);
+        if (joyResult.error == null) {
+        }else{
+            return res.status(404).send({
+                statusCode: 400,
+                status: false,
+                message: joyResult.error,
+                data: []
+            });
+        }
+
 
         User.findOne({
             where: Searchemail
@@ -172,15 +216,16 @@ exports.checkCompleteProfileWocman = (req, res, next) => {
                 });
             }
 
-           users.update({
-              firstname: firstname,
-              lastname: lastname,
-              address: address,
-              phone: phone,
-              country: country,
-              state: state,
-              province: province,
-              verify_email:1
+            users.update({
+                firstname: firstname,
+                lastname: lastname,
+                address: address,
+                phone: phone,
+                country: country,
+                state: state,
+                province: province,
+                username: username,
+                verify_email:1
             })
             .then( () => {
                 res.send({
