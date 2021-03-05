@@ -71,15 +71,14 @@ module.exports = function(app) {
     //auth
 
     app.post(
-        Helpers.apiVersion7()+"complete-profile-wocman",
-        [authJwt.verifyToken, authJwt.isWocman],
-        completeController.checkCompleteProfileWocman
-    );
-
-    app.post(
         Helpers.apiVersion7()+"profile-wocman",
         [authJwt.verifyToken, authJwt.isWocman],
         profileController.wocmanProfile
+    );
+    app.post(
+        Helpers.apiVersion7()+"complete-profile-wocman",
+        [authJwt.verifyToken, authJwt.isWocman],
+        completeController.checkCompleteProfileWocman
     );
 
     app.post(

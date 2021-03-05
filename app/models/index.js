@@ -36,12 +36,14 @@ db.projects = require("../models/projects.model.js")(sequelize, Sequelize);
 db.wshear = require("../models/wshear.model.js")(sequelize, Sequelize);
 
 
-db.wcChat = require("../models/wocmancustomerchat.model.js")(sequelize, Sequelize);
 db.waChat = require("../models/wocmanadminchat.model.js")(sequelize, Sequelize);
+
+db.wcChat = require("../models/wocmancustomerchat.model.js")(sequelize, Sequelize);
 db.wWallet = require("../models/wocmanwallet.model.js")(sequelize, Sequelize);
 db.wWalletH = require("../models/wocmanwallethistory.model.js")(sequelize, Sequelize);
 db.wrate = require("../models/wocmanrate.model.js")(sequelize, Sequelize);
 db.wNotice = require("../models/wocmannotice.model.js")(sequelize, Sequelize);
+db.wsetting = require("../models/wsetting.model.js")(sequelize, Sequelize);
 
 db.mtoken = require("../models/tokens.model.js")(sequelize, Sequelize);
 
