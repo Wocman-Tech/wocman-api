@@ -55,161 +55,116 @@ const Op = db.Sequelize.Op;
 
 
 exports.signUpWocman = (req, res, next) => {
-    if (typeof req.body.username === "undefined") {
+    
+
+    if (typeof req.body.email === "undefined") {
         return res.status(400).send(
             { 
                 statusCode: 400,
                 status: false,
-                message: "Username field is undefined.",
+                message: "Email field is undefined.",
                 data: []
             }
         );
     }else{
 
-        if (typeof req.body.email === "undefined") {
+        if (typeof req.body.password === "undefined") {
             return res.status(400).send(
-                { 
+                {
                     statusCode: 400,
                     status: false,
-                    message: "Email field is undefined.",
-                    data: []
+                    message: "Password field is undefined.",
+                    data: [] 
                 }
             );
         }else{
 
-            if (typeof req.body.password === "undefined") {
+            if (typeof req.body.repeat_password === "undefined") {
                 return res.status(400).send(
                     {
                         statusCode: 400,
                         status: false,
-                        message: "Password field is undefined.",
+                        message: "Repeat Password field is undefined.",
                         data: [] 
                     }
                 );
             }else{
 
-                if (typeof req.body.repeat_password === "undefined") {
-                    return res.status(400).send(
-                        {
-                            statusCode: 400,
-                            status: false,
-                            message: "Repeat Password field is undefined.",
-                            data: [] 
-                        }
-                    );
-                }else{
+            
 
+                const verify_email_1 = uuidv4();
+                var verify_email = bcrypt.hashSync(verify_email_1, 8);
+                verify_email = verify_email.replace(/[^\w\s]/gi, "");
+
+                var Searchemail = {};
                 
+                if(req.body.email && req.body.email !== ''){
+                    Searchemail = {'email': req.body.email}
+                }else{
+                    Searchemail = {'email': {$not: null}};
+                }
 
-                    const verify_email_1 = uuidv4();
-                    var verify_email = bcrypt.hashSync(verify_email_1, 8);
-                    verify_email = verify_email.replace(/[^\w\s]/gi, "");
-
-                    var  SearchUsername = {};
-                    var Searchemail = {};
-                    if(req.body.username && req.body.username !== ''){
-                        SearchUsername = {'username': req.body.username};
-                    }else{
-                        SearchUsername = {'username': {$not: null}};
+                User.findOne({
+                  where: Searchemail 
+                })
+                .then(dfg43 => {
+                    if (dfg43) {
+                        return res.status(404).send(
+                        { 
+                            statusCode: 404,
+                            status: false,
+                            message: "Email already exist",
+                            data: []
+                        });
                     }
-                    if(req.body.email && req.body.email !== ''){
-                        Searchemail = {'email': req.body.email}
-                    }else{
-                        Searchemail = {'email': {$not: null}};
-                    }
-
-                    User.findOne({
-                      where: Searchemail 
+                    User.create({
+                        username: 'Wocman',
+                        email: req.body.email,
+                        password: bcrypt.hashSync(req.body.password, 8),
+                        verify_email: verify_email
                     })
-                    .then(dfg43 => {
-                        if (dfg43) {
-                            return res.status(404).send(
-                            { 
-                                statusCode: 404,
-                                status: false,
-                                message: "Email already exist",
-                                data: []
-                            });
-                        }
-                        User.findOne({
-                          where: SearchUsername 
+                    .then(user => {
+                        UserRole.findOne({
+                            where: {userid: user.id}
                         })
-                        .then(uytyt7 => {
-                            if (uytyt7) {
-                                return res.status(404).send(
-                                { 
-                                    statusCode: 404,
-                                    status: false,
-                                    message: "Username already exist",
-                                    data: []
-                                });
-                            }
-                            User.create({
-                                username: req.body.username,
-                                email: req.body.email,
-                                password: bcrypt.hashSync(req.body.password, 8),
-                                verify_email: verify_email
-                            })
-                            .then(user => {
-                                UserRole.findOne({
-                                    where: {userid: user.id}
-                                })
-                                .then(userrole => {
-                                  if (!userrole) {
-                                    UserRole.create({
-                                        userid: user.id,
-                                        roleid: 2
-                                    });
-                                  }
-                                });
-                                // then send the email
-                                //source:https://medium.com/javascript-in-plain-english/how-to-send-emails-with-node-js-1bb282f334fe
-                                var verification_link = MAIN_URL.slice(0, -1)+Helpers.apiVersion7()+"wocman-signup-verification/"+ user.verify_email;
-                                let response = {
-                                    body: {
-                                      name: req.body.username,
-                                      intro: "Welcome to Wocman Technology! We're very excited to have you on board. Click or Copy this link to any browser to process your registration: "+verification_link,
-                                    },
-                                };
+                        .then(userrole => {
+                          if (!userrole) {
+                            UserRole.create({
+                                userid: user.id,
+                                roleid: 2
+                            });
+                          }
+                        });
+                        // then send the email
+                        //source:https://medium.com/javascript-in-plain-english/how-to-send-emails-with-node-js-1bb282f334fe
+                        var verification_link = MAIN_URL.slice(0, -1)+Helpers.apiVersion7()+"wocman-signup-verification/"+ user.verify_email;
+                        let response = {
+                            body: {
+                              name: "Wocman",
+                              intro: "Welcome to Wocman Technology! We're very excited to have you on board. Click or Copy this link to any browser to process your registration: "+verification_link,
+                            },
+                        };
 
-                                let mail = MailGenerator.generate(response);
+                        let mail = MailGenerator.generate(response);
 
-                                let message = {
-                                    from: EMAIL,
-                                    to:  user.email,
-                                    subject: "signup successful",
-                                    html: mail,
-                                };
+                        let message = {
+                            from: EMAIL,
+                            to:  user.email,
+                            subject: "Signup Successful",
+                            html: mail,
+                        };
 
-                                transporter.sendMail(message)
-                                .then(() => {
-                                     res.status(200).send({
-                                        statusCode: 200,
-                                        status: true,
-                                        message: "User registered successfully!",
-                                        data: {
-                                            link: verification_link, 
-                                            email : user.email, 
-                                            role: 'wocman'
-                                        }
-                                    });
-                                })
-                                .catch(err => {
-                                    return res.status(500).send({
-                                        statusCode: 500,
-                                        status: false, 
-                                        message: err.message,
-                                        data: [] 
-                                    });
-                                });
-                            })
-                            .catch(err => {
-                                return res.status(500).send({ 
-                                    statusCode: 500,
-                                    status: false, 
-                                    message: err.message,
-                                    data: [] 
-                                });
+                        transporter.sendMail(message)
+                        .then(() => {
+                             res.status(200).send({
+                                statusCode: 200,
+                                status: true,
+                                message: "User registered successfully!",
+                                data: {
+                                    link: verification_link, 
+                                    email : user.email, 
+                                    role: 'wocman'
+                                }
                             });
                         })
                         .catch(err => {
@@ -222,14 +177,23 @@ exports.signUpWocman = (req, res, next) => {
                         });
                     })
                     .catch(err => {
-                        return res.status(500).send({
+                        return res.status(500).send({ 
                             statusCode: 500,
                             status: false, 
                             message: err.message,
                             data: [] 
                         });
                     });
-                }
+                   
+                })
+                .catch(err => {
+                    return res.status(500).send({
+                        statusCode: 500,
+                        status: false, 
+                        message: err.message,
+                        data: [] 
+                    });
+                });
             }
         }
     }

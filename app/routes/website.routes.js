@@ -124,7 +124,6 @@ module.exports = function(app) {
             verifyWocmanSignUp.isEmailVerify, 
             verifyWocmanSignUp.isPasswordVerify, 
             verifyWocmanSignUp.isPasswordConfirmed,
-            verifyWocmanSignUp.isUsernameVerify, 
             verifyWocmanSignUp.checkDuplicateUsernameOrEmail
         ],
         signupController.signUpWocman
@@ -248,7 +247,6 @@ module.exports = function(app) {
             verifyAdminSignUp.isEmailVerify, 
             verifyAdminSignUp.isPasswordVerify, 
             verifyAdminSignUp.isPasswordConfirmed,
-            verifyAdminSignUp.isUsernameVerify, 
             verifyAdminSignUp.checkDuplicateUsernameOrEmail
         ],
         adminsignupController.signUpWocman

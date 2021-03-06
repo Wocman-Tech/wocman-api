@@ -101,56 +101,34 @@ isPasswordConfirmed = (req, res, next) => {
 };
 
 checkDuplicateUsernameOrEmail = (req, res, next) => {
-    // Username
+    
+
+    // Email
     User.findOne({
         where: {
-          username: req.body.username
+            email: req.body.email
         }
     }).then(user => {
-        if (user) {
-            res.status(404).send({
-                statusCode: 404,
-                status: false,
-                message: "Failed! Username is already in use!",
-                data: []
-            });
-            return;
-        }
-
-        // Email
-        User.findOne({
-            where: {
-                email: req.body.email
-            }
-        }).then(user => {
-          if (user) {
-            res.status(404).send({
-                statusCode: 404,
-                status: false,
-                message: "Failed! Email is already in use!",
-                data: []
-            });
-            return;
-          }
-          next();
-        })
-        .catch(err => {
-            res.status(500).send({
-                statusCode: 500,
-                status: false, 
-                message: err.message,
-                data: [] 
-            });
+      if (user) {
+        res.status(404).send({
+            statusCode: 404,
+            status: false,
+            message: "Failed! Email is already in use!",
+            data: []
         });
+        return;
+      }
+      next();
     })
     .catch(err => {
         res.status(500).send({
-                statusCode: 500,
-                status: false, 
-                message: err.message,
-                data: [] 
-            });
+            statusCode: 500,
+            status: false, 
+            message: err.message,
+            data: [] 
+        });
     });
+   
 };
 
 const verifySignUp = {

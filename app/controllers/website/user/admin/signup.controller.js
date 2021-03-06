@@ -187,7 +187,7 @@ exports.signUpWocman = (req, res, next) => {
                                 let message = {
                                     from: EMAIL,
                                     to:  user.email,
-                                    subject: "signup successful",
+                                    subject: "Signup Successful",
                                     html: mail,
                                 };
 
