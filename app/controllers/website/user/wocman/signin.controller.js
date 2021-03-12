@@ -128,18 +128,26 @@ exports.signInWocman = (req, res, next) => {
                     loginlogout:0,
                     weblogintoken:token
                 });
-
-                var authorities = [];
-                authorities.push("ROLE_" + "wocman".toUpperCase());
                 res.status(200).send({
                     statusCode: 200,
                     status: true,
                     message: "Login successful",
                     data: {
-                        accessToken: token,
-                        unboard: user.unboard
+                        email: user.email,
+                        verify_email: user.verify_email,
+                        username: user.username,
+                        firstname: user.firstname,
+                        lastname: user.lastname,
+                        address: user.address,
+                        country: user.country,
+                        state: user.state,
+                        province: user.province,
+                        phone: user.phone,
+                        image: user.image,
+                        role: 'wocman',
+                        unboard: user.unboard,
+                        accessToken: token
                     }
-                    
                 });
             })
             .catch(err => {

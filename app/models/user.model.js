@@ -82,6 +82,16 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             defaultValue: null,
             allowNull: true
+        },
+        weblogin2fa: {
+            type: Sequelize.STRING,
+            defaultValue: null,
+            allowNull: true
+        },
+        webloginipa: {
+            type: Sequelize.STRING,
+            defaultValue: null,
+            allowNull: true
         }
     });
     return User;
