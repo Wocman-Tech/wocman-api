@@ -4,6 +4,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const cookieSession = require('cookie-session');
 require("../config/passportgoogle.config.js");
 
+const { resolve, port, website }  = require("../config/auth.config");
 
 
 const { contactUs, search, addNewsLetter } = require("../middleware/website");
@@ -54,7 +55,8 @@ const searchController = require("../controllers/website/search.controller");
 const Helpers = require("../helpers/helper.js");
 const { EMAIL, PASSWORD, MAIN_URL } = require("../helpers/helper.js");
 
-const failUrl =  Helpers.apiVersion7()+"google-auth/wocman-signin-failed"
+// const failUrl =  Helpers.apiVersion7()+"google-auth/wocman-signin-failed"
+const failUrl = website + '/wocman?token=null';
 
 const path = require("path");
 const multer = require("multer");
@@ -136,6 +138,12 @@ module.exports = function(app) {
     //then they should be sent to profile completion page if access token returned is not null
     //the profile completion endpiont(complete-profile-wocman) is in the wocmanuser.routes.js routes 
     //var email_link =  req.params.link;
+
+    app.post(
+        Helpers.apiVersion7()+"wocman-signup-resend-verification",
+        [verifyWocmanSignUp.isEmailVerify],
+        emailverifyController.resendEmail
+    );
 
     app.get(
         Helpers.apiVersion7()+"wocman-signup-verification/:link",

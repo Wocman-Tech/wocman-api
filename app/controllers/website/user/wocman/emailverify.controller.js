@@ -121,3 +121,100 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
         }); 
     }
 };
+
+
+exports.resendEmail = (req, res) => {
+        
+
+    if (typeof req.body.email === "undefined") {
+        return res.status(400).send(
+            { 
+                statusCode: 400,
+                status: false,
+                message: "Email field is undefined.",
+                data: []
+            }
+        );
+    }else{
+       
+        var Searchemail = {};
+        
+        if(req.body.email && req.body.email !== ''){
+            Searchemail = {'email': req.body.email}
+        }else{
+            Searchemail = {'email': {$not: null}};
+        }
+
+        User.findOne({
+          where: Searchemail 
+        })
+        .then(user => {
+            if (!user) {
+                return res.status(404).send(
+                { 
+                    statusCode: 404,
+                    status: false,
+                    message: "Email does not exist",
+                    data: []
+                });
+            }
+            if (user.verify_email == 1) {
+                return res.status(404).send(
+                { 
+                    statusCode: 404,
+                    status: false,
+                    message: "Signup Has be verified, please login",
+                    data: []
+                });
+            }
+            // then send the email
+            //source:https://medium.com/javascript-in-plain-english/how-to-send-emails-with-node-js-1bb282f334fe
+            var verification_link = MAIN_URL.slice(0, -1)+Helpers.apiVersion7()+"wocman-signup-verification/"+ user.verify_email;
+            let response = {
+                body: {
+                  name: "Wocman",
+                  intro: "Welcome to Wocman Technology! We're very excited to have you on board. Click or Copy this link to any browser to process your registration: "+verification_link,
+                },
+            };
+
+            let mail = MailGenerator.generate(response);
+
+            let message = {
+                from: EMAIL,
+                to:  user.email,
+                subject: "Signup Successful",
+                html: mail,
+            };
+
+            transporter.sendMail(message)
+            .then(() => {
+                 res.status(200).send({
+                    statusCode: 200,
+                    status: true,
+                    message: "Email  was resent successfully!",
+                    data: {
+                        link: verification_link, 
+                        email : user.email, 
+                        role: 'wocman'
+                    }
+                });
+            })
+            .catch(err => {
+                return res.status(500).send({
+                    statusCode: 500,
+                    status: false, 
+                    message: err.message,
+                    data: [] 
+                });
+            });
+        })
+        .catch(err => {
+            return res.status(500).send({
+                statusCode: 500,
+                status: false, 
+                message: err.message,
+                data: [] 
+            });
+        });
+    }
+};
