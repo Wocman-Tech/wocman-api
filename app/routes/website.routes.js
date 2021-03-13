@@ -14,7 +14,9 @@ const
         verifySignUpLink, 
         verifySendPasswordEmail, 
         verifyChangePasswordEmail, 
-        verifyResetIn 
+        verifyResetIn,
+        verifyDevice,
+        verify2FA 
     } = require("../middleware/website/user/wocman");
 
 const 
@@ -150,7 +152,9 @@ module.exports = function(app) {
         [
             verifyWocmanSignIn.isEmailVerify, 
             verifyWocmanSignIn.isPasswordVerify, 
-            verifyWocmanSignIn.checkRole
+            verifyWocmanSignIn.checkRole,
+            verifyDevice.isDevice,
+            verify2FA.is2FA
         ],
         signinController.signInWocman
     );

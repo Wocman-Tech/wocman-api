@@ -30,6 +30,7 @@ db.user = require("../models/user.model.js")(sequelize, Sequelize);
 db.role = require("../models/role.model.js")(sequelize, Sequelize);
 db.userRole = require("../models/userrole.model.js")(sequelize, Sequelize);
 db.cert = require("../models/cert.model.js")(sequelize, Sequelize);
+db.ipblacklist = require("../models/wipblacklist.model.js")(sequelize, Sequelize);
 
 db.projecttype = require("../models/projecttype.model.js")(sequelize, Sequelize);
 db.projects = require("../models/projects.model.js")(sequelize, Sequelize);

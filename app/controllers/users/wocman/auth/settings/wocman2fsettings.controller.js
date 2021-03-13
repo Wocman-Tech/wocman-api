@@ -81,7 +81,7 @@ exports.w2fsettings = (req, res, next) => {
                 where: Searchuserid
             })
             .then(wsettings => {
-                if (!wsettings || !wsettings.length>0) {
+                if (!wsettings || !(wsettings.length>0) ) {
 
                     Wsetting.create({
                         userid: req.userId,

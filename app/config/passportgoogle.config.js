@@ -18,6 +18,8 @@ const callbackUrl = Helpers.apiVersion7() + "google-auth/wocman-signin-callback"
 
 
 passport.serializeUser(function(user, done) {
+    console.log(user.email);
+    console.log(user.password);
   
     /*
     From the user take just the id (to minimize the cookie size) and just pass the id of the user
@@ -36,6 +38,75 @@ passport.deserializeUser(function(email, done) {
     User.findOne({
         where: {email:email}
     }).then(user => {
+        // if (!user) {
+        //     User.create({
+        //         username: 'Wocman',
+        //         email: email,
+        //         password: bcrypt.hashSync(req.body.password, 8),
+        //         verify_email: verify_email
+        //     })
+        //     .then(user => {
+        //         UserRole.findOne({
+        //             where: {userid: user.id}
+        //         })
+        //         .then(userrole => {
+        //           if (!userrole) {
+        //             UserRole.create({
+        //                 userid: user.id,
+        //                 roleid: 2
+        //             });
+        //           }
+        //         });
+        //         // then send the email
+        //         //source:https://medium.com/javascript-in-plain-english/how-to-send-emails-with-node-js-1bb282f334fe
+        //         var verification_link = MAIN_URL.slice(0, -1)+Helpers.apiVersion7()+"wocman-signup-verification/"+ user.verify_email;
+        //         let response = {
+        //             body: {
+        //               name: "Wocman",
+        //               intro: "Welcome to Wocman Technology! We're very excited to have you on board. Click or Copy this link to any browser to process your registration: "+verification_link,
+        //             },
+        //         };
+
+        //         let mail = MailGenerator.generate(response);
+
+        //         let message = {
+        //             from: EMAIL,
+        //             to:  user.email,
+        //             subject: "Signup Successful",
+        //             html: mail,
+        //         };
+
+        //         transporter.sendMail(message)
+        //         .then(() => {
+        //              res.status(200).send({
+        //                 statusCode: 200,
+        //                 status: true,
+        //                 message: "User registered successfully!",
+        //                 data: {
+        //                     link: verification_link, 
+        //                     email : user.email, 
+        //                     role: 'wocman'
+        //                 }
+        //             });
+        //         })
+        //         .catch(err => {
+        //             return res.status(500).send({
+        //                 statusCode: 500,
+        //                 status: false, 
+        //                 message: err.message,
+        //                 data: [] 
+        //             });
+        //         });
+        //     })
+        //     .catch(err => {
+        //         return res.status(500).send({ 
+        //             statusCode: 500,
+        //             status: false, 
+        //             message: err.message,
+        //             data: [] 
+        //         });
+        //     });
+        // }
         done(null, user);
     })
     .catch(err => {
@@ -49,6 +120,7 @@ passport.use(new GoogleStrategy({
         callbackURL:  callbackUrl
     },
     function(accessToken, refreshToken, profile, done) {
+        console.log(profile);
         var email = profile.emails[0].value;
         done(null, profile);
     }

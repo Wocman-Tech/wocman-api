@@ -4,6 +4,8 @@ const verifySignUpLink = require("./verifySignUpLink");
 const sendChangePassword = require("./sendChangePassword");
 const verifyChangePasswordEmail = require("./verifyChangePasswordEmail");
 const verifyResetIn = require("./resetPassword");
+const verifyDevice = require("./verifyDevice");
+const verify2FA = require("./verify2FA");
 
 module.exports = {
   verifyWocmanSignUp: verifySignUp,
@@ -11,5 +13,7 @@ module.exports = {
   verifySignUpLink: verifySignUpLink,
   verifySendPasswordEmail: sendChangePassword,
   verifyChangePasswordEmail: verifyChangePasswordEmail,
-  verifyResetIn: verifyResetIn
+  verifyResetIn: verifyResetIn,
+  verifyDevice: verifyDevice,
+  verify2FA: verify2FA
 };

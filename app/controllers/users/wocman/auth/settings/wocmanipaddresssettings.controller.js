@@ -60,69 +60,88 @@ exports.wipsettings = (req, res, next) => {
             data: [] 
         });
     }else{
-        if(req.userId && req.userId !== ''){
-            Searchuserid = {'userid': req.userId};
-        }else{
-            Searchuserid = {'userid': {$not: null}};
-        }
-        
-        User.findByPk(req.userId)
-        .then(users => {
-            if (!users) {
-                return res.status(404).send({
-                    statusCode: 404,
-                    status: false,
-                    message: "User Not found.",
+
+        if (typeof req.body.ipaddress === "undefined") {
+            return res.status(400).send(
+                {
+                    statusCode: 400,
+                    status: false, 
+                    message: "IP Address is undefined.",
                     data: []
-                });
-            }
-           
-            Wsetting.findOne({
-                where: Searchuserid
-            })
-            .then(wsettings => {
-                if (!wsettings || !wsettings.length>0) {
-
-                    Wsetting.create({
-                        userid: req.userId,
-                        securityipa: 1 
-                    }).then( newsettings => {
-
-                        res.status(200).send({
-                            statusCode: 200,
-                            status: true,
-                            message: "Notification Settings Updated",
-                            data: {
-                                settings: newsettings,
-                                AccessToken: req.token,
-                                Unboard: users.unboard
-                            }
-                        });
-                    }) 
-                    
-                    
-                }else{
-                    Wsetting.update(
-                        {
-                        securityipa: 1 
-                        }, 
-                        {
-                            where : {id: wsettings.id}
-                        }
-                    ).then( newsettings => {
-
-                        res.status(200).send({
-                            statusCode: 200,
-                            status: true,
-                            message: "Notification Settings Updated",
-                            data: {
-                                settings: newsettings,
-                                AccessToken: req.token,
-                                Unboard: users.unboard
-                            }
-                        });
-                    })
                 }
+            );
+        }else{
+            var id_ad = req.body.ipaddress;
+            if(req.userId && req.userId !== ''){
+                Searchuserid = {'userid': req.userId};
+            }else{
+                Searchuserid = {'userid': {$not: null}};
+            }
+            
+            User.findByPk(req.userId)
+            .then(users => {
+                if (!users) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "User Not found.",
+                        data: []
+                    });
+                }
+               
+                Wsetting.findOne({
+                    where: Searchuserid
+                })
+                .then(wsettings => {
+                    if (!wsettings || !wsettings.length>0) {
+
+                        Wsetting.create({
+                            userid: req.userId,
+                            securityipa: id_ad 
+                        }).then( newsettings => {
+
+                            res.status(200).send({
+                                statusCode: 200,
+                                status: true,
+                                message: "Notification Settings Updated",
+                                data: {
+                                    settings: newsettings,
+                                    AccessToken: req.token,
+                                    Unboard: users.unboard
+                                }
+                            });
+                        }) 
+                    }else{
+                        Wsetting.update(
+                            {
+                                securityipa: id_ad 
+                            }, 
+                            {
+                                where : {id: wsettings.id}
+                            }
+                        ).then( newsettings => {
+
+                            res.status(200).send({
+                                statusCode: 200,
+                                status: true,
+                                message: "Notification Settings Updated",
+                                data: {
+                                    settings: newsettings,
+                                    AccessToken: req.token,
+                                    Unboard: users.unboard
+                                }
+                            });
+                        })
+                    }
+                })
+                .catch(err => {
+                    res.status(500).send({
+                        statusCode: 500,
+                        status: false, 
+                        message: err.message,
+                        data: [] 
+                    });
+                });
             })
             .catch(err => {
                 res.status(500).send({
@@ -132,15 +151,7 @@ exports.wipsettings = (req, res, next) => {
                     data: [] 
                 });
             });
-        })
-        .catch(err => {
-            res.status(500).send({
-                statusCode: 500,
-                status: false, 
-                message: err.message,
-                data: [] 
-            });
-        });
+        }
     }
 };
 exports.nwipsettings = (req, res, next) => {
