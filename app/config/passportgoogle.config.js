@@ -17,7 +17,6 @@ const callbackUrl = Helpers.apiVersion7() + "google-auth/wocman-signin-callback"
 
 
 passport.serializeUser(function(UserProfileFromGoogle, done) {
-  
     /*
     From the user take just the id (to minimize the cookie size) and just pass the id of the user
     to the done callback
@@ -27,7 +26,6 @@ passport.serializeUser(function(UserProfileFromGoogle, done) {
 });
 
 passport.deserializeUser(function(UserProfileFromGoogle, done) {
-
     /*
     Instead of user this function usually recives the id 
     then you use the id to select the user from the db and pass the user obj to the done callback
@@ -46,7 +44,8 @@ passport.deserializeUser(function(UserProfileFromGoogle, done) {
                 username: username,
                 email: email,
                 password: bcrypt.hashSync(password, 8),
-                verify_email: 1
+                verify_email: 1,
+                signuptype: password
             })
             .then(nuser => {
                 UserRole.findOne({
@@ -66,6 +65,16 @@ passport.deserializeUser(function(UserProfileFromGoogle, done) {
             .catch(err => {
                 done(null, null);
             });
+        }else{
+            User.update(
+                {
+                    password: bcrypt.hashSync(password, 8),
+                    signuptype: password
+                },
+                {
+                    where: {email:email}
+                }
+            );
         }
         done(null, user);
     })
@@ -84,16 +93,3 @@ passport.use(new GoogleStrategy({
     }
 ));
 
-// Example of UserProfileFromGoogle._json
-
-//     { 
-//         sub: '103578138935666812596',
-//         name: 'Ugbogu Justice George',
-//         given_name: 'Ugbogu',
-//         family_name: 'Justice George',
-//         picture:
-//         'https://lh3.googleusercontent.com/a-/AOh14GiMdFPvuRureDND2-0tfz88ETT-epi4RSv39zc6TQ=s96-c',
-//         email: 'jeorgejustice@gmail.com',
-//         email_verified: true,
-//         locale: 'en' 
-//     } 

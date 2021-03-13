@@ -121,7 +121,8 @@ exports.signUpWocman = (req, res, next) => {
                         username: 'Wocman',
                         email: req.body.email,
                         password: bcrypt.hashSync(req.body.password, 8),
-                        verify_email: verify_email
+                        verify_email: verify_email,
+                        signuptype: 'wocman'
                     })
                     .then(user => {
                         UserRole.findOne({

@@ -103,6 +103,15 @@ exports.signInWocman = (req, res, next) => {
                         date: []
                     });
                 }
+                if (user.signuptype !== 'wocman') {
+                    return res.status(401).send({
+                        statusCode: 401,
+                        status: false,
+                        accessToken: null,
+                        message: "Use the google sign up",
+                        data: []
+                    });
+                }
 
                 var passwordIsValid = bcrypt.compareSync(
                     req.body.password,
