@@ -24,6 +24,8 @@ const Helpers = require(pathRoot+"helpers/helper.js");
 const { verifySignUp } = require(pathRoot+"middleware");
 const { EMAIL, PASSWORD, MAIN_URL } = require(pathRoot+"helpers/helper.js");
 
+const { resolve, port, website }  = require(pathRoot + "config/auth.config");
+
 const {v4 : uuidv4} = require('uuid');
 const Joi = require('joi'); 
 let nodeGeocoder = require('node-geocoder');
@@ -100,27 +102,8 @@ exports.proceedSignIn = (req, res, next) => {
                 loginlogout:0,
                 weblogintoken:token
             });
-            res.status(200).send({
-                statusCode: 200,
-                status: true,
-                message: "Login successful",
-                data: {
-                    email: user.email,
-                    verify_email: user.verify_email,
-                    username: user.username,
-                    firstname: user.firstname,
-                    lastname: user.lastname,
-                    address: user.address,
-                    country: user.country,
-                    state: user.state,
-                    province: user.province,
-                    phone: user.phone,
-                    image: user.image,
-                    role: 'wocman',
-                    unboard: user.unboard,
-                    accessToken: token
-                }
-            });
+            var passUrl = website + '/wocman?token=' + token;
+            res.redirect(passUrl);
         })
         .catch(err => {
             res.status(500).send({

@@ -135,6 +135,7 @@ module.exports = function(app) {
     //they would hit this endpoint which returns an access token(prove of temporary login)
     //then they should be sent to profile completion page if access token returned is not null
     //the profile completion endpiont(complete-profile-wocman) is in the wocmanuser.routes.js routes 
+    //var email_link =  req.params.link;
 
     app.get(
         Helpers.apiVersion7()+"wocman-signup-verification/:link",

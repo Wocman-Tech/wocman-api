@@ -130,22 +130,22 @@ getJsondata = (stringValue, key) => {
 }
 
 const Helpers = {
-  getRoleById: getRoleById,
-  getRoleByName: getRoleByName,
-  getUserRoleById: getUserRoleById,
-  apiVersion7: apiVersion7,
-  getUserByEmail: getUserByEmail,
-  getUserByUsername: getUserByUsername,
-  kfgetEmailLink: kfgetEmailLink,
-  filterFile: filterFile,
-  coreProjectPath: coreProjectPath,
-  pathToImages: pathToImages,
-  padTogether: padTogether,
-  checkImageLink: checkImageLink,
-  EMAIL: config.email,    
-  PASSWORD: config.password, 
-  MAIN_URL: config.resolve+config.port,
-  getJsondata: getJsondata
+    getRoleById: getRoleById,
+    getRoleByName: getRoleByName,
+    getUserRoleById: getUserRoleById,
+    apiVersion7: apiVersion7,
+    getUserByEmail: getUserByEmail,
+    getUserByUsername: getUserByUsername,
+    kfgetEmailLink: kfgetEmailLink,
+    filterFile: filterFile,
+    coreProjectPath: coreProjectPath,
+    pathToImages: pathToImages,
+    padTogether: padTogether,
+    checkImageLink: checkImageLink,
+    EMAIL: config.email,    
+    PASSWORD: config.password, 
+    MAIN_URL: config.resolve+config.port,
+    getJsondata: getJsondata
 };
 
 module.exports = Helpers;
