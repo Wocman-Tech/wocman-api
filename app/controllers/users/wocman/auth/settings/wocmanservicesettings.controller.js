@@ -81,48 +81,27 @@ exports.serviceNotice = (req, res, next) => {
                 where: Searchuserid
             })
             .then(wsettings => {
-                if (!wsettings || !wsettings.length>0) {
+                Wsetting.update(
+                    {
+                    servicenotice: 1 
+                    }, 
+                    {
+                        where : {id: wsettings.id}
+                    }
+                ).then( newsettings => {
 
-                    Wsetting.create({
-                        userid: req.userId,
-                        servicenotice: 1 
-                    }).then( newsettings => {
-
-                        res.status(200).send({
-                            statusCode: 200,
-                            status: true,
-                            message: "Notification Settings Updated",
-                            data: {
-                                settings: newsettings,
-                                AccessToken: req.token,
-                                Unboard: users.unboard
-                            }
-                        });
-                    }) 
-                    
-                    
-                }else{
-                    Wsetting.update(
-                        {
-                        servicenotice: 1 
-                        }, 
-                        {
-                            where : {id: wsettings.id}
+                    res.status(200).send({
+                        statusCode: 200,
+                        status: true,
+                        message: "Notification Settings Updated",
+                        data: {
+                            settings: newsettings,
+                            AccessToken: req.token,
+                            Unboard: users.unboard
                         }
-                    ).then( newsettings => {
-
-                        res.status(200).send({
-                            statusCode: 200,
-                            status: true,
-                            message: "Notification Settings Updated",
-                            data: {
-                                settings: newsettings,
-                                AccessToken: req.token,
-                                Unboard: users.unboard
-                            }
-                        });
-                    })
-                }
+                    });
+                })
+                
             })
             .catch(err => {
                 res.status(500).send({

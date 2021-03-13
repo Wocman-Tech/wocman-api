@@ -16,6 +16,8 @@ const Wshear = db.wshear;
 const WAChat = db.waChat;
 const WCChat = db.wcChat;
 const WWallet = db.wWallet;
+const Wsetting = db.wsetting;
+
 
 const Helpers = require(pathRoot+"helpers/helper.js");
 const { verifySignUp } = require(pathRoot+"middleware");
@@ -92,7 +94,6 @@ exports.signInWocman = (req, res, next) => {
 
             User.findOne({
                 where: searchemail
-                
             })
             .then(user => {
                 if (!user) {
@@ -102,62 +103,84 @@ exports.signInWocman = (req, res, next) => {
                         message: "User Not found.",
                         date: []
                     });
-                }
-                if (user.signuptype !== 'wocman') {
-                    return res.status(401).send({
-                        statusCode: 401,
-                        status: false,
-                        accessToken: null,
-                        message: "Use the google sign up",
-                        data: []
-                    });
-                }
+                }else{
+                    // console.log(user.signuptype);
+                    if (user.signuptype !== 'wocman') {
+                        return res.status(401).send({
+                            statusCode: 401,
+                            status: false,
+                            accessToken: null,
+                            message: "Use the google sign up",
+                            data: []
+                        });
+                    }else{
 
-                var passwordIsValid = bcrypt.compareSync(
-                    req.body.password,
-                    user.password
-                );
+                        var passwordIsValid = bcrypt.compareSync(
+                            req.body.password,
+                            user.password
+                        );
+                        if (!passwordIsValid) {
+                            return res.status(401).send({
+                                statusCode: 401,
+                                status: false,
+                                accessToken: null,
+                                message: "Invalid Password!",
+                                data: []
+                            });
+                        }else{
 
-                if (!passwordIsValid) {
-                    return res.status(401).send({
-                        statusCode: 401,
-                        status: false,
-                          accessToken: null,
-                          message: "Invalid Password!",
-                          data: []
-                    });
-                }
 
-                var token = jwt.sign({ id: user.id }, config.secret, {
-                    expiresIn: 86400 // 24 hours
-                });
+                            var token = jwt.sign({ id: user.id }, config.secret, {
+                                expiresIn: 86400 // 24 hours
+                            });
 
-                //making sure a user was signed in appropriately
-                user.update({
-                    loginlogout:0,
-                    weblogintoken:token
-                });
-                res.status(200).send({
-                    statusCode: 200,
-                    status: true,
-                    message: "Login successful",
-                    data: {
-                        email: user.email,
-                        verify_email: user.verify_email,
-                        username: user.username,
-                        firstname: user.firstname,
-                        lastname: user.lastname,
-                        address: user.address,
-                        country: user.country,
-                        state: user.state,
-                        province: user.province,
-                        phone: user.phone,
-                        image: user.image,
-                        role: 'wocman',
-                        unboard: user.unboard,
-                        accessToken: token
+                            //making sure a user was signed in appropriately
+                            user.update({
+                                loginlogout:0,
+                                weblogintoken:token
+                            });
+                            Wsetting.findOne({
+                                where: {userid: user.id}
+                            })
+                            .then(hasSettings => {
+                                if (!hasSettings) {
+                                    Wsetting.create({
+                                        userid: user.id
+                                    });
+                                }
+                                res.status(200).send({
+                                    statusCode: 200,
+                                    status: true,
+                                    message: "Login successful",
+                                    data: {
+                                        email: user.email,
+                                        verify_email: user.verify_email,
+                                        username: user.username,
+                                        firstname: user.firstname,
+                                        lastname: user.lastname,
+                                        address: user.address,
+                                        country: user.country,
+                                        state: user.state,
+                                        province: user.province,
+                                        phone: user.phone,
+                                        image: user.image,
+                                        role: 'wocman',
+                                        unboard: user.unboard,
+                                        accessToken: token
+                                    }
+                                });
+                            })
+                            .catch(err => {
+                                res.status(500).send({
+                                    statusCode: 500,
+                                    status: false, 
+                                    message: err.message,
+                                    data: [] 
+                                });
+                            });
+                        }
                     }
-                });
+                }
             })
             .catch(err => {
                 res.status(500).send({

@@ -10,6 +10,7 @@ const fs = require('fs');
 const User = db.user;
 const Role = db.role;
 const UserRole = db.userRole;
+const Wsetting = db.wsetting;
 
 const { resolve, port, website }  = require(pathRoot+"config/auth.config");
 const { EMAIL, PASSWORD, MAIN_URL } = require(pathRoot+"helpers/helper.js");
@@ -56,6 +57,16 @@ passport.deserializeUser(function(UserProfileFromGoogle, done) {
                         UserRole.create({
                             userid: nuser.id,
                             roleid: 2
+                        });
+                    }
+                });
+                Wsetting.findOne({
+                    where: {userid: nuser.id}
+                })
+                .then(hasSettings => {
+                    if (!hasSettings) {
+                        Wsetting.create({
+                            userid: nuser.id
                         });
                     }
                 });
