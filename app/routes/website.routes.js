@@ -32,6 +32,7 @@ const
 
 
 
+const isDeviceVC = require("../controllers/website/user/wocman/isDevice.controller");
 const confirmpasswordresetController = require("../controllers/website/user/wocman/confirmpasswordresetemail.controller");
 const emailverifyController = require("../controllers/website/user/wocman/emailverify.controller");
 const resetpasswordController = require("../controllers/website/user/wocman/resetpassword.controller");
@@ -167,6 +168,47 @@ module.exports = function(app) {
         ],
         signinController.signInWocman
     );
+
+    app.post(
+        Helpers.apiVersion7()+"wocman-signin-resend-isdevice",
+        [
+            verifyWocmanSignIn.isEmailVerify
+        ],
+        isDeviceVC.resendIsDevice
+    );
+
+
+    app.get(
+        Helpers.apiVersion7()+"wocman-device-ip-confirm/:iplink",
+        [],
+        isDeviceVC.activateIsDevice
+    );
+
+    app.get(
+        Helpers.apiVersion7()+"wocman-device-ip-cancel/:iplink1",
+        [],
+        isDeviceVC.cancelIsDevice
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"wocman-signin-resend-otp",
+        [
+            verifyWocmanSignIn.isEmailVerify
+        ],
+        verify2FA.resendis2FA
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/wocman-signin-activate-otp",
+        [
+            verifyWocmanSignIn.isEmailVerify,
+            verifyWocmanSignIn.isPasswordVerify, 
+            verifyWocmanSignIn.checkRole,
+            verify2FA.activateis2FA
+        ],
+        signinController.signInWocman
+    );
+
     //a wocman user signs up, wants to login using google,
     //they would hit this endpoint once to login with google button
     //they would be sent to google plattform

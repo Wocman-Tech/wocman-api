@@ -48,9 +48,7 @@ const schemaJoiIP = Joi.object({
     ipaddress: Joi.string().min(10).required()
 });
 
-
-
-isDevice = (req, res, next) => {
+exports.isDevice = (req, res, next) => {
     var searchemail = {};
     if(req.body.email && req.body.email !== ''){
         searchemail = {'email': req.body.email}
@@ -128,10 +126,11 @@ isDevice = (req, res, next) => {
 
                                     if (usersettings.securityipa != ip) {
 
-                                        const verify_ip_ad = uuidv4();
+                                        var verify_ip_ad = uuidv4();
+                                        verify_ip_ad = verify_ip_ad + 'b9fdH' + ip;
                                         
                                         var verification_link = MAIN_URL.slice(0, -1)+Helpers.apiVersion7()+"wocman-device-ip-confirm/" + verify_ip_ad;
-                                        var verification_link_2 = MAIN_URL.slice(0, -1)+Helpers.apiVersion7()+"wocman-device-ip-cancel/" + ip;
+                                        var verification_link_2 = MAIN_URL.slice(0, -1)+Helpers.apiVersion7()+"wocman-device-ip-cancel/" + verify_ip_ad;
                                         let response = {
                                             body: {
                                               name: user.firstname + " " + user.lastname,
@@ -231,7 +230,4 @@ isDevice = (req, res, next) => {
         });
     });
 };
-const verifyDevice = {
-    isDevice: isDevice
-};
-module.exports = verifyDevice;
+
