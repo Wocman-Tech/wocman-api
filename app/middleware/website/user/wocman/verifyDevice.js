@@ -157,7 +157,10 @@ exports.isDevice = (req, res, next) => {
                                                     status: true,
                                                     accessToken: null,
                                                     message: "A message was sent to you to verify you are logging into your account from another device",
-                                                    data: []
+                                                    data: {
+                                                        accept: verification_link,
+                                                        reject: verification_link_2
+                                                    }
                                                 });
                                             })
                                             .catch(err => {
