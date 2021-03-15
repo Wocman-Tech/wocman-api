@@ -93,7 +93,9 @@ is2FA = (req, res, next) => {
 	                    statusCode: 200,
 	                    status: true, 
 	                    message: 'An OTP Was Sent',
-	                    data: [] 
+	                    data: {
+	                    	opt: otp
+	                    } 
 	                });
                 }else{
                     next(); 
@@ -200,7 +202,9 @@ resendis2FA = (req, res, next) => {
 	                    statusCode: 200,
 	                    status: true, 
 	                    message: 'An OTP Was Sent',
-	                    data: [] 
+	                    data: {
+	                    	otp: otp
+	                    }
 	                });
                 }else{
                     return res.status(404).send({
