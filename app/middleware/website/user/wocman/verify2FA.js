@@ -19,7 +19,6 @@ const schemaJoiOTP = Joi.object({
     otps: Joi.number().min(100000).required()
 });
 
-var otp = Math.floor(100000 + Math.random() * 900000);
 
 is2FA = (req, res, next) => {
 
@@ -67,6 +66,8 @@ is2FA = (req, res, next) => {
                 }
 
                 if (usersettings.security2fa != 0) {
+					const otp = Math.floor(100000 + Math.random() * 900000);
+
 
 					var messageParams = {
 					  'originator': 'MessageBird',
@@ -176,6 +177,8 @@ resendis2FA = (req, res, next) => {
                 }
 
                 if (usersettings.security2fa != 0) {
+					const otp = Math.floor(100000 + Math.random() * 900000);
+                	
 
 					var messageParams = {
 					  'originator': 'MessageBird',
