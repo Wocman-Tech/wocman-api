@@ -18,6 +18,7 @@ const { resolve, port, website, name }  = require(baseUrl + "config/auth.config.
 const schemaJoiOTP = Joi.object({
     otps: Joi.number().min(100000).required()
 });
+
 var otp = Math.floor(100000 + Math.random() * 900000);
 
 is2FA = (req, res, next) => {
@@ -80,6 +81,7 @@ is2FA = (req, res, next) => {
 					    return console.log(err);
 					}
 					// console.log(response);
+					});
 					User.update(
 						{
 							weblogin2fa: otp
@@ -88,7 +90,6 @@ is2FA = (req, res, next) => {
 					  		where: {id: user.id}
 					  	}
 					);
-					});
 					return res.status(200).send({
 	                    statusCode: 200,
 	                    status: true, 
@@ -189,6 +190,7 @@ resendis2FA = (req, res, next) => {
 					    return console.log(err);
 					}
 					// console.log(response);
+					});
 					User.update(
 						{
 							weblogin2fa: otp
@@ -197,7 +199,6 @@ resendis2FA = (req, res, next) => {
 					  		where: {id: user.id}
 					  	}
 					);
-					});
 					return res.status(200).send({
 	                    statusCode: 200,
 	                    status: true, 
