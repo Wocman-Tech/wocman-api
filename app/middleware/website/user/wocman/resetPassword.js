@@ -52,7 +52,7 @@ isPasswordVerify = (req, res, next) => {
         return res.status(422).json({
             statusCode: 422,
             status: false,
-            message: msgs,
+            message: 'Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character is required in password field',
             data: []
         })
     }else{

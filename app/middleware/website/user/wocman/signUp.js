@@ -33,7 +33,7 @@ const schemaJoiUsername = Joi.object({
 const schemaJoiMatchPassword = Joi.object({
 
     password: Joi.string()
-        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
+        .pattern(new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")).required(),
 
     repeat_password: Joi.ref('password')
 });
@@ -82,7 +82,7 @@ isPasswordVerify = (req, res, next) => {
         return res.status(422).json({
             statusCode: 422,
             status: false,
-            message: msgs,
+            message: 'Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character is required in password field',
             data: []
         })
     }else{
@@ -99,7 +99,7 @@ isPasswordConfirmed = (req, res, next) => {
         return res.status(422).json({
             statusCode: 422,
             status: false,
-            message: msgs,
+            message: 'Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character is required in repeat_password field',
             data: []
         })
     }else{
