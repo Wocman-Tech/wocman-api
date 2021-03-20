@@ -163,7 +163,7 @@ exports.resendEmail = (req, res) => {
                 { 
                     statusCode: 404,
                     status: false,
-                    message: "Signup Has be verified, please login",
+                    message: "Signup Has been verified, please login",
                     data: []
                 });
             }

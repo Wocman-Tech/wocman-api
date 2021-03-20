@@ -5,14 +5,16 @@ const pathRoot = '../';
 
 const Helpers = require(pathRoot+"helpers/helper.js");
 const db = require(pathRoot+"models");
-const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
 const User = db.user;
 const Role = db.role;
 const UserRole = db.userRole;
 const Wsetting = db.wsetting;
+var bcrypt = require("bcryptjs");
 
-const { resolve, port, website }  = require(pathRoot+"config/auth.config");
+
+const config = require(pathRoot+"config/auth.config");
+
 const { EMAIL, PASSWORD, MAIN_URL } = require(pathRoot+"helpers/helper.js");
 const callbackUrl = Helpers.apiVersion7() + "google-auth/wocman-signin-callback"
 
@@ -40,6 +42,7 @@ passport.deserializeUser(function(UserProfileFromGoogle, done) {
     User.findOne({
         where: {email:email}
     }).then(user => {
+        // console.log(user);
         if (!user) {
             User.create({
                 username: username,
@@ -70,11 +73,11 @@ passport.deserializeUser(function(UserProfileFromGoogle, done) {
                         });
                     }
                 });
-               
-                done(null, nuser);
+                user = nuser;
+                done(null, user);
             })
             .catch(err => {
-                done(null, null);
+                done(null, user);
             });
         }else{
             User.update(
@@ -88,10 +91,8 @@ passport.deserializeUser(function(UserProfileFromGoogle, done) {
             );
         }
         done(null, user);
-    })
-    .catch(err => {
-        done(null, null);    
     });
+
 });
 
 passport.use(new GoogleStrategy({
@@ -103,4 +104,5 @@ passport.use(new GoogleStrategy({
         done(null, UserProfileFromGoogle);
     }
 ));
+
 
