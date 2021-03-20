@@ -95,8 +95,8 @@ passport.deserializeUser(function(UserProfileFromGoogle, done) {
 });
 
 passport.use(new GoogleStrategy({
-        clientID: "41617709370-91tu56ot8gqk51ngetncu3b5austpjon.apps.googleusercontent.com",
-        clientSecret: "rjyf2fcqN58cHFJK1aRWt7bb",
+        clientID: config.googleAppClientID,
+        clientSecret: config.googleAppClientSecret,
         callbackURL:  callbackUrl
     },
     function(accessToken, refreshToken, UserProfileFromGoogle, done) {

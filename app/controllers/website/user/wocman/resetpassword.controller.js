@@ -140,24 +140,34 @@ exports.wocmanStartResetPassword = (req, res, next) => {
 
                 transporter.sendMail(message)
                 .then(() => {
-                    var sentMail = true;
+                    res.status(200).send({
+                        statusCode: 200,
+                        status: true,
+                        message: "Password Reset successful",
+                        data: {
+                            username: users.username,
+                            email: users.email,
+                            password: users.password,
+                            changepassword: users.changepassword,
+                            roles: authorities,
+                            sentMail: true
+                        }
+                    });
                 })
                 .catch(err => {
-                    var sentMail = false;
-                });
-                
-                res.status(200).send({
-                    statusCode: 200,
-                    status: true,
-                    message: "Password Reset successful",
-                    data: {
-                        username: users.username,
-                        email: users.email,
-                        password: users.password,
-                        changepassword: users.changepassword,
-                        roles: authorities,
-                        sentMail: sentMail
-                    }
+                    res.status(200).send({
+                        statusCode: 200,
+                        status: true,
+                        message: "Password Reset successful",
+                        data: {
+                            username: users.username,
+                            email: users.email,
+                            password: users.password,
+                            changepassword: users.changepassword,
+                            roles: authorities,
+                            sentMail: false
+                        }
+                    });
                 });
             })
             .catch(err => {

@@ -39,7 +39,7 @@ https://wocman.netlify.app
 
 2.  Open config folder
 
-3.  In env.config.js file and Set 
+3.  Open env.config.js file and Set 
 ```
 workstation : "localhost"
 ```

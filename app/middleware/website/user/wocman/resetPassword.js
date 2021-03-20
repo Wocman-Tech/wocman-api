@@ -14,11 +14,11 @@ const schemaJoiEmail = Joi.object({
 });
 const schemaJoiPassword = Joi.object({
     password: Joi.string()
-        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required()
+        .pattern(new RegExp('/^[a-zA-Z0-9!@#$%&*]{3,25}$/')).required()
 
 });
-
-
+// /^[a-zA-Z0-9!@#$%&*]{3,25}$/
+// ^[a-zA-Z0-9]{3,30}$
 
 isEmailVerify = (req, res, next) => {
     var joyresult = schemaJoiEmail.validate({ email: req.body.email });

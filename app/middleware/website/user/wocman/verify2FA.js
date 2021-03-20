@@ -9,16 +9,14 @@ const Helpers = require(baseUrl+"helpers/helper.js");
 const Joi = require('joi');
 const Wsetting = db.wsetting;
 
-const messagebird = require('messagebird')('8C5YFUT5NWJo8TD7tVQ20o4QF');
-// live:3pe4Hiye8v7oj469jusipiz2J
-// test:8C5YFUT5NWJo8TD7tVQ20o4QF
-// https://dashboard.messagebird.com/en/login
 
-const { resolve, port, website, name }  = require(baseUrl + "config/auth.config.js");
+
+const { resolve, port, website, name, otpId }  = require(baseUrl + "config/auth.config.js");
 const schemaJoiOTP = Joi.object({
     otps: Joi.number().min(100000).required()
 });
 
+const messagebird = require('messagebird')(otpId);
 
 is2FA = (req, res, next) => {
 
