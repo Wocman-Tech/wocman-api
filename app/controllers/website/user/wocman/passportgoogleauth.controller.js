@@ -59,61 +59,73 @@ let MailGenerator = new Mailgen({
 const Op = db.Sequelize.Op;
 
 exports.proceedSignIn = (req, res, next) => {
-    // console.log(req.user);
-    var email = req.user.email;
-
-    if (typeof email === "undefined") {
+    console.log(req.user);
+    if (typeof req.user === "undefined" || req.user == null ) {
         return res.status(400).send(
             {
                 statusCode: 400,
                 status: false, 
-                message: "Invalid Email",
+                message: "User already registered",
                 data: [] 
             }
         );
     }else{
 
-        var searchemail = {};
-       
-        if(email && email !== ''){
-            searchemail = {'email': email}
-        }else{
-            searchemail = {'email': {$not: null}};
-        }
+        var email = req.user.email;
 
-        User.findOne({
-            where: searchemail
-        })
-        .then(user => {
-            if (!user) {
-                return res.status(404).send({
-                    statusCode: 404,
-                    status: false,
-                    message: "User Not found.",
-                    date: []
-                });
+        if (typeof email === "undefined") {
+            return res.status(400).send(
+                {
+                    statusCode: 400,
+                    status: false, 
+                    message: "Invalid Email",
+                    data: [] 
+                }
+            );
+        }else{
+
+            var searchemail = {};
+           
+            if(email && email !== ''){
+                searchemail = {'email': email}
+            }else{
+                searchemail = {'email': {$not: null}};
             }
 
-            var token = jwt.sign({ id: user.id }, config.secret, {
-                expiresIn: 86400 // 24 hours
-            });
+            User.findOne({
+                where: searchemail
+            })
+            .then(user => {
+                if (!user) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "User Not found.",
+                        date: []
+                    });
+                }
 
-            //making sure a user was signed in appropriately
-            user.update({
-                loginlogout:0,
-                weblogintoken:token
+                var token = jwt.sign({ id: user.id }, config.secret, {
+                    expiresIn: 86400 // 24 hours
+                });
+
+                //making sure a user was signed in appropriately
+                user.update({
+                    loginlogout:0,
+                    weblogintoken:token
+                });
+                var passUrl = config.website + '/wocman?token=' + token;
+                res.redirect(passUrl);
+            })
+            .catch(err => {
+                res.status(500).send({
+                    statusCode: 500,
+                    status: false, 
+                    message: err.message,
+                    data: [] 
+                });
             });
-            var passUrl = config.website + '/wocman?token=' + token;
-            res.redirect(passUrl);
-        })
-        .catch(err => {
-            res.status(500).send({
-                statusCode: 500,
-                status: false, 
-                message: err.message,
-                data: [] 
-            });
-        });
+        }
     }
 };
 

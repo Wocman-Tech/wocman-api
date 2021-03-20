@@ -42,7 +42,6 @@ passport.deserializeUser(function(UserProfileFromGoogle, done) {
     User.findOne({
         where: {email:email}
     }).then(user => {
-        // console.log(user);
         if (!user) {
             User.create({
                 username: username,
@@ -73,26 +72,25 @@ passport.deserializeUser(function(UserProfileFromGoogle, done) {
                         });
                     }
                 });
-                user = nuser;
-                done(null, user);
-            })
-            .catch(err => {
-                done(null, user);
+                done(null, nuser);
             });
         }else{
-            User.update(
-                {
-                    password: bcrypt.hashSync(password, 8),
-                    signuptype: password
-                },
-                {
-                    where: {email:email}
-                }
-            );
+            if (user.signuptype == 'wocman') {
+                user = null;
+            }else{
+                User.update(
+                    {
+                        password: bcrypt.hashSync(password, 8),
+                        signuptype: password
+                    },
+                    {
+                        where: {email:email}
+                    }
+                );
+            }
+            done(null, user);
         }
-        done(null, user);
     });
-
 });
 
 passport.use(new GoogleStrategy({
