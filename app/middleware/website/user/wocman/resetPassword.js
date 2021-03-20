@@ -14,7 +14,7 @@ const schemaJoiEmail = Joi.object({
 });
 const schemaJoiPassword = Joi.object({
     password: Joi.string()
-        .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$")).required()
+        .pattern(new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")).required()
 
 });
 // /^[a-zA-Z0-9!@#$%&*]{3,25}$/
@@ -22,6 +22,7 @@ const schemaJoiPassword = Joi.object({
 // ^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})
 // /^[a-zA-Z0-9, ]*$/, 'Alphanumerics, space and comma characters'
 // "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+// ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$
 
 isEmailVerify = (req, res, next) => {
     var joyresult = schemaJoiEmail.validate({ email: req.body.email });
