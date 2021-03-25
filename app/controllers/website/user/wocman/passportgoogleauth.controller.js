@@ -59,7 +59,7 @@ let MailGenerator = new Mailgen({
 const Op = db.Sequelize.Op;
 
 exports.proceedSignIn = (req, res, next) => {
-    console.log(req.user);
+    // console.log(req.user);
     if (typeof req.user === "undefined" || req.user == null ) {
         return res.status(400).send(
             {
@@ -72,6 +72,7 @@ exports.proceedSignIn = (req, res, next) => {
     }else{
 
         var email = req.user.email;
+        var emailLink = req.body.redirectLink;
 
         if (typeof email === "undefined") {
             return res.status(400).send(
@@ -114,7 +115,7 @@ exports.proceedSignIn = (req, res, next) => {
                     loginlogout:0,
                     weblogintoken:token
                 });
-                var passUrl = config.website + '/wocman?token=' + token;
+                var passUrl = emailLink + token;
                 res.redirect(passUrl);
             })
             .catch(err => {

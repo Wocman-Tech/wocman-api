@@ -129,6 +129,7 @@ module.exports = function(app) {
             verifyWocmanSignUp.isEmailVerify, 
             verifyWocmanSignUp.isPasswordVerify, 
             verifyWocmanSignUp.isPasswordConfirmed,
+            verifyWocmanSignUp.isLinkVerify,
             verifyWocmanSignUp.checkDuplicateUsernameOrEmail
         ],
         signupController.signUpWocman
@@ -142,7 +143,10 @@ module.exports = function(app) {
 
     app.post(
         Helpers.apiVersion7()+"wocman-signup-resend-verification",
-        [verifyWocmanSignUp.isEmailVerify],
+        [
+            verifyWocmanSignUp.isEmailVerify,
+            verifyWocmanSignUp.isLinkVerify
+        ],
         emailverifyController.resendEmail
     );
 
@@ -211,9 +215,10 @@ module.exports = function(app) {
 
     //a wocman user signs up, wants to login using google,
     //they would hit this endpoint once to login with google button
-    //they would be sent to google plattform
-    app.get(
+    //they would be sent to google platform
+    app.post(
         Helpers.apiVersion7()+'google-auth/wocman-signin',
+        verifyWocmanSignUp.isLinkVerifyGoogle,
         passport.authenticate('google',
             { scope: ['profile', 'email'] }
         )

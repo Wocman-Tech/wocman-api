@@ -169,7 +169,8 @@ exports.resendEmail = (req, res) => {
             }
             // then send the email
             //source:https://medium.com/javascript-in-plain-english/how-to-send-emails-with-node-js-1bb282f334fe
-            var verification_link = MAIN_URL.slice(0, -1)+Helpers.apiVersion7()+"wocman-signup-verification/"+ user.verify_email;
+            var verification_link = emailLink6 +  user.verify_email;
+
             let response = {
                 body: {
                   name: "Wocman",

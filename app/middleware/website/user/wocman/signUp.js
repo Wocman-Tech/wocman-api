@@ -39,6 +39,8 @@ const schemaJoiMatchPassword = Joi.object({
 });
 
 
+
+
 isEmailVerify = (req, res, next) => {
     var joyresult = schemaJoiEmail.validate({ email: req.body.email });
     var { value, error } = joyresult;
@@ -107,6 +109,59 @@ isPasswordConfirmed = (req, res, next) => {
     }
 };
 
+isLinkVerify = (req, res, next) => {
+
+    if (typeof req.body.emailLink === "undefined") {
+        return res.status(400).send(
+            {
+                statusCode: 400,
+                status: false,
+                message: "Include an emailLink that would be sent to user email",
+                data: [] 
+            }
+        );
+    }else{
+        var resrt6d = req.body.emailLink.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
+        if (resrt6d == null) {
+            return res.status(422).json({
+                statusCode: 422,
+                status: false,
+                message: 'Invalid Email Link',
+                data: []
+            })
+        }else{
+            next();
+        }
+    }
+};
+
+isLinkVerifyGoogle = (req, res, next) => {
+
+    if (typeof req.body.redirectLink === "undefined") {
+        return res.status(400).send(
+            {
+                statusCode: 400,
+                status: false,
+                message: "Include an redirectLink that would be used to return user unique token",
+                data: [] 
+            }
+        );
+    }else{
+        var resrt6d = req.body.redirectLink.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
+        if (resrt6d == null) {
+            return res.status(422).json({
+                statusCode: 422,
+                status: false,
+                message: 'Invalid redirectLink',
+                data: []
+            })
+        }else{
+            next();
+        }
+    }
+};
+
+
 checkDuplicateUsernameOrEmail = (req, res, next) => {
     
 
@@ -143,6 +198,8 @@ const verifySignUp = {
     isEmailVerify: isEmailVerify,
     isUsernameVerify: isUsernameVerify,
     isPasswordVerify: isPasswordVerify,
+    isLinkVerify: isLinkVerify,
+    isLinkVerifyGoogle : isLinkVerifyGoogle,
     isPasswordConfirmed: isPasswordConfirmed
 };
 
