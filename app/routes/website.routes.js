@@ -2,7 +2,6 @@ const { verifySignUp } = require("../middleware");
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const cookieSession = require('cookie-session');
-require("../config/passportgoogle.config.js");
 
 const { resolve, port, website }  = require("../config/auth.config");
 
@@ -218,37 +217,11 @@ module.exports = function(app) {
     //they would be sent to google platform
     app.post(
         Helpers.apiVersion7()+'google-auth/wocman-signin',
-        verifyWocmanSignUp.isLinkVerifyGoogle,
-        passport.authenticate('google',
-            { scope: ['profile', 'email'] }
-        )
-    );
-
-    
-    //google would redirect them to hit this endpoint once the user login credential with google is true
-    //they would be sent to google-auth/wocman-signin-proceed endpoint
-    app.get(
-        Helpers.apiVersion7()+'google-auth/wocman-signin-callback',
-        passport.authenticate('google', { failureRedirect: failUrl } ),
-        function(req, res) {
-            res.redirect(Helpers.apiVersion7()+"google-auth/wocman-signin-proceed");
-        }
-    );
-
-    app.get(
-        Helpers.apiVersion7()+"google-auth/wocman-signin-failed",
-        signinPassportGoogleController.failedSignIn
-    );
-
-    //this servers as auth/wocman-signin endpoint
-    //then they should be sent to dashboard page if access token returned is not null
-    //immediatelly they are sent to dashboard, you call the dashboard endpoint to retrieve all the wocman data(very complex array of profile info, wallet info, job info and settings info)
-    //the dashboard endpoint(profile-wocman) is in the wocmanuser.routes.js routes 
-    app.get(
-        Helpers.apiVersion7()+"google-auth/wocman-signin-proceed",
+        [
+            verifyWocmanSignUp.isToken,
+        ],
         signinPassportGoogleController.proceedSignIn
     );
-
     //a wocman user forgot his/her password,
     //they would hit this endpoint to start password reset process.
     //this sends an email to them with a password recovery link

@@ -1,11 +1,16 @@
 const baseUrl = "../../../../";
+const { resolve, port, website, googleAppClientID }  = require(baseUrl + "config/auth.config");
+
 const db = require(baseUrl+"models");
+const {OAuth2Client} = require("google-auth-library");
 const User = db.user;
 const UserRole = db.userRole;
 const Role = db.role;
 const Cert = db.cert;
 const Helpers = require(baseUrl+"helpers/helper.js");
 const Joi = require('joi');
+
+const client = new OAuth2Client(googleAppClientID);
 
 const schemaJoiEmail = Joi.object({
     email: Joi.string()
@@ -135,36 +140,49 @@ isLinkVerify = (req, res, next) => {
     }
 };
 
-isLinkVerifyGoogle = (req, res, next) => {
-
-    if (typeof req.body.redirectLink === "undefined") {
+isToken = (req, res, next) => {
+    if (typeof req.body.tokenId === "undefined") {
         return res.status(400).send(
             {
                 statusCode: 400,
                 status: false,
-                message: "Include an redirectLink that would be used to return user unique token",
+                message: "Include a google token id",
                 data: [] 
             }
         );
     }else{
-        var resrt6d = req.body.redirectLink.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
-        if (resrt6d == null) {
-            return res.status(422).json({
-                statusCode: 422,
-                status: false,
-                message: 'Invalid redirectLink',
-                data: []
-            })
-        }else{
-            next();
-        }
+        var tokenId  = req.body.tokenId;
+        client.verifyIdToken({idToken : tokenId, audience : googleAppClientID})
+        .then( response => {
+            const {  email_verified, email, name } = response.payload;
+            if(email_verified && email_verified === true){
+                req.email = email;
+                req.name = name;
+                next();
+            }else{
+                return res.status(422).json({
+                    statusCode: 422,
+                    status: false,
+                    message: 'Invalid tokenId',
+                    data: []
+                });
+            }
+        })
+        .catch(err => {
+            // req.email = 'jeorgejustice@gmail.com';
+            // req.name = 'Justice George';
+            // next();
+
+            return res.status(500).send({
+                statusCode: 500,
+                status: false, 
+                message: err.message+"adjust",
+                data: [] 
+            });
+        });
     }
 };
-
-
 checkDuplicateUsernameOrEmail = (req, res, next) => {
-    
-
     // Email
     User.findOne({
         where: {
@@ -199,7 +217,7 @@ const verifySignUp = {
     isUsernameVerify: isUsernameVerify,
     isPasswordVerify: isPasswordVerify,
     isLinkVerify: isLinkVerify,
-    isLinkVerifyGoogle : isLinkVerifyGoogle,
+    isToken : isToken,
     isPasswordConfirmed: isPasswordConfirmed
 };
 

@@ -4,7 +4,6 @@ const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
 const passport = require('passport');
 const cookieSession = require('cookie-session');
-require(pathRoot+"config/passportgoogle.config");
 const User = db.user;
 const Role = db.role;
 const UserRole = db.userRole;
@@ -56,87 +55,160 @@ let MailGenerator = new Mailgen({
 });
 
 
+
+
 const Op = db.Sequelize.Op;
 
 exports.proceedSignIn = (req, res, next) => {
-    // console.log(req.user);
-    if (typeof req.user === "undefined" || req.user == null ) {
+    if (typeof req.email === "undefined" || req.email == null ) {
         return res.status(400).send(
             {
                 statusCode: 400,
                 status: false, 
-                message: "User already registered",
+                message: "Could not resolve google oauth",
                 data: [] 
             }
         );
     }else{
+        var email = req.email;
+        var name = req.name;
+        User.findOne({
+            where: {email:email}
+        }).then(user => {
+            if (!user) {
+                User.create({
+                    username: name,
+                    email: email,
+                    password: bcrypt.hashSync(req.body.tokenId, 8),
+                    verify_email: 1,
+                    signuptype: req.body.tokenId
+                })
+                .then(nuser => {
+                    UserRole.findOne({
+                        where: {userid: nuser.id}
+                    })
+                    .then(userrole => {
+                        if (!userrole) {
+                            UserRole.create({
+                                userid: nuser.id,
+                                roleid: 2
+                            });
+                        }
+                    });
+                    Wsetting.findOne({
+                        where: {userid: nuser.id}
+                    })
+                    .then(hasSettings => {
+                        if (!hasSettings) {
+                            Wsetting.create({
+                                userid: nuser.id
+                            });
+                        }
+                    });
+                    //return user data here
+                    var token = jwt.sign({ id: user.id }, config.secret, {
+                        expiresIn: 86400 // 24 hours
+                    });
 
-        var email = req.user.email;
-        var emailLink = req.body.redirectLink;
+                    //making sure a user was signed in appropriately
+                    user.update({
+                        loginlogout:0,
+                        weblogintoken:token
+                    });
 
-        if (typeof email === "undefined") {
-            return res.status(400).send(
-                {
-                    statusCode: 400,
-                    status: false, 
-                    message: "Invalid Email",
-                    data: [] 
-                }
-            );
-        }else{
-
-            var searchemail = {};
-           
-            if(email && email !== ''){
-                searchemail = {'email': email}
-            }else{
-                searchemail = {'email': {$not: null}};
-            }
-
-            User.findOne({
-                where: searchemail
-            })
-            .then(user => {
-                if (!user) {
-                    return res.status(404).send({
-                        statusCode: 404,
+                    res.status(200).send({
+                        statusCode: 200,
+                        status: true,
+                        message: "Login successful",
+                        data: {
+                            email: user.email,
+                            verify_email: user.verify_email,
+                            username: user.username,
+                            firstname: user.firstname,
+                            lastname: user.lastname,
+                            address: user.address,
+                            country: user.country,
+                            state: user.state,
+                            province: user.province,
+                            phone: user.phone,
+                            image: user.image,
+                            role: 'wocman',
+                            unboard: user.unboard,
+                            accessToken: token
+                        }
+                    });
+                })
+                .catch(err => {
+                    return res.status(500).send({
+                        statusCode: 500,
                         status: false,
-                        message: "User Not found.",
-                        date: []
+                        message: err.message,
+                        data: []
+                    });
+                });
+            }else{
+                if (user.signuptype == 'wocman') {
+                    return res.status(400).send(
+                        {
+                            statusCode: 400,
+                            status: false, 
+                            message: "User Registered Already",
+                            data: [] 
+                        }
+                    );
+                }else{
+                    User.update(
+                        {
+                            password: bcrypt.hashSync(req.body.tokenId, 8),
+                            signuptype: req.body.tokenId
+                        },
+                        {
+                            where: {email:email}
+                        }
+                    );
+                    //return user data here
+                    var token = jwt.sign({ id: user.id }, config.secret, {
+                        expiresIn: 86400 // 24 hours
+                    });
+
+                    //making sure a user was signed in appropriately
+                    user.update({
+                        loginlogout:0,
+                        weblogintoken:token
+                    });
+
+                    res.status(200).send({
+                        statusCode: 200,
+                        status: true,
+                        message: "Login successful",
+                        data: {
+                            email: user.email,
+                            verify_email: user.verify_email,
+                            username: user.username,
+                            firstname: user.firstname,
+                            lastname: user.lastname,
+                            address: user.address,
+                            country: user.country,
+                            state: user.state,
+                            province: user.province,
+                            phone: user.phone,
+                            image: user.image,
+                            role: 'wocman',
+                            unboard: user.unboard,
+                            accessToken: token
+                        }
                     });
                 }
-
-                var token = jwt.sign({ id: user.id }, config.secret, {
-                    expiresIn: 86400 // 24 hours
-                });
-
-                //making sure a user was signed in appropriately
-                user.update({
-                    loginlogout:0,
-                    weblogintoken:token
-                });
-                var passUrl = emailLink + token;
-                res.redirect(passUrl);
-            })
-            .catch(err => {
-                res.status(500).send({
-                    statusCode: 500,
-                    status: false, 
-                    message: err.message,
-                    data: [] 
-                });
+            }
+        })
+        .catch(err => {
+            return res.status(500).send({
+                statusCode: 500,
+                status: false,
+                message: err.message,
+                data: []
             });
-        }
+        });
     }
 };
 
-exports.failedSignIn = (req, res, next) => {
-    res.status(200).send({
-        statusCode: 200,
-        status: true,
-        message: "Google Verification failed",
-        data: {
-            accessToken: null
-        }
-    });
-};
