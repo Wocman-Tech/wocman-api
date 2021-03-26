@@ -33,10 +33,10 @@ const
 
 
 const isDeviceVC = require("../controllers/website/user/wocman/isDevice.controller");
-const confirmpasswordresetController = require("../controllers/website/user/wocman/confirmpasswordresetemail.controller");
+const confirmpasswordresetController = require("../controllers/website/user/wocman/confirmpasswordreset.controller");
 const emailverifyController = require("../controllers/website/user/wocman/emailverify.controller");
 const resetpasswordController = require("../controllers/website/user/wocman/resetpassword.controller");
-const sendchangepasswordController = require("../controllers/website/user/wocman/sendchangepasswordemail.controller");
+const sendchangepasswordController = require("../controllers/website/user/wocman/requestpasswordreset.controller");
 const signinController = require("../controllers/website/user/wocman/signin.controller");
 const signinPassportGoogleController = require("../controllers/website/user/wocman/passportgoogleauth.controller");
 const signupController = require("../controllers/website/user/wocman/signup.controller");
@@ -258,14 +258,6 @@ module.exports = function(app) {
         sendchangepasswordController.wocmanResetPassword
     );
 
-    //a wocman user requested to reset password,
-    //they would hit this endpoint once they click on the link in the recover password email sent to them.
-    //this would verify the email is valid and actually requested to reset password
-    app.get(
-        Helpers.apiVersion7()+"wocman-password-reset/:link",
-        [verifyChangePasswordEmail.isLinkVerify],
-        confirmpasswordresetController.wocmanResetPasswordConfirm
-    );
     //a wocman user clicks the link in reset password email and got confired,
     //they would hit this endpoint once they submit the new password details.
     //this would reset their password for them

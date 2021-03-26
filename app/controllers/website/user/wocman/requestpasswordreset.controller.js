@@ -52,7 +52,7 @@ let MailGenerator = new Mailgen({
 
 
 const Op = db.Sequelize.Op;
-
+const otp = Math.floor(100000 + Math.random() * 900000);
 exports.wocmanResetPassword = (req, res, next) => {
     if (typeof req.body.email === "undefined") {
         return res.status(400).send(
@@ -64,10 +64,7 @@ exports.wocmanResetPassword = (req, res, next) => {
             }
         );
     }else{
-        const verify_email_1 = uuidv4();
-        var verify_email = bcrypt.hashSync(verify_email_1, 8);
-        verify_email = verify_email.replace(/[^\w\s]/gi, "");
-
+        const verify_email = otp;
         var  SearchUsername = {};
         var Searchemail = {};
         var whereQuery = {};
@@ -97,13 +94,10 @@ exports.wocmanResetPassword = (req, res, next) => {
                     changepassword: verify_email
                 })
                 .then(tht => {
-                    // console.log("yes");
-                    //source:https://medium.com/javascript-in-plain-english/how-to-send-emails-with-node-js-1bb282f334fe
-                    var verification_link = MAIN_URL.slice(0, -1)+Helpers.apiVersion7()+"wocman-password-reset/" + dfg43.changepassword;
                     let response = {
                         body: {
                           name: dfg43.username,
-                          intro: "You have requested that your password be changed. If not you, kindly disregard this message. Click or Copy this link to any browser to proceed with your request to change your password: "+verification_link,
+                          intro: "You have requested that your password be changed. If not you, kindly disregard this message.  Copy this digits to complete the password reset process: " + verify_email,
                         },
                     };
 
@@ -123,7 +117,7 @@ exports.wocmanResetPassword = (req, res, next) => {
                             status: true,
                             message: "Password Reset Request", 
                             data: {
-                                link: verification_link, 
+                                link: otp, 
                                 email : dfg43.email, 
                                 role: 'wocman' 
                             }

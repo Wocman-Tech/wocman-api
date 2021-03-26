@@ -55,8 +55,9 @@ const Op = db.Sequelize.Op;
 
 
 exports.wocmanStartResetPassword = (req, res, next) => {
-    var email_link =  req.body.link;
+    var email_link =  req.body.email;
     var password_link =  req.body.password;
+    var password_otplink =  req.body.otp;
     if (typeof password_link === "undefined") {
         return res.status(400).send(
             {
@@ -82,21 +83,21 @@ exports.wocmanStartResetPassword = (req, res, next) => {
         var password = bcrypt.hashSync(password_link, 8);
     }
     var SearchemailLink = {};
-    if (typeof email_link === "undefined") {
+    if (typeof password_otplink === "undefined" || password_otplink.length != 6) {
         return res.status(400).send(
             {
                 statusCode: 400,
                 status: false,
-                message: "link is undefined." ,
+                message: "OTP is undefined." ,
                 data: []
             }
         );
     }else{
 
         if(email_link && email_link !== ''){
-            SearchemailLink = {'changepassword': email_link};
+            SearchemailLink = {'email': email_link, 'changepassword': password_otplink};
         }else{
-            SearchemailLink = {'changepassword': {$not: null}};
+            SearchemailLink = {'email':  {$not: null}, 'changepassword': {$not: null}};
         }
 
         User.findOne({
@@ -108,10 +109,11 @@ exports.wocmanStartResetPassword = (req, res, next) => {
                 {
                     statusCode: 404,
                     status: false,
-                    message: "link does not exist.",
+                    message: "Password reset link does not exist.",
                     data: []
                 });
             }
+            
             users.update({
                 password: password,
                 changepassword: 1
@@ -121,7 +123,7 @@ exports.wocmanStartResetPassword = (req, res, next) => {
 
                 authorities.push("ROLE_" + "wocman".toUpperCase());
 
-                var verification_link = MAIN_URL.slice(0, -1)+Helpers.apiVersion7()+"auth/wocman-signin";
+                var verification_link = config.website + "/register?wocman=1";
                 let response = {
                     body: {
                       name: users.username,
@@ -140,6 +142,15 @@ exports.wocmanStartResetPassword = (req, res, next) => {
 
                 transporter.sendMail(message)
                 .then(() => {
+                    if (users.changepassword == 1) {
+                        var changepassword = "Completed";
+                    }
+                    if (users.changepassword.length == 6) {
+                        var changepassword = "In progress";
+                    }
+                    if (users.changepassword == 0) {
+                        var changepassword = "Not Started";
+                    }
                     res.status(200).send({
                         statusCode: 200,
                         status: true,
@@ -147,8 +158,7 @@ exports.wocmanStartResetPassword = (req, res, next) => {
                         data: {
                             username: users.username,
                             email: users.email,
-                            password: users.password,
-                            changepassword: users.changepassword,
+                            changepassword: changepassword,
                             roles: authorities,
                             sentMail: true
                         }
