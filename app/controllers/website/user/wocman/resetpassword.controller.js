@@ -123,7 +123,7 @@ exports.wocmanStartResetPassword = (req, res, next) => {
 
                 authorities.push("ROLE_" + "wocman".toUpperCase());
 
-                var verification_link = config.website + "/register?wocman=1";
+                var verification_link = config.website + "/login?wocman=1";
                 let response = {
                     body: {
                       name: users.username,

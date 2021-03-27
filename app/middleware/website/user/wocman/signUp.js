@@ -176,7 +176,7 @@ isToken = (req, res, next) => {
             return res.status(500).send({
                 statusCode: 500,
                 status: false, 
-                message: err.message+"adjust",
+                message: err.message,
                 data: [] 
             });
         });

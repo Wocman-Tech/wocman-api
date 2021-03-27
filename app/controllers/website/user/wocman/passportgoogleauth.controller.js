@@ -18,6 +18,7 @@ const Wshear = db.wshear;
 const WAChat = db.waChat;
 const WCChat = db.wcChat;
 const WWallet = db.wWallet;
+const Wsetting = db.wsetting;
 
 const Helpers = require(pathRoot+"helpers/helper.js");
 const { verifySignUp } = require(pathRoot+"middleware");
