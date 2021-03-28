@@ -147,6 +147,20 @@ exports.signInWocman = (req, res, next) => {
                                     Wsetting.create({
                                         userid: user.id
                                     });
+                                    var isDeviceSettings = false;
+                                    var isOTPSetings = false;
+                                }else{
+                                    if (hasSettings.securityipa  != 0) {
+                                        var isDeviceSettings = true;
+                                    }else{
+                                        var isDeviceSettings = false;
+                                    }
+
+                                    if (hasSettings.security2fa  != 0) {
+                                        var isOTPSetings = true;
+                                    }else{
+                                        var isOTPSetings = false;
+                                    }
                                 }
                                 res.status(200).send({
                                     statusCode: 200,
@@ -166,7 +180,9 @@ exports.signInWocman = (req, res, next) => {
                                         image: user.image,
                                         role: 'wocman',
                                         unboard: user.unboard,
-                                        accessToken: token
+                                        accessToken: token,
+                                        checkDevice: isDeviceSettings,
+                                        checkOTP: isOTPSetings
                                     }
                                 });
                             })

@@ -85,17 +85,6 @@ exports.proceedSignIn = (req, res, next) => {
                     signuptype: req.body.tokenId
                 })
                 .then(nuser => {
-                    UserRole.findOne({
-                        where: {userid: nuser.id}
-                    })
-                    .then(userrole => {
-                        if (!userrole) {
-                            UserRole.create({
-                                userid: nuser.id,
-                                roleid: 2
-                            });
-                        }
-                    });
                     Wsetting.findOne({
                         where: {userid: nuser.id}
                     })
@@ -104,39 +93,63 @@ exports.proceedSignIn = (req, res, next) => {
                             Wsetting.create({
                                 userid: nuser.id
                             });
-                        }
-                    });
-                    //return user data here
-                    var token = jwt.sign({ id: user.id }, config.secret, {
-                        expiresIn: 86400 // 24 hours
-                    });
+                            var isDeviceSettings = false;
+                            var isOTPSetings = false;
+                        }else{
+                            if (hasSettings.securityipa  != 0) {
+                                var isDeviceSettings = true;
+                            }else{
+                                var isDeviceSettings = false;
+                            }
 
-                    //making sure a user was signed in appropriately
-                    user.update({
-                        loginlogout:0,
-                        weblogintoken:token
-                    });
-
-                    res.status(200).send({
-                        statusCode: 200,
-                        status: true,
-                        message: "Login successful",
-                        data: {
-                            email: user.email,
-                            verify_email: user.verify_email,
-                            username: user.username,
-                            firstname: user.firstname,
-                            lastname: user.lastname,
-                            address: user.address,
-                            country: user.country,
-                            state: user.state,
-                            province: user.province,
-                            phone: user.phone,
-                            image: user.image,
-                            role: 'wocman',
-                            unboard: user.unboard,
-                            accessToken: token
+                            if (hasSettings.security2fa  != 0) {
+                                var isOTPSetings = true;
+                            }else{
+                                var isOTPSetings = false;
+                            }
                         }
+                        //return user data here
+                        var token = jwt.sign({ id: nuser.id }, config.secret, {
+                            expiresIn: 86400 // 24 hours
+                        });
+
+                        //making sure a user was signed in appropriately
+                        nuser.update({
+                            loginlogout:0,
+                            weblogintoken:token
+                        });
+
+                        res.status(200).send({
+                            statusCode: 200,
+                            status: true,
+                            message: "Login successful",
+                            data: {
+                                email: nuser.email,
+                                verify_email: nuser.verify_email,
+                                username: nuser.username,
+                                firstname: nuser.firstname,
+                                lastname: nuser.lastname,
+                                address: nuser.address,
+                                country: nuser.country,
+                                state: nuser.state,
+                                province: nuser.province,
+                                phone: nuser.phone,
+                                image: nuser.image,
+                                role: 'wocman',
+                                unboard: nuser.unboard,
+                                accessToken: token,
+                                checkDevice: isDeviceSettings,
+                                checkOTP: isOTPSetings
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        return res.status(500).send({
+                            statusCode: 500,
+                            status: false,
+                            message: err.message,
+                            data: []
+                        });
                     });
                 })
                 .catch(err => {
@@ -172,32 +185,67 @@ exports.proceedSignIn = (req, res, next) => {
                         expiresIn: 86400 // 24 hours
                     });
 
-                    //making sure a user was signed in appropriately
-                    user.update({
-                        loginlogout:0,
-                        weblogintoken:token
-                    });
 
-                    res.status(200).send({
-                        statusCode: 200,
-                        status: true,
-                        message: "Login successful",
-                        data: {
-                            email: user.email,
-                            verify_email: user.verify_email,
-                            username: user.username,
-                            firstname: user.firstname,
-                            lastname: user.lastname,
-                            address: user.address,
-                            country: user.country,
-                            state: user.state,
-                            province: user.province,
-                            phone: user.phone,
-                            image: user.image,
-                            role: 'wocman',
-                            unboard: user.unboard,
-                            accessToken: token
+                    Wsetting.findOne({
+                        where: {userid: user.id}
+                    })
+                    .then(hasSettings => {
+                        if (!hasSettings) {
+                            Wsetting.create({
+                                userid: user.id
+                            });
+                            var isDeviceSettings = false;
+                            var isOTPSetings = false;
+                        }else{
+                            if (hasSettings.securityipa  != 0) {
+                                var isDeviceSettings = true;
+                            }else{
+                                var isDeviceSettings = false;
+                            }
+
+                            if (hasSettings.security2fa  != 0) {
+                                var isOTPSetings = true;
+                            }else{
+                                var isOTPSetings = false;
+                            }
                         }
+                        //making sure a user was signed in appropriately
+                        user.update({
+                            loginlogout:0,
+                            weblogintoken:token
+                        });
+
+                        res.status(200).send({
+                            statusCode: 200,
+                            status: true,
+                            message: "Login successful",
+                            data: {
+                                email: user.email,
+                                verify_email: user.verify_email,
+                                username: user.username,
+                                firstname: user.firstname,
+                                lastname: user.lastname,
+                                address: user.address,
+                                country: user.country,
+                                state: user.state,
+                                province: user.province,
+                                phone: user.phone,
+                                image: user.image,
+                                role: 'wocman',
+                                unboard: user.unboard,
+                                accessToken: token,
+                                checkDevice: isDeviceSettings,
+                                checkOTP: isOTPSetings
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        return res.status(500).send({
+                            statusCode: 500,
+                            status: false,
+                            message: err.message,
+                            data: []
+                        });
                     });
                 }
             }

@@ -92,7 +92,7 @@ exports.isDevice = (req, res, next) => {
                     });
                 }
 
-                if (usersettings.securityipa != 0) {
+                if (parseInt(usersettings.securityipa, 10) != 0) {
 
                     if (typeof req.body.ipaddress === "undefined") {
                         return res.status(400).send(

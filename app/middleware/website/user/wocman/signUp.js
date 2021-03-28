@@ -169,7 +169,7 @@ isToken = (req, res, next) => {
             }
         })
         .catch(err => {
-            // req.email = 'jeorgejustice@gmail.com';
+            // req.email = 'sdsd@gmail.com';
             // req.name = 'Justice George';
             // next();
 

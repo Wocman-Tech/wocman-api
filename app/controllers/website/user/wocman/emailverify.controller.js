@@ -88,10 +88,18 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
                     statusCode: 404,
                     status: false,
                     message: "Email link does not exist.",
-                     data: []
+                    data: []
                 });
-          
             }
+
+            User.update(
+                {
+                    verify_email: 1
+                },
+                {
+                    where: {email : users.email}
+                }
+            );
       
             var token = jwt.sign({ id: users.id }, config.secret, {
                 expiresIn: 86400 // 24 hours
@@ -108,7 +116,6 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
                 data: {
                     accessToken: token
                 }
-                
             });
         })
         .catch(err => {
