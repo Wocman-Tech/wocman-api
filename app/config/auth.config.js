@@ -18,8 +18,8 @@ if (workstation.toLowerCase() === "web") {
         name: "Wocman Technology",
         website: "https://wocman.netlify.app",
         otpId: "8C5YFUT5NWJo8TD7tVQ20o4QF",
-        googleAppClientID: "41617709370-91tu56ot8gqk51ngetncu3b5austpjon.apps.googleusercontent.com",
-        googleAppClientSecret: "rjyf2fcqN58cHFJK1aRWt7bb"
+        googleAppClientID: "832018209601-v1h3d5qgu10p3m4pv6l1jvgq9gcrl9v1.apps.googleusercontent.com",
+        googleAppClientSecret: "o1pyycovPehN0loXowHRh0aR"
     }
 }
 
@@ -38,7 +38,7 @@ if(workstation.toLowerCase() === "localhost"){
         name: "Wocman Technology",
         website: "https://wocman.netlify.app",
         otpId: "8C5YFUT5NWJo8TD7tVQ20o4QF",
-        googleAppClientID: "41617709370-91tu56ot8gqk51ngetncu3b5austpjon.apps.googleusercontent.com",
-        googleAppClientSecret: "rjyf2fcqN58cHFJK1aRWt7bb"
+        googleAppClientID: "832018209601-v1h3d5qgu10p3m4pv6l1jvgq9gcrl9v1.apps.googleusercontent.com",
+        googleAppClientSecret: "o1pyycovPehN0loXowHRh0aR"
     }
 }
