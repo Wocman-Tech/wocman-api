@@ -254,3 +254,94 @@ exports.isDevice = (req, res, next) => {
     });
 };
 
+exports.checkisDeviceisOTP = (req, res, next) => {
+    var searchemail = {};
+    if(req.body.email && req.body.email !== ''){
+        searchemail = {'email': req.body.email}
+    }else{
+        searchemail = {'email': {$not: null}};
+    }
+    User.findOne({
+        where: searchemail
+    })
+    .then(user => {
+        if (!user) {
+            return res.status(404).send({
+                statusCode: 404,
+                status: false,
+                message: "User Not found.",
+                date: []
+            });
+        }
+        var searchuser = {'userid': user.id};
+
+        Wsetting.findOne({
+            where: searchuser
+        })
+        .then(hasSettings => {
+            if (!hasSettings) {
+                Wsetting.create({
+                    userid: user.id
+                });
+            }
+            Wsetting.findOne({
+                where: searchuser
+            })
+            .then(usersettings => {
+                if (!usersettings) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "User Settings not found.",
+                        date: []
+                    });
+                }
+                if (parseInt(usersettings.securityipa, 10) != 0) {
+                    var isDevice = true;
+                }else{
+                    var isDevice = false;
+                }
+                if (parseInt(usersettings.security2fa, 10) != 0) {
+                    var isOTP = true;
+                }else{
+                    var isOTP = false;
+                }
+                res.status(202).send({
+                    statusCode: 202,
+                    status: true,
+                    accessToken: null,
+                    message: "Checking Device and OTP Settings",
+                    data: {
+                        checkDevice: isDevice,
+                        checkOTP: isOTP
+                    }
+                });
+            })
+            .catch(err => {
+                return res.status(500).send({
+                    statusCode: 500,
+                    status: false, 
+                    message: err.message,
+                    data: [] 
+                });
+            });
+        })
+        .catch(err => {
+            return res.status(500).send({
+                statusCode: 500,
+                status: false, 
+                message: err.message,
+                data: [] 
+            });
+        });
+    })                   
+    .catch(err => {
+        return res.status(500).send({
+            statusCode: 500,
+            status: false, 
+            message: err.message,
+            data: [] 
+        });
+    });             
+};
+

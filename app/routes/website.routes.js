@@ -173,6 +173,14 @@ module.exports = function(app) {
     );
 
     app.post(
+        Helpers.apiVersion7()+"wocman-account-Settings",
+        [
+            verifyWocmanSignIn.isEmailVerify
+        ],
+        verifyDevice.checkisDeviceisOTP
+    );
+
+    app.post(
         Helpers.apiVersion7()+"wocman-signin-resend-isdevice",
         [
             verifyWocmanSignIn.isEmailVerify
