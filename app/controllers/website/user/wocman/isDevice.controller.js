@@ -55,190 +55,378 @@ const schemaJoiLink = Joi.object({
 
 const Op = db.Sequelize.Op;
 
-exports.resendIsDevice = (req, res) => {
-    var searchemail = {};
-    if(req.body.email && req.body.email !== ''){
-        searchemail = {'email': req.body.email}
+const otp = Math.floor(100000 + Math.random() * 900000);
+
+exports.isDevice = (req, res, next) => {
+    var email = req.body.email;
+    var ip = (req.headers['x-forwarded-for'] || '').split(',').pop().trim() || 
+        req.connection.remoteAddress || 
+        req.socket.remoteAddress || 
+        req.connection.socket.remoteAddress
+
+    // console.log(ip);
+    // next();
+
+    if (typeof ip === "undefined") {
+        return res.status(400).send(
+            {
+                statusCode: 400,
+                status: false, 
+                message: "IP Address is undefined.",
+                data: []
+            }
+        );
     }else{
-        searchemail = {'email': {$not: null}};
-    }
 
-    User.findOne({
-        where: searchemail
-    })
-    .then(user => {
-        if (!user) {
-            return res.status(404).send({
-                statusCode: 404,
-                status: false,
-                message: "User Not found.",
-                date: []
-            });
+        var searchemail = {};
+
+        if(email && email !== ''){
+            searchemail = {'email': email}
+        }else{
+            searchemail = {'email': {$not: null}};
         }
-        var searchuser = {'userid': user.id};
 
-        
-        Wsetting.findOne({
-            where: searchuser
+        User.findOne({
+            where: searchemail
         })
-        .then(usersettings => {
-            if (!usersettings) {
+        .then(user => {
+            if (!user) {
                 return res.status(404).send({
                     statusCode: 404,
                     status: false,
-                    message: "User Settings not found.",
+                    message: "User Not found.",
                     date: []
                 });
             }
+            const username = user.username;
 
-            if (usersettings.securityipa != 0) {
+            var searchuser = {'userid': user.id};
 
-                if (typeof req.body.ipaddress === "undefined") {
-                    return res.status(400).send(
-                        {
-                            statusCode: 400,
-                            status: false, 
-                            message: "IP Address is undefined.",
-                            data: []
+            Wsetting.findOne({
+                where: searchuser
+            })
+            .then(hasSettings => {
+                if (!hasSettings) {
+                    Wsetting.create({
+                        userid: user.id
+                    });
+                }
+                Wsetting.findOne({
+                    where: searchuser
+                })
+                .then(usersettings => {
+                    if (!usersettings) {
+                        return res.status(404).send({
+                            statusCode: 404,
+                            status: false,
+                            message: "User Settings not found.",
+                            date: []
+                        });
+                    }
+                    if (parseInt(usersettings.securityipa, 10) == 0) {
+                        next();
+                    }else{
+                        var joyresult = schemaJoiIP.validate({ ipaddress: ip });
+                        var { value, error } = joyresult;
+                        if (!(typeof error === 'undefined')) {
+                            var msg = Helpers.getJsondata(error, 'details')[0];
+                            var msgs = Helpers.getJsondata(msg, 'message');
+                            return res.status(422).json({
+                                statusCode: 422,
+                                status: false,
+                                message: msgs,
+                                data: []
+                            })
+                        }else{
+                            IpBlacklist.findOne({
+                                where: {ip: ip, userid: user.id}
+                            }).then(findip => {
+                                if (!findip) {//assuming the ip addres does not exit before now
+                                    IpBlacklist.create({//we create it
+                                        ip: ip,
+                                        ipmode: 0,
+                                        ipotp: otp,
+                                        userid: user.id
+                                    })
+                                }else{
+                                    IpBlacklist.update(
+                                        {
+                                            ipotp: otp
+                                        },
+                                        {
+                                            where: {ip: ip, userid: user.id }
+                                        }
+                                    )
+                                    IpBlacklist.findOne({
+                                        where: {ip: ip, userid: user.id}
+                                    }).then(newfinhd5ip => {//we sent the opt to the users email
+                                        // console.log(newfinhd5ip.ipmode);
+
+                                        if (parseInt(newfinhd5ip.ipmode, 10) == 1) {
+                                            return res.status(401).send({
+                                                statusCode: 401,
+                                                status: false,
+                                                accessToken: null,
+                                                message: "IP Addres was blacklisted",
+                                                data: []
+                                            });
+                                        }
+                                    })
+                                }
+                                var sentMail = false;
+
+                                let response = {
+                                    body: {
+                                      name: username,
+                                      intro: "Welcome to Wocman Technology! You are trying to login into your account from another device. Copy this OTP  to continue  Login: <br /><div style='font-weight:bolder;'>" + otp + "</div><br />",
+                                    },
+                                };
+
+                                let mail = MailGenerator.generate(response);
+
+                                let message = {
+                                    from: EMAIL,
+                                    to:  user.email,
+                                    subject: "Securiy Concern: Device Verification",
+                                    html: mail,
+                                };
+
+                                transporter.sendMail(message)
+                                .then(  sentMails => {
+                                    var sentMail = true;
+                                })
+                                return res.status(202).send({//return response
+                                    statusCode: 202,
+                                    status: true,
+                                    accessToken: null,
+                                    isdevice: true,
+                                    message: "You are logging into your account from another device",
+                                    data: {
+                                        otp: otp,
+                                        sentMail: sentMail
+                                    }
+                                });
+                            })
+                            .catch(err => {
+                                return res.status(500).send({
+                                    statusCode: 500,
+                                    status: false, 
+                                    message: err.message,
+                                    data: [] 
+                                });
+                            });
                         }
-                    );
-                }else{
-                    var ip = req.body.ipaddress;
+                    }
+                })
+                .catch(err => {
+                    return res.status(500).send({
+                        statusCode: 500,
+                        status: false, 
+                        message: err.message,
+                        data: [] 
+                    });
+                });
+            })
+            .catch(err => {
+                return res.status(500).send({
+                    statusCode: 500,
+                    status: false, 
+                    message: err.message,
+                    data: [] 
+                });
+            });
+        })
+        .catch(err => {
+            return res.status(500).send({
+                statusCode: 500,
+                status: false, 
+                message: err.message,
+                data: [] 
+            });
+        });
+    }
+};
+exports.resendIsDevice = (req, res) => {    
+    var email = req.body.email;
+    var ip = (req.headers['x-forwarded-for'] || '').split(',').pop().trim() || 
+         req.connection.remoteAddress || 
+         req.socket.remoteAddress || 
+         req.connection.socket.remoteAddress
+    // console.log(ip);
 
-                    var joyresult = schemaJoiIP.validate({ ipaddress: ip });
-                    var { value, error } = joyresult;
-                    if (!(typeof error === 'undefined')) {
-                        var msg = Helpers.getJsondata(error, 'details')[0];
-                        var msgs = Helpers.getJsondata(msg, 'message');
+    if (typeof ip === "undefined") {
+        return res.status(400).send(
+            {
+                statusCode: 400,
+                status: false, 
+                message: "IP Address is undefined.",
+                data: []
+            }
+        );
+    }else{
+
+        var searchemail = {};
+
+        if(email && email !== ''){
+            searchemail = {'email': email}
+        }else{
+            searchemail = {'email': {$not: null}};
+        }
+
+        User.findOne({
+            where: searchemail
+        })
+        .then(user => {
+            if (!user) {
+                return res.status(404).send({
+                    statusCode: 404,
+                    status: false,
+                    message: "User Not found.",
+                    date: []
+                });
+            }
+            const username = user.username;
+            var searchuser = {'userid': user.id};
+
+            Wsetting.findOne({
+                where: searchuser
+            })
+            .then(hasSettings => {
+                if (!hasSettings) {
+                    Wsetting.create({
+                        userid: user.id
+                    });
+                }
+                Wsetting.findOne({
+                    where: searchuser
+                })
+                .then(usersettings => {
+                    if (!usersettings) {
+                        return res.status(404).send({
+                            statusCode: 404,
+                            status: false,
+                            message: "User Settings not found.",
+                            date: []
+                        });
+                    }
+                    if (parseInt(usersettings.securityipa, 10) == 0) {
                         return res.status(422).json({
                             statusCode: 422,
                             status: false,
-                            message: msgs,
+                            message: 'User does not have device settings',
                             data: []
                         })
                     }else{
 
-                        IpBlacklist.findOne({
-                            where: {ip: ip, userid: user.id}
-                        }).then(findip => {
-                            if (!findip) {
+                        var joyresult = schemaJoiIP.validate({ ipaddress: ip });
+                        var { value, error } = joyresult;
+                        if (!(typeof error === 'undefined')) {
+                            var msg = Helpers.getJsondata(error, 'details')[0];
+                            var msgs = Helpers.getJsondata(msg, 'message');
+                            return res.status(422).json({
+                                statusCode: 422,
+                                status: false,
+                                message: msgs,
+                                data: []
+                            })
+                        }else{
+                            IpBlacklist.findOne({
+                                where: {ip: ip, userid: user.id}
+                            }).then(findip => {
+                                if (!findip) {//assuming the ip addres does not exit before now
+                                    IpBlacklist.create({//we create it
+                                        ip: ip,
+                                        ipmode: 0,
+                                        ipotp: otp,
+                                        userid: user.id
+                                    })
+                                }else{
 
-                                if (usersettings.securityipa != 0) {
-
-                                    if (typeof req.body.emailLink === "undefined") {
-                                        return res.status(400).send(
-                                            {
-                                                statusCode: 400,
+                                    IpBlacklist.update(
+                                        {
+                                            ipotp: otp
+                                        },
+                                        {
+                                            where: {ip: ip, userid: user.id }
+                                        }
+                                    )
+                                    IpBlacklist.findOne({
+                                        where: {ip: ip, userid: user.id}
+                                    }).then(newfindip => {//we sent the opt to the users email
+                                        if (parseInt(newfindip.ipmode, 10) == 1) {
+                                            return res.status(401).send({
+                                                statusCode: 401,
                                                 status: false,
-                                                message: "Include an emailLink that would be sent to user email",
-                                                data: [] 
-                                            }
-                                        );
-                                    }else{
-                                        var resrt6d = req.body.emailLink.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
-                                        if (resrt6d == null) {
-                                            return res.status(422).json({
-                                                statusCode: 422,
-                                                status: false,
-                                                message: 'Invalid Email Link',
+                                                accessToken: null,
+                                                message: "IP Addres was blacklisted",
                                                 data: []
-                                            })
-                                        }else{
-
-                                            var verify_ip_ad = uuidv4();
-                                            verify_ip_ad = verify_ip_ad + 'b9fdH' + ip;
-
-                                            
-                                            var verification_link = req.body.emailLink + verify_ip_ad;
-                                            var verification_link_2 = req.body.emailLink + verify_ip_ad;
-                                            let response = {
-                                                body: {
-                                                  name: user.firstname + " " + user.lastname,
-                                                  intro: "Welcome to Wocman Technology! You are trying to login into your account from another device. Click or Copy this link to any browser to processed  in Login: " + verification_link + "<br /> If it is not you, kindly click on this link to cancel login: " + verification_link_2,
-                                                },
-                                            };
-
-                                            let mail = MailGenerator.generate(response);
-
-                                            let message = {
-                                                from: EMAIL,
-                                                to:  user.email,
-                                                subject: "Securiy Concern: Device Verification",
-                                                html: mail,
-                                            };
-
-                                            transporter.sendMail(message)
-                                            .then(  sentMail => {
-                                                user.update({
-                                                    webloginipa: verify_ip_ad
-                                                }).then( updatedUser => {
-                                                    res.status(200).send({
-                                                        statusCode: 200,
-                                                        status: true,
-                                                        accessToken: null,
-                                                        message: "A message was sent to you to verify you are logging into your account from another device",
-                                                        data: {
-                                                            accept: verification_link,
-                                                            reject: verification_link_2
-                                                        }
-                                                    });
-                                                })
-                                                .catch(err => {
-                                                    return res.status(500).send({
-                                                        statusCode: 500,
-                                                        status: false, 
-                                                        message: err.message,
-                                                        data: [] 
-                                                    });
-                                                });
-
-                                            })
-                                            .catch(err => {
-                                                return res.status(500).send({
-                                                    statusCode: 500,
-                                                    status: false, 
-                                                    message: err.message,
-                                                    data: [] 
-                                                });
                                             });
                                         }
-                                    }
-                                }else{
-                                    return res.status(404).send({
-                                        statusCode: 404,
-                                        status: false, 
-                                        message: 'User Settings does not include Device Checks',
-                                        data: [] 
                                     });
                                 }
-                            }else{
-                                return res.status(401).send({
-                                    statusCode: 401,
-                                    status: false,
+
+                                var sentMail = false;
+
+                                let response = {
+                                    body: {
+                                      name: username,
+                                      intro: "Welcome to Wocman Technology! You are trying to login into your account from another device. Copy this OTP  to continue  Login: <br /><div style='font-weight:bolder;'>" + otp + "</div><br/>",
+                                    },
+                                };
+
+                                let mail = MailGenerator.generate(response);
+
+                                let message = {
+                                    from: EMAIL,
+                                    to:  user.email,
+                                    subject: "Securiy Concern: Device Verification",
+                                    html: mail,
+                                };
+
+                                transporter.sendMail(message)
+                                .then(  sentMails => {
+                                    var sentMail = true;
+                                })
+                                return res.status(202).send({//return response
+                                    statusCode: 202,
+                                    status: true,
                                     accessToken: null,
-                                    message: "Device has been blacklisted",
-                                    data: []
+                                    isdevice: true,
+                                    message: "You are logging into your account from another device",
+                                    data: {
+                                        otp: otp,
+                                        sentMail: sentMail
+                                    }
                                 });
-                            }
-                        })
-                        .catch(err => {
-                            return res.status(500).send({
-                                statusCode: 500,
-                                status: false, 
-                                message: err.message,
-                                data: [] 
+                            })
+                            .catch(err => {
+                                return res.status(500).send({
+                                    statusCode: 500,
+                                    status: false, 
+                                    message: err.message,
+                                    data: [] 
+                                });
                             });
-                        });
+                        }
                     }
-                }
-            }else{
-                return res.status(404).send({
-                    statusCode: 404,
+                })
+                .catch(err => {
+                    return res.status(500).send({
+                        statusCode: 500,
+                        status: false, 
+                        message: err.message,
+                        data: [] 
+                    });
+                });
+            })
+            .catch(err => {
+                return res.status(500).send({
+                    statusCode: 500,
                     status: false, 
-                    message: 'User Settings does not include Device Checks',
+                    message: err.message,
                     data: [] 
                 });
-            }
+            });
         })
         .catch(err => {
             return res.status(500).send({
@@ -248,207 +436,150 @@ exports.resendIsDevice = (req, res) => {
                 data: [] 
             });
         });
-    })
-    .catch(err => {
-        return res.status(500).send({
-            statusCode: 500,
-            status: false, 
-            message: err.message,
-            data: [] 
-        });
-    });
+    }
 };
 exports.activateIsDevice = (req, res) => {
-    var links = req.params.iplink;
-    var g6 = links.split('b9fdH');
-    var link = g6[0];
-    var ip = g6[1];
-    var searchemail = {};
-    if(link && link !== ''){
-        searchemail = {'webloginipa': links}
-    }else{
-        searchemail = {'webloginipa': {$not: null}};
-    }
-    var joyresult = schemaJoiLink.validate({ links: links });
-    var { value, error } = joyresult;
-    if (!(typeof error === 'undefined')) {
-        var msg = Helpers.getJsondata(error, 'details')[0];
-        var msgs = Helpers.getJsondata(msg, 'message');
-        return res.status(422).json({
-            statusCode: 422,
-            status: false,
-            message: msgs,
-            data: []
-        })
+    var email = req.body.email;
+    var otpToken = req.body.otpToken;
+    var password = req.body.password;
+    var ip = (req.headers['x-forwarded-for'] || '').split(',').pop().trim() || 
+         req.connection.remoteAddress || 
+         req.socket.remoteAddress || 
+         req.connection.socket.remoteAddress
+
+    if (typeof ip === "undefined") {
+        return res.status(400).send(
+            {
+                statusCode: 400,
+                status: false, 
+                message: "IP Address is undefined.",
+                data: []
+            }
+        );
     }else{
 
-        User.findOne({
-            where: searchemail
-        })
-        .then(user => {
-            if (!user) {
-                return res.status(404).send({
-                    statusCode: 404,
-                    status: false,
-                    message: "User Not found.",
-                    date: []
-                });
-            }
-            var searchuser = {'userid': user.id};
-            Wsetting.findOne({
-                where: searchuser
+        var joyresult = schemaJoiIP.validate({ ipaddress: ip });
+        var { value, error } = joyresult;
+        if (!(typeof error === 'undefined')) {
+            var msg = Helpers.getJsondata(error, 'details')[0];
+            var msgs = Helpers.getJsondata(msg, 'message');
+            return res.status(422).json({
+                statusCode: 422,
+                status: false,
+                message: msgs,
+                data: []
             })
-            .then(usersettings => {
-                if (!usersettings) {
+        }else{
+
+            var searchemail = {};
+
+            if(email && email !== ''){
+                searchemail = {'email': email}
+            }else{
+                searchemail = {'email': {$not: null}};
+            }
+
+            User.findOne({
+                where: searchemail
+            })
+            .then(user => {
+                if (!user) {
                     return res.status(404).send({
                         statusCode: 404,
                         status: false,
-                        message: "User Settings not found.",
+                        message: "User Not found.",
                         date: []
                     });
                 }
-                if (usersettings.securityipa != 0) {
-                    if (user.webloginipa == links) {
-                        Wsetting.update(
-                            {
-                                securityipa: ip
-                            },
-                            {
-                                where: {userid: user.id}
-                            }
-                        )
+                
+
+                var searchuser = {'userid': user.id};
+                IpBlacklist.findOne({
+                    where: {ip: ip, userid: user.id, ipotp: otpToken}
+                }).then(newfindip => {
+                    if (!newfindip) {
+                        return res.status(502).send({
+                            statusCode: 502,
+                            status: false,
+                            accessToken: null,
+                            message: "Bad Request",
+                            data: []
+                        });
+                    }
+                    if (newfindip.ipmode == 1) {
+                        return res.status(401).send({
+                            statusCode: 401,
+                            status: false,
+                            accessToken: null,
+                            message: "IP Addres was blacklisted",
+                            data: []
+                        });
+                    }
+                    //we check the password and continue login
+                    //destroy the token
+                    IpBlacklist.update(
+                        {
+                            ipotp: 0
+                        },
+                        {
+                            where: {ip: ip, userid: user.id, ipotp: otpToken}
+                        }
+                    )
+                    var passwordIsValid = bcrypt.compareSync(
+                        password,
+                        user.password
+                    );
+                    if (!passwordIsValid) {
+                        return res.status(401).send({
+                            statusCode: 401,
+                            status: false,
+                            accessToken: null,
+                            message: "Invalid Password!",
+                            data: []
+                        });
+                    }else{
+
+                        var token = jwt.sign({ id: user.id }, config.secret, {
+                            expiresIn: 86400 // 24 hours
+                        });
+
+                        //making sure a user was signed in appropriately
+                        user.update({
+                            loginlogout:0,
+                            weblogintoken:token
+                        });
                         res.status(200).send({
                             statusCode: 200,
                             status: true,
-                            message: "Your Device Has been activated",
-                            date: {
-                                ip: ip
+                            message: "Login successful",
+                            isdevice: false,
+                            data: {
+                                email: user.email,
+                                verify_email: user.verify_email,
+                                username: user.username,
+                                firstname: user.firstname,
+                                lastname: user.lastname,
+                                address: user.address,
+                                country: user.country,
+                                state: user.state,
+                                province: user.province,
+                                phone: user.phone,
+                                image: user.image,
+                                role: 'wocman',
+                                unboard: user.unboard,
+                                accessToken: token
                             }
                         });
-                    }else{
-                        return res.status(404).send({
-                            statusCode: 404,
-                            status: false, 
-                            message: 'Invalid link',
-                            data: [] 
-                        });
-                    }    
-                }else{
-                    return res.status(404).send({
-                        statusCode: 404,
+                    }                  
+                })
+                .catch(err => {
+                    return res.status(500).send({
+                        statusCode: 500,
                         status: false, 
-                        message: 'User Settings does not include Device Checks',
-                        data: []
-                    });
-                }
-            })
-            .catch(err => {
-                return res.status(500).send({
-                    statusCode: 500,
-                    status: false, 
-                    message: err.message,
-                    data: [] 
-                });
-            });
-        })
-        .catch(err => {
-            return res.status(500).send({
-                statusCode: 500,
-                status: false, 
-                message: err.message,
-                data: [] 
-            });
-        });
-    }
-};
-exports.cancelIsDevice  = (req, res) => {
-    var links = req.params.iplink1;
-    var g6 = links.split('b9fdH');
-    var link = g6[0];
-    var ip = g6[1];
-    var searchemail = {};
-    if(link && link !== ''){
-        searchemail = {'webloginipa': links}
-    }else{
-        searchemail = {'webloginipa': {$not: null}};
-    }
-
-    var joyresult = schemaJoiLink.validate({ links: links });
-    var { value, error } = joyresult;
-    if (!(typeof error === 'undefined')) {
-        var msg = Helpers.getJsondata(error, 'details')[0];
-        var msgs = Helpers.getJsondata(msg, 'message');
-        return res.status(422).json({
-            statusCode: 422,
-            status: false,
-            message: msgs,
-            data: []
-        })
-    }else{
-        User.findOne({
-            where: searchemail
-        })
-        .then(user => {
-            if (!user) {
-                return res.status(404).send({
-                    statusCode: 404,
-                    status: false,
-                    message: "User Not found.",
-                    date: []
-                });
-            }
-            var searchuser = {'userid': user.id};
-
-            Wsetting.findOne({
-                where: searchuser
-            })
-            .then(usersettings => {
-                if (usersettings.securityipa != 0) {
-
-                    IpBlacklist.findOne({
-                        where: {ip: ip, userid: user.id}
-                    }).then(findip => {
-                        if (!findip) {
-                            IpBlacklist.create(
-                                {
-                                    ip: ip,
-                                    userid: user.id
-                                }
-                            );
-                        }
-                    });
-                    User.update(
-                        {
-                            webloginipa: null
-                        },
-                        {
-                            where : {id: user.id}
-                        }
-                    );
-                    Wsetting.update(
-                        {
-                            webloginipa: 1
-                        },
-                        {
-                            where : searchuser
-                        }
-                    );
-                    res.status(200).send({
-                        statusCode: 200,
-                        status: true, 
-                        message: 'Device Blacklisted',
-                        data: {
-                            ip: ip
-                        }
-                    });
-                }else{
-                    return res.status(404).send({
-                        statusCode: 404,
-                        status: false, 
-                        message: 'User Settings does not include Device Checks',
+                        message: err.message,
                         data: [] 
                     });
-                }
+                });
             })
             .catch(err => {
                 return res.status(500).send({
@@ -457,15 +588,8 @@ exports.cancelIsDevice  = (req, res) => {
                     message: err.message,
                     data: [] 
                 });
-            });
-        })
-        .catch(err => {
-            return res.status(500).send({
-                statusCode: 500,
-                status: false, 
-                message: err.message,
-                data: [] 
-            });
-        });
+            });   
+        }
     }
 };
+

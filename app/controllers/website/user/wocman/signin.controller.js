@@ -51,161 +51,101 @@ let MailGenerator = new Mailgen({
     link: config.website,
   },
 });
-
-
 const Op = db.Sequelize.Op;
 
 exports.signInWocman = (req, res, next) => {
-
-    if (typeof req.body.password === "undefined") {
-        return res.status(400).send(
-            {
-                statusCode: 400,
-                status: false, 
-                message: "Password field is undefined.",
-                data: [] 
-            }
-        );
+    var searchemail = {};
+    var searchPassword = {};
+    if(req.body.password && req.body.password !== ''){
+        searchPassword = {'password': req.body.password};
     }else{
+        searchPassword = {'password': {$not: null}};
+    }
+    if(req.body.email && req.body.email !== ''){
+        searchemail = {'email': req.body.email}
+    }else{
+        searchemail = {'email': {$not: null}};
+    }
 
-        if (typeof req.body.email === "undefined") {
-            return res.status(400).send(
-                {
-                    statusCode: 400,
-                    status: false, 
-                    message: "Email field is undefined.",
-                    data: []
-                }
-            );
+    User.findOne({
+        where: searchemail
+    })
+    .then(user => {
+        if (!user) {
+            return res.status(404).send({
+                statusCode: 404,
+                status: false,
+                message: "User Not found.",
+                date: []
+            });
         }else{
-
-            var searchemail = {};
-            var searchPassword = {};
-            if(req.body.password && req.body.password !== ''){
-                searchPassword = {'password': req.body.password};
+            // console.log(user.signuptype);
+            if (user.signuptype !== 'wocman') {
+                return res.status(401).send({
+                    statusCode: 401,
+                    status: false,
+                    accessToken: null,
+                    message: "Use the google sign up",
+                    data: []
+                });
             }else{
-                searchPassword = {'password': {$not: null}};
-            }
-            if(req.body.email && req.body.email !== ''){
-                searchemail = {'email': req.body.email}
-            }else{
-                searchemail = {'email': {$not: null}};
-            }
 
-            User.findOne({
-                where: searchemail
-            })
-            .then(user => {
-                if (!user) {
-                    return res.status(404).send({
-                        statusCode: 404,
+                var passwordIsValid = bcrypt.compareSync(
+                    req.body.password,
+                    user.password
+                );
+                if (!passwordIsValid) {
+                    return res.status(401).send({
+                        statusCode: 401,
                         status: false,
-                        message: "User Not found.",
-                        date: []
+                        accessToken: null,
+                        message: "Invalid Password!",
+                        data: []
                     });
                 }else{
-                    // console.log(user.signuptype);
-                    if (user.signuptype !== 'wocman') {
-                        return res.status(401).send({
-                            statusCode: 401,
-                            status: false,
-                            accessToken: null,
-                            message: "Use the google sign up",
-                            data: []
-                        });
-                    }else{
 
-                        var passwordIsValid = bcrypt.compareSync(
-                            req.body.password,
-                            user.password
-                        );
-                        if (!passwordIsValid) {
-                            return res.status(401).send({
-                                statusCode: 401,
-                                status: false,
-                                accessToken: null,
-                                message: "Invalid Password!",
-                                data: []
-                            });
-                        }else{
+                    var token = jwt.sign({ id: user.id }, config.secret, {
+                        expiresIn: 86400 // 24 hours
+                    });
 
-
-                            var token = jwt.sign({ id: user.id }, config.secret, {
-                                expiresIn: 86400 // 24 hours
-                            });
-
-                            //making sure a user was signed in appropriately
-                            user.update({
-                                loginlogout:0,
-                                weblogintoken:token
-                            });
-                            Wsetting.findOne({
-                                where: {userid: user.id}
-                            })
-                            .then(hasSettings => {
-                                if (!hasSettings) {
-                                    Wsetting.create({
-                                        userid: user.id
-                                    });
-                                    var isDeviceSettings = false;
-                                    var isOTPSetings = false;
-                                }else{
-                                    if (hasSettings.securityipa  != 0) {
-                                        var isDeviceSettings = true;
-                                    }else{
-                                        var isDeviceSettings = false;
-                                    }
-
-                                    if (hasSettings.security2fa  != 0) {
-                                        var isOTPSetings = true;
-                                    }else{
-                                        var isOTPSetings = false;
-                                    }
-                                }
-                                res.status(200).send({
-                                    statusCode: 200,
-                                    status: true,
-                                    message: "Login successful",
-                                    data: {
-                                        email: user.email,
-                                        verify_email: user.verify_email,
-                                        username: user.username,
-                                        firstname: user.firstname,
-                                        lastname: user.lastname,
-                                        address: user.address,
-                                        country: user.country,
-                                        state: user.state,
-                                        province: user.province,
-                                        phone: user.phone,
-                                        image: user.image,
-                                        role: 'wocman',
-                                        unboard: user.unboard,
-                                        accessToken: token,
-                                        checkDevice: isDeviceSettings,
-                                        checkOTP: isOTPSetings
-                                    }
-                                });
-                            })
-                            .catch(err => {
-                                res.status(500).send({
-                                    statusCode: 500,
-                                    status: false, 
-                                    message: err.message,
-                                    data: [] 
-                                });
-                            });
+                    //making sure a user was signed in appropriately
+                    user.update({
+                        loginlogout:0,
+                        weblogintoken:token
+                    });
+                    res.status(200).send({
+                        statusCode: 200,
+                        status: true,
+                        message: "Login successful",
+                        isdevice: false,
+                        isOtp: false,
+                        data: {
+                            email: user.email,
+                            verify_email: user.verify_email,
+                            username: user.username,
+                            firstname: user.firstname,
+                            lastname: user.lastname,
+                            address: user.address,
+                            country: user.country,
+                            state: user.state,
+                            province: user.province,
+                            phone: user.phone,
+                            image: user.image,
+                            role: 'wocman',
+                            unboard: user.unboard,
+                            accessToken: token
                         }
-                    }
+                    });
                 }
-            })
-            .catch(err => {
-                res.status(500).send({
-                    statusCode: 500,
-                    status: false, 
-                    message: err.message,
-                    data: [] 
-                });
-            });
+            }
         }
-    }
+    })
+    .catch(err => {
+        res.status(500).send({
+            statusCode: 500,
+            status: false, 
+            message: err.message,
+            data: [] 
+        });
+    });
 };

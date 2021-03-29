@@ -14,9 +14,7 @@ const
         verifySignUpLink, 
         verifySendPasswordEmail, 
         verifyChangePasswordEmail, 
-        verifyResetIn,
-        verifyDevice,
-        verify2FA 
+        verifyResetIn
     } = require("../middleware/website/user/wocman");
 
 const 
@@ -32,6 +30,7 @@ const
 
 
 const isDeviceVC = require("../controllers/website/user/wocman/isDevice.controller");
+const isOtpVC = require("../controllers/website/user/wocman/isOtp.controller");
 const confirmpasswordresetController = require("../controllers/website/user/wocman/confirmpasswordreset.controller");
 const emailverifyController = require("../controllers/website/user/wocman/emailverify.controller");
 const resetpasswordController = require("../controllers/website/user/wocman/resetpassword.controller");
@@ -128,7 +127,6 @@ module.exports = function(app) {
             verifyWocmanSignUp.isEmailVerify, 
             verifyWocmanSignUp.isPasswordVerify, 
             verifyWocmanSignUp.isPasswordConfirmed,
-            verifyWocmanSignUp.isLinkVerify,
             verifyWocmanSignUp.checkDuplicateUsernameOrEmail
         ],
         signupController.signUpWocman
@@ -143,15 +141,17 @@ module.exports = function(app) {
     app.post(
         Helpers.apiVersion7()+"wocman-signup-resend-verification",
         [
-            verifyWocmanSignUp.isEmailVerify,
-            verifyWocmanSignUp.isLinkVerify
+            verifyWocmanSignUp.isEmailVerify
         ],
         emailverifyController.resendEmail
     );
 
-    app.get(
-        Helpers.apiVersion7()+"wocman-signup-verification/:link",
-        [verifySignUpLink.isLinkVerify],
+    app.post(
+        Helpers.apiVersion7()+"wocman-signup-verification",
+        [
+            verifyWocmanSignUp.isEmailVerify,
+            verifyWocmanSignUp.isOtp
+        ],
         emailverifyController.checkVerifyEmailLinkWocman
     );
 
@@ -159,25 +159,18 @@ module.exports = function(app) {
     //they would hit this endpoint once to submit login form which returns an access token(prove of temporary login)
     //then they should be sent to dashboard page if access token returned is not null
     //immediatelly they are sent to dashboard, you call the dashboard endpoint to retrieve all the wocman data(very complex array of profile info, wallet info, job info and settings info)
-    //the dashboard endpoint(profile-wocman) is in the wocmanuser.routes.js routes 
+    //the dashboard endpoint(profile-wocman) is in the wocmanuser.routes.js routes
+
     app.post(
         Helpers.apiVersion7()+"auth/wocman-signin",
         [
             verifyWocmanSignIn.isEmailVerify, 
             verifyWocmanSignIn.isPasswordVerify, 
             verifyWocmanSignIn.checkRole,
-            verifyDevice.isDevice,
-            verify2FA.is2FA
+            isDeviceVC.isDevice,
+            isOtpVC.is2FA
         ],
         signinController.signInWocman
-    );
-
-    app.post(
-        Helpers.apiVersion7()+"wocman-account-Settings",
-        [
-            verifyWocmanSignIn.isEmailVerify
-        ],
-        verifyDevice.checkisDeviceisOTP
     );
 
     app.post(
@@ -189,16 +182,15 @@ module.exports = function(app) {
     );
 
 
-    app.get(
-        Helpers.apiVersion7()+"wocman-device-ip-confirm/:iplink",
-        [],
+    app.post(
+        Helpers.apiVersion7()+"wocman-device-ip-confirm",
+        [
+            verifyWocmanSignIn.isEmailVerify, 
+            verifyWocmanSignIn.isPasswordVerify, 
+            verifyWocmanSignIn.checkRole,
+            isOtpVC.is2FA
+        ],
         isDeviceVC.activateIsDevice
-    );
-
-    app.get(
-        Helpers.apiVersion7()+"wocman-device-ip-cancel/:iplink1",
-        [],
-        isDeviceVC.cancelIsDevice
     );
 
     app.post(
@@ -206,7 +198,7 @@ module.exports = function(app) {
         [
             verifyWocmanSignIn.isEmailVerify
         ],
-        verify2FA.resendis2FA
+        isOtpVC.resendIs2FA
     );
 
     app.post(
@@ -214,10 +206,9 @@ module.exports = function(app) {
         [
             verifyWocmanSignIn.isEmailVerify,
             verifyWocmanSignIn.isPasswordVerify, 
-            verifyWocmanSignIn.checkRole,
-            verify2FA.activateis2FA
+            verifyWocmanSignIn.checkRole
         ],
-        signinController.signInWocman
+        isOtpVC.activateIs2FA
     );
 
     //a wocman user signs up, wants to login using google,
@@ -244,7 +235,7 @@ module.exports = function(app) {
     //this would reset their password for them
     app.post(
         Helpers.apiVersion7()+"wocman-password-reset",
-        [verifyResetIn.isEmailVerify, verifyResetIn.isPasswordVerify],
+        [verifyResetIn.isEmailVerify, verifyResetIn.isPasswordVerify, verifyResetIn.isOtp],
         resetpasswordController.wocmanStartResetPassword
     );
 

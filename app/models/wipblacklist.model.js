@@ -5,6 +5,14 @@ module.exports = (sequelize, Sequelize) => {
         },
         userid: {
             type: Sequelize.INTEGER,
+        },
+        ipmode: {
+            type: Sequelize.INTEGER,
+            defaultValue: 0
+        },
+        ipotp: {
+            type: Sequelize.INTEGER,
+            defaultValue: 0
         }
     });
     return Ipblacklist;
