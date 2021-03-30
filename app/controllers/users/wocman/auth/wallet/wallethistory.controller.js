@@ -72,6 +72,7 @@ exports.walletDetailsHistory = (req, res, next) => {
             }else{
                 Searchuserid = {'userid': {$not: null}};
             }
+            var unboard = Helpers.returnBoolean(users.unboard);
 
 
             WWalletH.findAll({
@@ -84,8 +85,8 @@ exports.walletDetailsHistory = (req, res, next) => {
                         status: false,
                         message: "Wocman Wallet Not Found",
                         data: {
-                            AccessToken: req.token,
-                            Unboard: users.unboard
+                            accessToken: req.token,
+                            unboard: unboard
                         }
                     });
                 }else{
@@ -95,9 +96,9 @@ exports.walletDetailsHistory = (req, res, next) => {
                         status: true,
                         message: "Found a wocmna user",
                         data: {
-                            History: wwallet,
-                            AccessToken: req.token,
-                            Unboard: users.unboard
+                            history: wwallet,
+                            accessToken: req.token,
+                            unboard: unboard
                         }
                     });
                 }

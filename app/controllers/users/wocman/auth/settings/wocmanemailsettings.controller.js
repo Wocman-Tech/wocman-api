@@ -71,6 +71,8 @@ exports.emailNotice = (req, res, next) => {
                     data: []
                 });
             }
+            var unboard = Helpers.returnBoolean(users.unboard);
+
            
             Wsetting.findOne({
                 where: {
@@ -78,6 +80,14 @@ exports.emailNotice = (req, res, next) => {
                 }
             })
             .then(wsettings => {
+                if (!wsettings) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "User has no settings.",
+                        data: []
+                    });
+                }
                 Wsetting.update(
                     {
                         emailnotice: 1
@@ -87,16 +97,30 @@ exports.emailNotice = (req, res, next) => {
                     }
                 )
                 .then( newsettings => {
+                    Wsetting.findOne({
+                        where: {userid: req.userId}
+                    })
+                    .then(updatedsettings => {
+                        var emailnotice = Helpers.returnBoolean(updatedsettings.emailnotice);
 
-                    res.status(200).send({
-                        statusCode: 200,
-                        status: true,
-                        message: "Notification Settings Updated",
-                        data: {
-                            settings: newsettings,
-                            AccessToken: req.token,
-                            Unboard: users.unboard
-                        }
+                        res.status(200).send({
+                            statusCode: 200,
+                            status: true,
+                            message: "Notification Settings Updated",
+                            data: {
+                                emailNotice: emailnotice,
+                                accessToken: req.token,
+                                unboard: unboard
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        res.status(500).send({
+                            statusCode: 500,
+                            status: false, 
+                            message: err.message,
+                            data: [] 
+                        });
                     });
                 })
                 .catch(err => {
@@ -150,6 +174,8 @@ exports.nemailNotice = (req, res, next) => {
                     data: []
                 });
             }
+            var unboard = Helpers.returnBoolean(users.unboard);
+
            
             Wsetting.findOne({
                 where: {
@@ -157,53 +183,39 @@ exports.nemailNotice = (req, res, next) => {
                 }
             })
             .then(wsettings => {
-                if (!wsettings || !wsettings.length>0) {
-                    Wsetting.create({
-                        userid: req.userId,
-                        emailnotice: 0
-                        
-                    }).then( newsettings => {
-
-                        res.status(200).send({
-                            statusCode: 200,
-                            status: true,
-                            message: "Notification Settings Updated",
-                            data: {
-                                settings: newsettings,
-                                AccessToken: req.token,
-                                Unboard: users.unboard
-                            }
-                        });
-                    }) 
-                    .catch(err => {
-                        res.status(500).send({
-                            statusCode: 500,
-                            status: false, 
-                            message: err.message,
-                            data: [] 
-                        });
+                if (!wsettings) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "User has no settings.",
+                        data: []
                     });
-                    
-                }else{
-                    Wsetting.update(
-                        {
-                            emailnotice: 0
+                }
 
-                        },
-                        {
-                            where: {id: wsettings.id}
-                        }
-                    )
-                    .then( newsettings => {
+                Wsetting.update(
+                    {
+                        emailnotice: 0
 
+                    },
+                    {
+                        where: {id: wsettings.id}
+                    }
+                )
+                .then( newsettings => {
+
+                    Wsetting.findOne({
+                        where: {userid: req.userId}
+                    })
+                    .then(updatedsettings => {
+                        var emailnotice = Helpers.returnBoolean(updatedsettings.emailnotice);
                         res.status(200).send({
                             statusCode: 200,
                             status: true,
                             message: "Notification Settings Updated",
                             data: {
-                                settings: newsettings,
-                                AccessToken: req.token,
-                                Unboard: users.unboard
+                                twofactor: emailnotice,
+                                accessToken: req.token,
+                                unboard: unboard
                             }
                         });
                     })
@@ -215,7 +227,15 @@ exports.nemailNotice = (req, res, next) => {
                             data: [] 
                         });
                     });
-                }
+                })
+                .catch(err => {
+                    res.status(500).send({
+                        statusCode: 500,
+                        status: false, 
+                        message: err.message,
+                        data: [] 
+                    });
+                });
             })
             .catch(err => {
                 res.status(500).send({

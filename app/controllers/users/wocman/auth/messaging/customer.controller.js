@@ -88,6 +88,7 @@ exports.wocmanContactCustomer = (req, res, next) => {
                   });
                   return;
                 }
+                var unboard = Helpers.returnBoolean(user.unboard);
                 var gg = 0;
                 Projects.findAll({
                     where: {
@@ -138,7 +139,8 @@ exports.wocmanContactCustomer = (req, res, next) => {
                                     custmer_email: customeruser.email,
                                     custmer_address: customeruser.address,
                                     custmer_country: customeruser.country,
-                                    custmer_image: customeruser.image
+                                    custmer_image: customeruser.image,
+                                    unboard: unboard
                                 }
                             });
                         })

@@ -68,6 +68,8 @@ exports.walletDetails = (req, res, next) => {
                     data: []
                 });
             }
+            var unboard = Helpers.returnBoolean(users.unboard);
+
             if(req.userId && req.userId !== ''){
                 Searchuserid = {'userid': req.userId};
             }else{
@@ -85,8 +87,8 @@ exports.walletDetails = (req, res, next) => {
                         status: false,
                         message: "Wocman Wallet Not Found",
                         data: {
-                            AccessToken: req.token,
-                            Unboard: users.unboard
+                            accessToken: req.token,
+                            unboard: unboard
                         }
                     });
                 }else{
@@ -96,9 +98,9 @@ exports.walletDetails = (req, res, next) => {
                         status: true,
                         message: "Found a wocmna user",
                         data: {
-                            Wallet: wwallet,
-                            AccessToken: req.token,
-                            Unboard: users.unboard
+                            wallet: wwallet,
+                            accessToken: req.token,
+                            unboard: unboard
                         }
                     });
                 }

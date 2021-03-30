@@ -65,6 +65,8 @@ exports.rating = (req, res, next) => {
                     data: []
                 });
             }
+            var unboard = Helpers.returnBoolean(users.unboard);
+
             if(req.userId && req.userId !== ''){
                 Searchuserid = {'userid': req.userId};
                 Searchwocmanid = {'wocmanid': req.userId};
@@ -84,8 +86,8 @@ exports.rating = (req, res, next) => {
                         status: false,
                         message: "Wocman Rate Not Found",
                         data: {
-                            AccessToken: req.token,
-                            Unboard: users.unboard
+                            accessToken: req.token,
+                            unboard: unboard
                         }
                     });
                 }else{
@@ -105,9 +107,9 @@ exports.rating = (req, res, next) => {
                     status: true,
                     message: "Found a wocmna user",
                     data: {
-                        Rate: rateUserWocman,
-                        AccessToken: req.token,
-                        Unboard: users.unboard
+                        rate: rateUserWocman,
+                        accessToken: req.token,
+                        unboard: unboard
                     }
                 });
             })

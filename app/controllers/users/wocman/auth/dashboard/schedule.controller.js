@@ -70,6 +70,8 @@ exports.schedule = (req, res, next) => {
                     data: []
                 });
             }
+            var unboard = Helpers.returnBoolean(users.unboard);
+
             if(req.userId && req.userId !== ''){
                 Searchuserid = {'userid': req.userId};
                 Searchwocmanid = {'wocmanid': req.userId};
@@ -89,8 +91,8 @@ exports.schedule = (req, res, next) => {
                         status: false,
                         message: "Wocman Schedule Not Found",
                         data: {
-                            AccessToken: req.token,
-                            Unboard: users.unboard
+                            accessToken: req.token,
+                            unboard: unboard
                         }
                     });
                 }else{
@@ -109,9 +111,9 @@ exports.schedule = (req, res, next) => {
                         status: true,
                         message: "Found a wocmna user",
                         data: {
-                            Schedule: send_row,
-                            AccessToken: req.token,
-                            Unboard: users.unboard
+                            schedule: send_row,
+                            accessToken: req.token,
+                            unboard: unboard
                         }
                     });
                 }
@@ -154,7 +156,7 @@ exports.producttype = (req, res, next) => {
                 status: false,
                 message: "Wocman project type Not Found",
                 data: {
-                    AccessToken: req.token
+                    accessToken: req.token
                 }
             });
         }else{
@@ -163,8 +165,8 @@ exports.producttype = (req, res, next) => {
                 status: true,
                 message: "Found a wocmam project type",
                 data: {
-                    Schedule: project,
-                    AccessToken: req.token
+                    schedule: project,
+                    accessToken: req.token
                 }
             });
         }
@@ -199,7 +201,7 @@ exports.projectCustomer = (req, res, next) => {
                 status: false,
                 message: "Wocman project customer Not Found",
                 data: {
-                    AccessToken: req.token
+                    accessToken: req.token
                 }
             });
         }else{
@@ -239,7 +241,7 @@ exports.projectCustomer = (req, res, next) => {
                             message: "Found a wocmam project customer",
                             data: {
                                 customer: user,
-                                AccessToken: req.token
+                                accessToken: req.token
                             }
                         });
                     }else{
@@ -248,7 +250,7 @@ exports.projectCustomer = (req, res, next) => {
                             status: true,
                             message: "Found a user not customer",
                             data: {
-                                AccessToken: req.token
+                                accessToken: req.token
                             }
                         });
                     }

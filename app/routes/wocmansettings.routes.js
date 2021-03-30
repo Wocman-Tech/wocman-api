@@ -11,6 +11,7 @@ const wocmanIPASettings = require("../controllers/users/wocman/auth/settings/woc
 const wocmanUPDPSDSettings = require("../controllers/users/wocman/auth/settings/wocmanupdatepasswordsettings.controller");
 const wocmanWalletSettings = require("../controllers/users/wocman/auth/settings/wocmanwalletinfosettings.controller");
 const wocmanPSSettings = require("../controllers/users/wocman/auth/settings/wocmanpaymentschedulesettings.controller");
+const wocmanDeviceSettings = require("../controllers/users/wocman/auth/settings/wocmanlogindevicesettings.controller");
 
 
 const Helpers = require("../helpers/helper.js");
@@ -51,101 +52,127 @@ module.exports = function(app) {
     //chat end points
 
     app.post(
-        Helpers.apiVersion7() + "wocman-settings",
+        Helpers.apiVersion7() + "wocman/settings/create",
+        [authJwt.verifyToken, authJwt.isWocman], 
+        wocmanSettings.createsettings
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "wocman/settings/get",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmanSettings.settings
     );
+
     app.post(
-        Helpers.apiVersion7() + "wocman-sms-notice",
+        Helpers.apiVersion7() + "wocman/settings/activate/sms",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmansmsSettings.smsNotice
     );
+
     app.post(
-        Helpers.apiVersion7() + "wocman-sms-notice-cancel",
+        Helpers.apiVersion7() + "wocman/settings/cancel/sms",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmansmsSettings.nsmsNotice
     );
+
     app.post(
-        Helpers.apiVersion7() + "wocman-email-notice",
+        Helpers.apiVersion7() + "wocman/settings/activate/email",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmanemailSettings.emailNotice
     );
+
     app.post(
-        Helpers.apiVersion7() + "wocman-email-notice-cancel",
+        Helpers.apiVersion7() + "wocman/settings/cancel/email",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmanemailSettings.nemailNotice
     );
+
     app.post(
-        Helpers.apiVersion7() + "wocman-service-notice",
+        Helpers.apiVersion7() + "wocman/settings/activate/service",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmanserviceSettings.serviceNotice
     );
     app.post(
-        Helpers.apiVersion7() + "wocman-service-notice-cancel",
+        Helpers.apiVersion7() + "wocman/settings/cancel/service",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmanserviceSettings.nserviceNotice
     );
+
     app.post(
-        Helpers.apiVersion7() + "wocman-technical-notice",
+        Helpers.apiVersion7() + "wocman/settings/activate/technical",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmantechnicalSettings.technicalNotice
     );
+
     app.post(
-        Helpers.apiVersion7() + "wocman-technical-notice-cancel",
+        Helpers.apiVersion7() + "wocman/settings/cancel/technical",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmantechnicalSettings.ntechnicalNotice
     );
 
     app.post(
-        Helpers.apiVersion7() + "wocman-2fa-settings",
+        Helpers.apiVersion7() + "wocman/settings/activate/2fa",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocman2FASettings.w2fsettings
     );
+
     app.post(
-        Helpers.apiVersion7() + "wocman-2fa-settings-cancel",
+        Helpers.apiVersion7() + "wocman/settings/cancel/2fa",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocman2FASettings.nw2fsettings
     );
 
     app.post(
-        Helpers.apiVersion7() + "wocman-ipa-settings",
+        Helpers.apiVersion7() + "wocman/settings/activate/ipa",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmanIPASettings.wipsettings
     );
+    
     app.post(
-        Helpers.apiVersion7() + "wocman-ipa-settings-cancel",
+        Helpers.apiVersion7() + "wocman/settings/cancel/ipa",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmanIPASettings.nwipsettings
     );
 
     app.post(
-        Helpers.apiVersion7() + "wocman-updpsd-settings",
+        Helpers.apiVersion7() + "wocman/settings/edit/password",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmanUPDPSDSettings.wocmanChangePassword
     );
 
     app.post(
-        Helpers.apiVersion7() + "wocman-wallet-info",
+        Helpers.apiVersion7() + "wocman/settings/get/wallet",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmanWalletSettings.wwDetails
     );
 
     app.post(
-        Helpers.apiVersion7() + "wocman-change-bankdetails",
+        Helpers.apiVersion7() + "wocman/settings/edit/bankdetails",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmanWalletSettings.wchangeBankDetails
     );
 
     app.post(
-        Helpers.apiVersion7() + "wocman-ps-settings",
+        Helpers.apiVersion7() + "wocman/settings/weekly/paymentschedule",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmanPSSettings.wpssettings
     );
     
     app.post(
-        Helpers.apiVersion7() + "wocman-ps-settings-cancel",
+        Helpers.apiVersion7() + "wocman/settings/monthly/paymentschedule",
         [authJwt.verifyToken, authJwt.isWocman], 
         wocmanPSSettings.nwpssettings
     );
-    
+
+    app.post(
+        Helpers.apiVersion7() + "wocman/settings/blacklist/device",
+        [authJwt.verifyToken, authJwt.isWocman], 
+        wocmanDeviceSettings.blacklistsettings
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "wocman/settings/allow/device",
+        [authJwt.verifyToken, authJwt.isWocman], 
+        wocmanDeviceSettings.allowsettings
+    );
 };

@@ -72,6 +72,7 @@ exports.wocmanChatContact = (req, res, next) => {
           });
           return;
         }
+        var unboard = Helpers.returnBoolean(user.unboard);
         Projects.findAll({
             where: {wocmanid: req.userId}
         }).then(projectBase => {
@@ -100,7 +101,8 @@ exports.wocmanChatContact = (req, res, next) => {
                 message: "Found Current Projects Customers",
                 data: {
                     accessToken: req.token,
-                    customers: customers
+                    customers: customers,
+                    unboard: unboard
                 }
             });
         })

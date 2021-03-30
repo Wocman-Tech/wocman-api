@@ -129,6 +129,28 @@ getJsondata = (stringValue, key) => {
     return objectValue[key];
 }
 
+returnBoolean = (value) => {
+	if(value === 1){
+		return true;
+	}
+	if(value === 0){
+		return false;
+	}
+	if(value === '1'){
+		return true;
+	}
+	if(value === '0'){
+		return false;
+	}
+	if(value === 'null'){
+		return false;
+	}
+	if(value === null){
+		return false;
+	}
+	return value;
+}
+
 const Helpers = {
     getRoleById: getRoleById,
     getRoleByName: getRoleByName,
@@ -145,7 +167,9 @@ const Helpers = {
     EMAIL: config.email,    
     PASSWORD: config.password, 
     MAIN_URL: config.resolve+config.port,
-    getJsondata: getJsondata
+    getJsondata: getJsondata,
+    returnBoolean: returnBoolean
+
 };
 
 module.exports = Helpers;

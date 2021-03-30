@@ -47,7 +47,6 @@ const Op = db.Sequelize.Op;
 
 
 exports.notice = (req, res, next) => {
-    // console.log(req.email_link);
     if (typeof req.userId == "undefined") {
         return res.status(400).send(
         {
@@ -60,6 +59,7 @@ exports.notice = (req, res, next) => {
 
         User.findByPk(req.userId)
         .then(users => {
+
             if (!users) {
                 return res.status(404).send({
                     statusCode: 404,
@@ -68,6 +68,7 @@ exports.notice = (req, res, next) => {
                     data: []
                 });
             }
+            var unboard = Helpers.returnBoolean(users.unboard);
             if(req.userId && req.userId !== ''){
                 Searchuserid = {'userid': req.userId};
                 Searchwocmanid = {'wocmanid': req.userId};
@@ -89,8 +90,8 @@ exports.notice = (req, res, next) => {
                         status: false,
                         message: "Wocman Notice Not Found",
                         data: {
-                            AccessToken: req.token,
-                            Unboard: users.unboard
+                            accessToken: req.token,
+                            unboard: unboard
                         }
                     });
                 }else{
@@ -113,9 +114,9 @@ exports.notice = (req, res, next) => {
                     status: true,
                     message: "Found a wocmna user",
                     data: {
-                        Notice: notice,
-                        AccessToken: req.token,
-                        Unboard: users.unboard
+                        notice: notice,
+                        accessToken: req.token,
+                        unboard: unboard
                     }
                 });
             })

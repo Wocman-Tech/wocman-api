@@ -76,6 +76,8 @@ exports.wwDetails = (req, res, next) => {
                     data: []
                 });
             }
+            var unboard = Helpers.returnBoolean(users.unboard);
+
            
             WWallet.findOne({
                 where: Searchuserid
@@ -87,8 +89,8 @@ exports.wwDetails = (req, res, next) => {
                         status: false,
                         message: "Wallet Details Not Found",
                         data: {
-                            AccessToken: req.token,
-                            Unboard: users.unboard
+                            accessToken: req.token,
+                            unboard: unboard
                         }
                     });
                 }
@@ -98,8 +100,8 @@ exports.wwDetails = (req, res, next) => {
                     message: "Wallet Details  Found",
                     data: {
                         walletDettails: wwallet,
-                        AccessToken: req.token,
-                        Unboard: users.unboard
+                        accessToken: req.token,
+                        unboard: unboard
                     }
                 });
             })
@@ -124,7 +126,7 @@ exports.wwDetails = (req, res, next) => {
 };
 exports.wchangeBankDetails = (req, res, next) => {
     
-
+    var searchuserid = [];
     if (typeof req.userId == "undefined") {
         return res.status(400).send(
         {
@@ -147,7 +149,7 @@ exports.wchangeBankDetails = (req, res, next) => {
             {
                 statusCode: 400,
                 status: false,
-                message: "Invalid Bank Name",
+                message: "Invalid bankName field",
                 data: []
             });
         }
@@ -159,7 +161,7 @@ exports.wchangeBankDetails = (req, res, next) => {
             {
                 statusCode: 400,
                 status: false,
-                message: "Invalid Account Number",
+                message: "Invalid accNumber field",
                 data: []
             });
         }
@@ -171,7 +173,7 @@ exports.wchangeBankDetails = (req, res, next) => {
             {
                 statusCode: 400,
                 status: false,
-                message: "Invalid Account Name",
+                message: "Invalid accName field",
                 data: []
             });
         }
@@ -183,7 +185,7 @@ exports.wchangeBankDetails = (req, res, next) => {
             {
                 statusCode: 400,
                 status: false,
-                message: "Invalid Bank Type",
+                message: "Invalid accType field",
                 data: []
             });
         }
@@ -222,7 +224,7 @@ exports.wchangeBankDetails = (req, res, next) => {
                     data: []
                 });
             }
-
+            var unboard = Helpers.returnBoolean(users.unboard);
             if(req.userId && req.userId !== ''){
                 searchuserid = {'userid': req.userId};
             }else{
@@ -261,8 +263,8 @@ exports.wchangeBankDetails = (req, res, next) => {
                         message: "Bank Details Updated",
                         data: {
                             walletDetails: newsettings,
-                            AccessToken: req.token,
-                            Unboard: users.unboard
+                            accessToken: req.token,
+                            unboard: unboard
                         }
                     });
                 })

@@ -50,7 +50,7 @@ const Op = db.Sequelize.Op;
 
 exports.w2fsettings = (req, res, next) => {
     
-
+    var searchuserid = [];
     if (typeof req.userId == "undefined") {
         return res.status(400).send(
         {
@@ -61,9 +61,9 @@ exports.w2fsettings = (req, res, next) => {
         });
     }else{
         if(req.userId && req.userId !== ''){
-            Searchuserid = {'userid': req.userId};
+            searchuserid = {'userid': req.userId};
         }else{
-            Searchuserid = {'userid': {$not: null}};
+            searchuserid = {'userid': {$not: null}};
         }
         
         User.findByPk(req.userId)
@@ -78,9 +78,17 @@ exports.w2fsettings = (req, res, next) => {
             }
            
             Wsetting.findOne({
-                where: Searchuserid
+                where: searchuserid
             })
             .then(wsettings => {
+                if (!wsettings) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "User has no settings.",
+                        data: []
+                    });
+                }
                 Wsetting.update(
                     {
                     security2fa: 1 
@@ -90,17 +98,41 @@ exports.w2fsettings = (req, res, next) => {
                     }
                 ).then( newsettings => {
 
-                    res.status(200).send({
-                        statusCode: 200,
-                        status: true,
-                        message: "Notification Settings Updated",
-                        data: {
-                            settings: newsettings,
-                            AccessToken: req.token,
-                            Unboard: users.unboard
-                        }
+                    Wsetting.findOne({
+                        where: searchuserid
+                    })
+                    .then(updatedsettings => {
+                        var security2fa = Helpers.returnBoolean(updatedsettings.security2fa);
+                        var unboard = Helpers.returnBoolean(users.unboard);
+
+                        res.status(200).send({
+                            statusCode: 200,
+                            status: true,
+                            message: "Notification Settings Updated",
+                            data: {
+                                twofactor: security2fa,
+                                accessToken: req.token,
+                                unboard: unboard
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        res.status(500).send({
+                            statusCode: 500,
+                            status: false, 
+                            message: err.message,
+                            data: [] 
+                        });
                     });
                 })
+                 .catch(err => {
+                    res.status(500).send({
+                        statusCode: 500,
+                        status: false, 
+                        message: err.message,
+                        data: [] 
+                    });
+                });
             })
             .catch(err => {
                 res.status(500).send({
@@ -122,8 +154,7 @@ exports.w2fsettings = (req, res, next) => {
     }
 };
 exports.nw2fsettings = (req, res, next) => {
-    
-
+    var searchuserid = [];
     if (typeof req.userId == "undefined") {
         return res.status(400).send(
         {
@@ -155,6 +186,14 @@ exports.nw2fsettings = (req, res, next) => {
                 where: searchuserid
             })
             .then(wsettings => {
+                if (!wsettings) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "User has no settings.",
+                        data: []
+                    });
+                }
 
                 Wsetting.update(
                     {
@@ -165,15 +204,30 @@ exports.nw2fsettings = (req, res, next) => {
                     }
                 ).then( newsettings => {
 
-                    res.status(200).send({
-                        statusCode: 200,
-                        status: true,
-                        message: "Notification Settings Updated",
-                        data: {
-                            settings: wsettings,
-                            AccessToken: req.token,
-                            Unboard: users.unboard
-                        }
+                     Wsetting.findOne({
+                        where: searchuserid
+                    })
+                    .then(updatedsettings => {
+                        var unboard = Helpers.returnBoolean(users.unboard);
+                        var security2fa = Helpers.returnBoolean(updatedsettings.security2fa);
+                        res.status(200).send({
+                            statusCode: 200,
+                            status: true,
+                            message: "Notification Settings Updated",
+                            data: {
+                                twofactor: security2fa,
+                                accessToken: req.token,
+                                unboard: unboard
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        res.status(500).send({
+                            statusCode: 500,
+                            status: false, 
+                            message: err.message,
+                            data: [] 
+                        });
                     });
                 })
                 .catch(err => {

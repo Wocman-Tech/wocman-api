@@ -49,17 +49,15 @@ const Op = db.Sequelize.Op;
 
 
 exports.completedProjects = (req, res, next) => {
-    // console.log(req.email_link);
     if (typeof req.userId == "undefined") {
         return res.status(400).send(
         {
             statusCode: 400,
             status: false,
             message: "User was not found",
-            data: [] 
+            data: []
         });
     }else{
-
         User.findByPk(req.userId)
         .then(users => {
             if (!users) {
@@ -81,6 +79,7 @@ exports.completedProjects = (req, res, next) => {
                 where: Searchwocmanid
             })
             .then(projects => {
+                var unboard = Helpers.returnBoolean(users.unboard);
                 var  acceptedProjects = 0;
                 var  allProjects = 0;
                 if (!projects) {
@@ -89,8 +88,8 @@ exports.completedProjects = (req, res, next) => {
                         status: false,
                         message: "Wocman Project Not Found",
                         data: {
-                            AccessToken: req.token,
-                            Unboard: users.unboard
+                            accessToken: req.token,
+                            unboard: unboard
                         }
                     });
                 }else{
@@ -107,11 +106,11 @@ exports.completedProjects = (req, res, next) => {
                 res.status(200).send({
                     statusCode: 200,
                     status: true,
-                    message: "Found a wocmna user",
+                    message: "Found a wocman user",
                     data: {
-                        Completion: percentageCompletion,
-                        AccessToken: req.token,
-                        Unboard: users.unboard
+                        completion: percentageCompletion,
+                        accessToken: req.token,
+                        unboard: unboard
                     }
                 });
             })

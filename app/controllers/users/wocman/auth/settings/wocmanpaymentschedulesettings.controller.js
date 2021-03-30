@@ -49,8 +49,7 @@ let MailGenerator = new Mailgen({
 const Op = db.Sequelize.Op;
 
 exports.wpssettings = (req, res, next) => {
-    
-
+    var searchuserid = [];
     if (typeof req.userId == "undefined") {
         return res.status(400).send(
         {
@@ -61,9 +60,9 @@ exports.wpssettings = (req, res, next) => {
         });
     }else{
         if(req.userId && req.userId !== ''){
-            Searchuserid = {'userid': req.userId};
+            searchuserid = {'userid': req.userId};
         }else{
-            Searchuserid = {'userid': {$not: null}};
+            searchuserid = {'userid': {$not: null}};
         }
         
         User.findByPk(req.userId)
@@ -76,32 +75,69 @@ exports.wpssettings = (req, res, next) => {
                     data: []
                 });
             }
-           
+            var unboard = Helpers.returnBoolean(users.unboard);
+
             Wsetting.findOne({
-                where: Searchuserid
+                where: searchuserid
             })
             .then(wsettings => {
+                if (!wsettings) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "User has no settings.",
+                        data: []
+                    });
+                }
                 Wsetting.update(
                     {
-                    paymentschedule: 1 
+                    paymentschedule: 1
                     }, 
                     {
                         where : {id: wsettings.id}
                     }
                 ).then( newsettings => {
 
-                    res.status(200).send({
-                        statusCode: 200,
-                        status: true,
-                        message: "Notification Settings Updated",
-                        data: {
-                            settings: newsettings,
-                            AccessToken: req.token,
-                            Unboard: users.unboard
+                    Wsetting.findOne({
+                        where: searchuserid
+                    })
+                    .then(updatedsettings => {
+                        var paymentschedule = Helpers.returnBoolean(updatedsettings.paymentschedule);
+                        if (paymentschedule === true) {
+                            paymentschedule = 'weekly';
                         }
+                        if (paymentschedule === false) {
+                            paymentschedule = 'monthly';
+                        }
+
+                        res.status(200).send({
+                            statusCode: 200,
+                            status: true,
+                            message: "Notification Settings Updated",
+                            data: {
+                                paymentSchedule: paymentschedule,
+                                accessToken: req.token,
+                                unboard: unboard
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        res.status(500).send({
+                            statusCode: 500,
+                            status: false, 
+                            message: err.message,
+                            data: [] 
+                        });
                     });
                 })
-                
+                .catch(err => {
+                    res.status(500).send({
+                        statusCode: 5050,
+                        status: false, 
+                        message: err.message,
+                        data: [] 
+                    });
+                });
             })
             .catch(err => {
                 res.status(500).send({
@@ -124,7 +160,7 @@ exports.wpssettings = (req, res, next) => {
 };
 exports.nwpssettings = (req, res, next) => {
     
-
+     var searchuserid = [];
     if (typeof req.userId == "undefined") {
         return res.status(400).send(
         {
@@ -145,6 +181,8 @@ exports.nwpssettings = (req, res, next) => {
                     data: []
                 });
             }
+            var unboard = Helpers.returnBoolean(users.unboard);
+
 
             if(req.userId && req.userId !== ''){
                 searchuserid = {'userid': req.userId};
@@ -156,6 +194,14 @@ exports.nwpssettings = (req, res, next) => {
                 where: searchuserid
             })
             .then(wsettings => {
+                if (!wsettings) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "User has no settings.",
+                        data: []
+                    });
+                }
 
                 Wsetting.update(
                     {
@@ -166,16 +212,38 @@ exports.nwpssettings = (req, res, next) => {
                     }
                 ).then( newsettings => {
 
-                    res.status(200).send({
-                        statusCode: 200,
-                        status: true,
-                        message: "Notification Settings Updated",
-                        data: {
-                            settings: wsettings,
-                            AccessToken: req.token,
-                            Unboard: users.unboard
+                    Wsetting.findOne({
+                        where: searchuserid
+                    })
+                    .then(updatedsettings => {
+                        var paymentschedule = Helpers.returnBoolean(updatedsettings.paymentschedule);
+                        if (paymentschedule === true) {
+                            paymentschedule = 'weekly';
                         }
+                        if (paymentschedule === false) {
+                            paymentschedule = 'monthly';
+                        }
+
+                        res.status(200).send({
+                            statusCode: 200,
+                            status: true,
+                            message: "Notification Settings Updated",
+                            data: {
+                                paymentSchedule: paymentschedule,
+                                accessToken: req.token,
+                                unboard: unboard
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        res.status(500).send({
+                        statusCode: 500,
+                        status: false, 
+                        message: err.message,
+                        data: [] 
                     });
+                });
+
                 })
                 .catch(err => {
                     res.status(500).send({

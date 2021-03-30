@@ -84,7 +84,7 @@ exports.wocmanChangePassword = (req, res, next) => {
             {
                 statusCode: 400,
                 status: false,
-                message: "Enter a valid password. min of 8 characters",
+                message: "Enter a valid password field. min of 8 characters",
                 data: []
             });
         }
@@ -96,7 +96,7 @@ exports.wocmanChangePassword = (req, res, next) => {
             {
                 statusCode: 400,
                 status: false,
-                message: "Enter a valid previous password",
+                message: "Enter a valid oldpassword  field",
                 data: []
             });
         }
@@ -108,7 +108,7 @@ exports.wocmanChangePassword = (req, res, next) => {
             {
                 statusCode: 400,
                 status: false,
-                message: "Enter a valid confirm password",
+                message: "Enter a valid confirmpassword  field",
                 data: []
             });
         }
@@ -149,6 +149,8 @@ exports.wocmanChangePassword = (req, res, next) => {
                     data: []
                 });
             }
+            var unboard = Helpers.returnBoolean(users.unboard);
+
             var passwordIsValid = bcrypt.compareSync(
                 oldpassword,
                 users.password
@@ -182,7 +184,8 @@ exports.wocmanChangePassword = (req, res, next) => {
                     status: true,
                     message: "Password was Changed",
                     data: {
-                        accessToken: req.token
+                        accessToken: req.token,
+                        unboard: unboard
                     }
                 });
             })

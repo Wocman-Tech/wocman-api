@@ -50,7 +50,7 @@ const Op = db.Sequelize.Op;
 
 exports.technicalNotice = (req, res, next) => {
     
-
+    var searchuserid  = [];
     if (typeof req.userId == "undefined") {
         return res.status(400).send(
         {
@@ -61,9 +61,9 @@ exports.technicalNotice = (req, res, next) => {
         });
     }else{
         if(req.userId && req.userId !== ''){
-            Searchuserid = {'userid': req.userId};
+            searchuserid = {'userid': req.userId};
         }else{
-            Searchuserid = {'userid': {$not: null}};
+            searchuserid = {'userid': {$not: null}};
         }
         
         User.findByPk(req.userId)
@@ -76,11 +76,19 @@ exports.technicalNotice = (req, res, next) => {
                     data: []
                 });
             }
-           
+            var unboard = Helpers.returnBoolean(users.unboard);
             Wsetting.findOne({
-                where: Searchuserid
+                where: searchuserid
             })
             .then(wsettings => {
+                if (!wsettings) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "User has no settings.",
+                        data: []
+                    });
+                }
                 Wsetting.update(
                     {
                     technicalnotice: 1 
@@ -90,17 +98,40 @@ exports.technicalNotice = (req, res, next) => {
                     }
                 ).then( newsettings => {
 
-                    res.status(200).send({
-                        statusCode: 200,
-                        status: true,
-                        message: "Notification Settings Updated",
-                        data: {
-                            settings: newsettings,
-                            AccessToken: req.token,
-                            Unboard: users.unboard
-                        }
+                    Wsetting.findOne({
+                        where: searchuserid
+                    })
+                    .then(updatedsettings => {
+                        var technicalnotice = Helpers.returnBoolean(updatedsettings.technicalnotice);
+
+                        res.status(200).send({
+                            statusCode: 200,
+                            status: true,
+                            message: "Notification Settings Updated",
+                            data: {
+                                technicalNotice: technicalnotice,
+                                accessToken: req.token,
+                                unboard: unboard
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        res.status(500).send({
+                            statusCode: 500,
+                            status: false, 
+                            message: err.message,
+                            data: [] 
+                        });
                     });
                 })
+                .catch(err => {
+                    res.status(500).send({
+                        statusCode: 5050,
+                        status: false, 
+                        message: err.message,
+                        data: [] 
+                    });
+                });
             })
             .catch(err => {
                 res.status(500).send({
@@ -123,7 +154,7 @@ exports.technicalNotice = (req, res, next) => {
 };
 exports.ntechnicalNotice = (req, res, next) => {
     
-
+    var searchuserid = [];
     if (typeof req.userId == "undefined") {
         return res.status(400).send(
         {
@@ -144,6 +175,8 @@ exports.ntechnicalNotice = (req, res, next) => {
                     data: []
                 });
             }
+            var unboard = Helpers.returnBoolean(users.unboard);
+
 
             if(req.userId && req.userId !== ''){
                 searchuserid = {'userid': req.userId};
@@ -155,6 +188,14 @@ exports.ntechnicalNotice = (req, res, next) => {
                 where: searchuserid
             })
             .then(wsettings => {
+                if (!wsettings) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "User has no settings.",
+                        data: []
+                    });
+                }
 
                 Wsetting.update(
                     {
@@ -165,15 +206,30 @@ exports.ntechnicalNotice = (req, res, next) => {
                     }
                 ).then( newsettings => {
 
-                    res.status(200).send({
-                        statusCode: 200,
-                        status: true,
-                        message: "Notification Settings Updated",
-                        data: {
-                            settings: wsettings,
-                            AccessToken: req.token,
-                            Unboard: users.unboard
-                        }
+                    Wsetting.findOne({
+                        where: searchuserid
+                    })
+                    .then(updatedsettings => {
+                        var technicalnotice = Helpers.returnBoolean(updatedsettings.technicalnotice);
+
+                        res.status(200).send({
+                            statusCode: 200,
+                            status: true,
+                            message: "Notification Settings Updated",
+                            data: {
+                                technicalNotice: technicalnotice,
+                                accessToken: req.token,
+                                unboard: unboard
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        res.status(500).send({
+                            statusCode: 500,
+                            status: false, 
+                            message: err.message,
+                            data: [] 
+                        });
                     });
                 })
                 .catch(err => {

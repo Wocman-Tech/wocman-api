@@ -47,75 +47,57 @@ const Op = db.Sequelize.Op;
 
 
 exports.workDone = (req, res, next) => {
-    // console.log(req.email_link);
-    if (typeof req.userId == "undefined") {
-        return res.status(400).send(
-        {
-            statusCode: 400,
-            status: false,
-            message: "User was not found",
-            data: [] 
-        });
-    }else{
+    User.findByPk(req.userId)
+    .then(users => {
+        if (!users) {
+            return res.status(404).send({
+                statusCode: 404,
+                status: false,
+                message: "User Not found.",
+                data: []
+            });
+        }
+        var unboard = Helpers.returnBoolean(users.unboard);
 
-        User.findByPk(req.userId)
-        .then(users => {
-            if (!users) {
+        if(req.userId && req.userId !== ''){
+            Searchuserid = {'userid': req.userId};
+            Searchwocmanid = {'wocmanid': req.userId};
+        }else{
+            Searchuserid = {'userid': {$not: null}};
+            Searchwocmanid = {'wocmanid': {$not: null}};
+        }
+        
+        Projects.findAll({
+            where: Searchwocmanid
+        })
+        .then(projects => {
+            var workDone = 0;
+            if (!projects) {
                 return res.status(404).send({
                     statusCode: 404,
                     status: false,
-                    message: "User Not found.",
-                    data: []
+                    message: "Wocman Project Not Found",
+                    data: {
+                        accessToken: req.token,
+                        nnboard: unboard
+                    }
                 });
-            }
-            if(req.userId && req.userId !== ''){
-                Searchuserid = {'userid': req.userId};
-                Searchwocmanid = {'wocmanid': req.userId};
             }else{
-                Searchuserid = {'userid': {$not: null}};
-                Searchwocmanid = {'wocmanid': {$not: null}};
-            }
-            
-            Projects.findAll({
-                where: Searchwocmanid
-            })
-            .then(projects => {
-                var workDone = 0;
-                if (!projects) {
-                    return res.status(404).send({
-                        statusCode: 404,
-                        status: false,
-                        message: "Wocman Project Not Found",
-                        data: {
-                            AccessToken: req.token,
-                            Unboard: users.unboard
-                        }
-                    });
-                }else{
-                    for (let i = 0; i < projects.length; i++) {
-                        if (parseInt(projects[i].wocmanaccept, 10) == 5) {
-                            workDone = workDone + 1;
-                        }
+                for (let i = 0; i < projects.length; i++) {
+                    if (parseInt(projects[i].wocmanaccept, 10) == 5) {
+                        workDone = workDone + 1;
                     }
                 }
-                res.status(200).send({
-                    statusCode: 200,
-                    status: true,
-                    message: "Found a wocmna user",
-                    data: {
-                        WorkDone: workDone,
-                        AccessToken: req.token,
-                        Unboard: users.unboard
-                    }
-                });
-            })
-            .catch(err => {
-                res.status(500).send({
-                    statusCode: 500,
-                    status: false, 
-                    message: err.message,
-                    data: [] 
-                });
+            }
+            res.status(200).send({
+                statusCode: 200,
+                status: true,
+                message: "Found a wocmna user",
+                data: {
+                    workDone: workDone,
+                    accessToken: req.token,
+                    unboard: unboard
+                }
             });
         })
         .catch(err => {
@@ -126,5 +108,14 @@ exports.workDone = (req, res, next) => {
                 data: [] 
             });
         });
-    }
+    })
+    .catch(err => {
+        res.status(500).send({
+            statusCode: 500,
+            status: false, 
+            message: err.message,
+            data: [] 
+        });
+    });
+    
 };

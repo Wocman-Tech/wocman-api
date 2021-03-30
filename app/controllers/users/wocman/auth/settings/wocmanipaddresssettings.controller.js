@@ -50,7 +50,7 @@ const Op = db.Sequelize.Op;
 
 exports.wipsettings = (req, res, next) => {
     
-
+    var searchuserid = [];
     if (typeof req.userId == "undefined") {
         return res.status(400).send(
         {
@@ -61,58 +61,70 @@ exports.wipsettings = (req, res, next) => {
         });
     }else{
 
-        if (typeof req.body.ipaddress === "undefined") {
-            return res.status(400).send(
-                {
-                    statusCode: 400,
-                    status: false, 
-                    message: "IP Address is undefined.",
-                    data: []
-                }
-            );
+        
+        if(req.userId && req.userId !== ''){
+            searchuserid = {'userid': req.userId};
         }else{
-            var id_ad = req.body.ipaddress;
-            if(req.userId && req.userId !== ''){
-                Searchuserid = {'userid': req.userId};
-            }else{
-                Searchuserid = {'userid': {$not: null}};
+            searchuserid = {'userid': {$not: null}};
+        }
+        
+        User.findByPk(req.userId)
+        .then(users => {
+            if (!users) {
+                return res.status(404).send({
+                    statusCode: 404,
+                    status: false,
+                    message: "User Not found.",
+                    data: []
+                });
             }
-            
-            User.findByPk(req.userId)
-            .then(users => {
-                if (!users) {
+            var unboard = Helpers.returnBoolean(users.unboard);
+           
+            Wsetting.findOne({
+                where: searchuserid
+            })
+            .then(wsettings => {
+                if (!wsettings) {
                     return res.status(404).send({
                         statusCode: 404,
                         status: false,
-                        message: "User Not found.",
+                        message: "User has no settings.",
                         data: []
                     });
                 }
-               
-                Wsetting.findOne({
-                    where: Searchuserid
-                })
-                .then(wsettings => {
-                    Wsetting.update(
-                        {
-                            securityipa: id_ad 
-                        }, 
-                        {
-                            where : {id: wsettings.id}
-                        }
-                    ).then( newsettings => {
+                Wsetting.update(
+                    {
+                        securityipa: 1 
+                    }, 
+                    {
+                        where : {id: wsettings.id}
+                    }
+                ).then( newsettings => {
+                    Wsetting.findOne({
+                        where: searchuserid
+                    })
+                    .then(updatedsettings => {
+                        var securityipa = Helpers.returnBoolean(updatedsettings.securityipa);
 
                         res.status(200).send({
                             statusCode: 200,
                             status: true,
                             message: "Notification Settings Updated",
                             data: {
-                                settings: newsettings,
-                                AccessToken: req.token,
-                                Unboard: users.unboard
+                                deviceSettings: securityipa,
+                                accessToken: req.token,
+                                unboard: unboard
                             }
                         });
                     })
+                    .catch(err => {
+                        res.status(500).send({
+                            statusCode: 500,
+                            status: false, 
+                            message: err.message,
+                            data: [] 
+                        });
+                    });
                 })
                 .catch(err => {
                     res.status(500).send({
@@ -131,11 +143,19 @@ exports.wipsettings = (req, res, next) => {
                     data: [] 
                 });
             });
-        }
+        })
+        .catch(err => {
+            res.status(500).send({
+                statusCode: 500,
+                status: false, 
+                message: err.message,
+                data: [] 
+            });
+        });
     }
 };
 exports.nwipsettings = (req, res, next) => {
-    
+    var searchuserid = [];
 
     if (typeof req.userId == "undefined") {
         return res.status(400).send(
@@ -157,6 +177,7 @@ exports.nwipsettings = (req, res, next) => {
                     data: []
                 });
             }
+            var unboard = Helpers.returnBoolean(users.unboard);
 
             if(req.userId && req.userId !== ''){
                 searchuserid = {'userid': req.userId};
@@ -168,6 +189,14 @@ exports.nwipsettings = (req, res, next) => {
                 where: searchuserid
             })
             .then(wsettings => {
+                if (!wsettings) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "User has no settings.",
+                        data: []
+                    });
+                }
 
                 Wsetting.update(
                     {
@@ -178,15 +207,30 @@ exports.nwipsettings = (req, res, next) => {
                     }
                 ).then( newsettings => {
 
-                    res.status(200).send({
-                        statusCode: 200,
-                        status: true,
-                        message: "Notification Settings Updated",
-                        data: {
-                            settings: wsettings,
-                            AccessToken: req.token,
-                            Unboard: users.unboard
-                        }
+                    Wsetting.findOne({
+                        where: searchuserid
+                    })
+                    .then(updatedsettings => {
+                        var securityipa = Helpers.returnBoolean(updatedsettings.securityipa);
+
+                        res.status(200).send({
+                            statusCode: 200,
+                            status: true,
+                            message: "Notification Settings Updated",
+                            data: {
+                                deviceSettings: securityipa,
+                                accessToken: req.token,
+                                unboard: unboard
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        res.status(500).send({
+                            statusCode: 500,
+                            status: false, 
+                            message: err.message,
+                            data: [] 
+                        });
                     });
                 })
                 .catch(err => {
