@@ -41,7 +41,7 @@ isEmailVerify = (req, res, next) => {
             return res.status(422).json({
                 statusCode: 422,
                 status: false,
-                message: msgs,
+                message: 'Invalid Email Address',
                 data: []
             })
         }else{

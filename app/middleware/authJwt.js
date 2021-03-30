@@ -24,7 +24,8 @@ verifyToken = (req, res, next) => {
     const { headers, body, params } = req; 
     const joyvalidateSchema = Joi.object().keys({ 
         authorization: Joi.string().required().min(100)
-    }).options({ allowUnknown: true }) 
+    }).options({ allowUnknown: true })
+    
     const joyresult = joyvalidateSchema.validate(headers);
     const { value, error } = joyresult;
     if (!(typeof error === 'undefined')) { 

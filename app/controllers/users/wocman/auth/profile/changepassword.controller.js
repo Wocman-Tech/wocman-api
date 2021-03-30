@@ -54,8 +54,7 @@ let MailGenerator = new Mailgen({
 const Op = db.Sequelize.Op;
 
 exports.wocmanChangePassword = (req, res, next) => {
-    // console.log(req.email_link);
-    if (parseInt(req.userId, 10) === 1) {
+    if (typeof req.userId == "undefined") {
         return res.status(400).send(
         {
             statusCode: 400,
@@ -65,7 +64,7 @@ exports.wocmanChangePassword = (req, res, next) => {
         });
     }else{
 
-         var Searchemail = {};
+        var Searchemail = {};
 
         if(req.email && req.email !== ''){
             Searchemail = {'email': req.email}
@@ -73,10 +72,10 @@ exports.wocmanChangePassword = (req, res, next) => {
             Searchemail = {'email': {$not: null}};
         }
 
-
         var psd = req.body.password;
         var opsd = req.body.oldpassword;
         var cpsd = req.body.confirmpassword;
+
         if(psd && psd !== '' && psd.length > 7){
             var password = psd;
         }else{
@@ -115,33 +114,29 @@ exports.wocmanChangePassword = (req, res, next) => {
 
 
         //schema
-        const joiCleanSchema = Joi.object().keys({ 
-            password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(), 
-            oldpassword: Joi.string().min(7).max(50).required(),
+        const joiCleanSchema = Joi.object({
+            password: Joi.string().pattern(new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")).required(),
+            oldpassword: Joi.string().pattern(new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")).required(),
             confirmpassword: Joi.ref('password')
-        }); 
-        const dataToValidate = {
-          password: password,
-          oldpassword: oldpassword,
-          confirmpassword: confirmpassword
-        }
-        const joyResult = joiCleanSchema.validate(dataToValidate);
-        if (joyResult.error == null) {
-        }else{
-            return res.status(404).send({
-                statusCode: 400,
+        });
+
+        var joyresult = joiCleanSchema.validate({ password: psd, oldpassword: opsd, confirmpassword: cpsd});
+        var { value, error } = joyresult;
+        if (!(typeof error === 'undefined')) {
+            var msg = Helpers.getJsondata(error, 'details')[0];
+            var msgs = Helpers.getJsondata(msg, 'message');
+            return res.status(422).json({
+                statusCode: 422,
                 status: false,
-                message: joyResult.error,
+                message: 'Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character is required in password field',
                 data: []
-            });
+            })
+        }else{
         }
 
-        User.findOne({
-            where: Searchemail
-        })
+        User.findByPk(req.userId)
         .then(users => {
             if (!users) {
-
                 return res.status(404).send({
                     statusCode: 404,
                     status: false,
@@ -159,7 +154,7 @@ exports.wocmanChangePassword = (req, res, next) => {
                     statusCode: 401,
                     status: false,
                     accessToken: null,
-                    message: "Previous Password is not correct",
+                    message: "oldpassword field is not defined or incorrect",
                     data: []
                 });
             }

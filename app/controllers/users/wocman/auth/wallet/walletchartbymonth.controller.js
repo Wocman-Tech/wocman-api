@@ -64,7 +64,7 @@ exports.walletDetails = (req, res, next) => {
         return [year, month, day];
     }
 
-    if (parseInt(req.userId, 10) < 1) {
+    if (typeof req.userId == "undefined") {
         return res.status(400).send(
         {
             statusCode: 400,

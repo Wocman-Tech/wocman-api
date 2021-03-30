@@ -51,7 +51,7 @@ const Op = db.Sequelize.Op;
 exports.technicalNotice = (req, res, next) => {
     
 
-    if (parseInt(req.userId, 10) < 1) {
+    if (typeof req.userId == "undefined") {
         return res.status(400).send(
         {
             statusCode: 400,
@@ -124,7 +124,7 @@ exports.technicalNotice = (req, res, next) => {
 exports.ntechnicalNotice = (req, res, next) => {
     
 
-    if (parseInt(req.userId, 10) < 1) {
+    if (typeof req.userId == "undefined") {
         return res.status(400).send(
         {
             statusCode: 400,

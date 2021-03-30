@@ -46,7 +46,7 @@ const Op = db.Sequelize.Op;
 
 exports.rating = (req, res, next) => {
     // console.log(req.email_link);
-    if (parseInt(req.userId, 10) === 1) {
+    if (typeof req.userId == "undefined") {
         return res.status(400).send(
         {
             statusCode: 400,
