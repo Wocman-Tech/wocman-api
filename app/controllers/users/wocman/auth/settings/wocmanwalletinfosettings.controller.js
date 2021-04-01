@@ -84,11 +84,12 @@ exports.wwDetails = (req, res, next) => {
             })
             .then(wwallet => {
                 if (!wwallet) {
-                    res.status(404).send({
-                        statusCode: 404,
-                        status: false,
+                    res.status(200).send({
+                        statusCode: 200,
+                        status: true,
                         message: "Wallet Details Not Found",
                         data: {
+                            walletDettails: 'User is not unboarded yet and so cannot set up bank and wallet details',
                             accessToken: req.token,
                             unboard: unboard
                         }

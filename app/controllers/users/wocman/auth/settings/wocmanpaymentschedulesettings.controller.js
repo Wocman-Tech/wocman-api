@@ -103,11 +103,15 @@ exports.wpssettings = (req, res, next) => {
                     })
                     .then(updatedsettings => {
                         var paymentschedule = Helpers.returnBoolean(updatedsettings.paymentschedule);
+                        var isWeekly = false;
+                        var isMonthly = false;
                         if (paymentschedule === true) {
                             paymentschedule = 'weekly';
+                            isWeekly = true;
                         }
                         if (paymentschedule === false) {
                             paymentschedule = 'monthly';
+                            isMonthly = true;
                         }
 
                         res.status(200).send({
@@ -115,7 +119,8 @@ exports.wpssettings = (req, res, next) => {
                             status: true,
                             message: "Notification Settings Updated",
                             data: {
-                                paymentSchedule: paymentschedule,
+                                weekly: isWeekly,
+                                monthly: isMonthly,
                                 accessToken: req.token,
                                 unboard: unboard
                             }
@@ -160,7 +165,7 @@ exports.wpssettings = (req, res, next) => {
 };
 exports.nwpssettings = (req, res, next) => {
     
-     var searchuserid = [];
+    var searchuserid = [];
     if (typeof req.userId == "undefined") {
         return res.status(400).send(
         {
@@ -217,11 +222,15 @@ exports.nwpssettings = (req, res, next) => {
                     })
                     .then(updatedsettings => {
                         var paymentschedule = Helpers.returnBoolean(updatedsettings.paymentschedule);
+                        var isWeekly = false;
+                        var isMonthly = false;
                         if (paymentschedule === true) {
                             paymentschedule = 'weekly';
+                            isWeekly = true;
                         }
                         if (paymentschedule === false) {
                             paymentschedule = 'monthly';
+                            isMonthly = true;
                         }
 
                         res.status(200).send({
@@ -229,7 +238,8 @@ exports.nwpssettings = (req, res, next) => {
                             status: true,
                             message: "Notification Settings Updated",
                             data: {
-                                paymentSchedule: paymentschedule,
+                                weekly: isWeekly,
+                                monthly: isMonthly,
                                 accessToken: req.token,
                                 unboard: unboard
                             }

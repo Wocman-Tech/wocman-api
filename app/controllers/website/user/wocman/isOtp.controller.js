@@ -53,7 +53,7 @@ const Op = db.Sequelize.Op;
 const { resolve, port, website, name, otpId }  = require(baseUrl + "config/auth.config.js");
 
 const schemaJoiOTP = Joi.object({
-    otps: Joi.number().min(100000).required()
+    otpToken: Joi.number().min(100000).required()
 });
 
 const messagebird = require('messagebird')(otpId);
@@ -488,7 +488,7 @@ exports.activateIs2FA = (req, res) => {
     var otpToken = req.body.otpToken;
     var password = req.body.password;
 
-    var joyresult = schemaJoiOTP.validate({ otps: otpToken });
+    var joyresult = schemaJoiOTP.validate({ otpToken: otpToken });
     var { value, error } = joyresult;
     if (!(typeof error === 'undefined')) {
         var msg = Helpers.getJsondata(error, 'details')[0];
