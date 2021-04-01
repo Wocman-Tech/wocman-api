@@ -233,10 +233,6 @@ isToken = (req, res, next) => {
             }
         })
         .catch(err => {
-            // req.email = 'jeorgejustice@gmail.com';
-            // req.name = 'Ugbogu Justice';
-            // req.password = tokenId;
-            // next();
             return res.status(500).send({
                 statusCode: 500,
                 status: false, 
