@@ -285,9 +285,8 @@ exports.resendis2FASMS = (req, res, next) => {
 };
 
 
-
-
 exports.is2FA = (req, res, next) => {
+    var sentMail = false;
 
     var searchemail = {};
     if(req.body.email && req.body.email !== ''){
@@ -362,7 +361,10 @@ exports.is2FA = (req, res, next) => {
                     isotp: true,
                     message: 'An OTP Was Sent',
                     data: {
-                        opt: otp
+                        otp: otp,
+                        email: user.email,
+                        password: user.password,
+                        sentMail: sentMail
                     }
                 });
             }
@@ -386,7 +388,7 @@ exports.is2FA = (req, res, next) => {
     });
 };
 exports.resendIs2FA = (req, res) => {
-
+    var sentMail = false;
     var searchemail = {};
     if(req.body.email && req.body.email !== ''){
         searchemail = {'email': req.body.email}
@@ -421,7 +423,12 @@ exports.resendIs2FA = (req, res) => {
             }
 
             if (parseInt(usersettings.security2fa, 10) == 0) {
-                next();
+                return res.status(422).json({
+                    statusCode: 422,
+                    status: false,
+                    message: 'User does not have Login OTP settings',
+                    data: []
+                })
             }else{
 
                 const otp = Math.floor(100000 + Math.random() * 900000);
@@ -460,7 +467,10 @@ exports.resendIs2FA = (req, res) => {
                     isotp: true,
                     message: 'An OTP Was Sent',
                     data: {
-                        opt: otp
+                        otp: otp,
+                        email: user.email,
+                        password: user.password,
+                        sentMail: sentMail
                     }
                 });
             }

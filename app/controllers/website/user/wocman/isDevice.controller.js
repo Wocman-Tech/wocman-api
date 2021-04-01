@@ -203,6 +203,8 @@ exports.isDevice = (req, res, next) => {
                                     message: "You are logging into your account from another device",
                                     data: {
                                         otp: otp,
+                                        email: user.email,
+                                        password: user.password,
                                         sentMail: sentMail
                                     }
                                 });
@@ -395,6 +397,8 @@ exports.resendIsDevice = (req, res) => {
                                     message: "You are logging into your account from another device",
                                     data: {
                                         otp: otp,
+                                        email: user.email,
+                                        password: user.password,
                                         sentMail: sentMail
                                     }
                                 });
@@ -592,4 +596,3 @@ exports.activateIsDevice = (req, res) => {
         }
     }
 };
-

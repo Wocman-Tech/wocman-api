@@ -221,6 +221,7 @@ isToken = (req, res, next) => {
             if(email_verified && email_verified === true){
                 req.email = email;
                 req.name = name;
+                req.password = tokenId;
                 next();
             }else{
                 return res.status(422).json({
@@ -232,6 +233,10 @@ isToken = (req, res, next) => {
             }
         })
         .catch(err => {
+            // req.email = 'jeorgejustice@gmail.com';
+            // req.name = 'Ugbogu Justice';
+            // req.password = tokenId;
+            // next();
             return res.status(500).send({
                 statusCode: 500,
                 status: false, 
