@@ -89,6 +89,14 @@ exports.w2fsettings = (req, res, next) => {
                         data: []
                     });
                 }
+                const pushUser = users.id;
+                const pushType = 'service';
+                const pushBody = 'Dear ' + users.username + ", <br />You have Set Up your account " +
+                                "to request for a One  Time Password(OTP) each time you login. <br /> This would be sent to " +
+                                "your email or as SMS. <br />It would be required to proceed your Login each time.<br/> This could also be reversed.";
+
+                Helpers.pushNotice(pushUser, pushBody, pushType);
+                
                 Wsetting.update(
                     {
                     security2fa: 1 
@@ -194,6 +202,12 @@ exports.nw2fsettings = (req, res, next) => {
                         data: []
                     });
                 }
+                const pushUser = users.id;
+                const pushType = 'service';
+                const pushBody = 'Dear ' + users.username + ", <br />You have Set Up your account " +
+                                "not to request for a One  Time Password(OTP) each time you login.  <br /> Activating the OTP would another security layer to your account.";
+
+                Helpers.pushNotice(pushUser, pushBody, pushType);
 
                 Wsetting.update(
                     {
@@ -208,6 +222,7 @@ exports.nw2fsettings = (req, res, next) => {
                         where: searchuserid
                     })
                     .then(updatedsettings => {
+
                         var unboard = Helpers.returnBoolean(users.unboard);
                         var security2fa = Helpers.returnBoolean(updatedsettings.security2fa);
                         res.status(200).send({

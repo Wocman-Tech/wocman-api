@@ -99,6 +99,14 @@ exports.smsNotice = (req, res, next) => {
                     }
                 ).then( newsettings => {
 
+                    const pushUser = users.id;
+                    const pushType = 'service';
+                    const pushBody = 'Dear ' + users.username + ", <br />You have Set Up your account " +
+                                    "to receive technical and service notice through SMS." +
+                                    "<br/> This could also be reversed.";
+
+                    Helpers.pushNotice(pushUser, pushBody, pushType);
+
                     Wsetting.findOne({
                         where: searchuserid
                     })
@@ -198,6 +206,14 @@ exports.nsmsNotice = (req, res, next) => {
                         data: []
                     });
                 }
+
+                const pushUser = users.id;
+                const pushType = 'service';
+                const pushBody = 'Dear ' + users.username + ", <br />You have Set Up your account " +
+                                "not to receive sms as technical and service notices. " +
+                                "<br/> This could also be reversed.";
+
+                Helpers.pushNotice(pushUser, pushBody, pushType);
 
                 Wsetting.update(
                     {

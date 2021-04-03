@@ -78,7 +78,7 @@ exports.wipsettings = (req, res, next) => {
                     data: []
                 });
             }
-            var unboard = Helpers.returnBoolean(users.unboard);
+
            
             Wsetting.findOne({
                 where: searchuserid
@@ -92,6 +92,17 @@ exports.wipsettings = (req, res, next) => {
                         data: []
                     });
                 }
+
+                const pushUser = users.id;
+                const pushType = 'service';
+                const pushBody = 'Dear ' + users.username + ", <br />You have Set Up your account " +
+                                "to request check on your device each time you login. <br /> This would be sent to " +
+                                "your email or as SMS. <br />It would be required to proceed your Login each time.<br/> This could also be reversed.";
+
+                Helpers.pushNotice(pushUser, pushBody, pushType);
+
+                var unboard = Helpers.returnBoolean(users.unboard);
+
                 Wsetting.update(
                     {
                         securityipa: 1 
@@ -197,6 +208,13 @@ exports.nwipsettings = (req, res, next) => {
                         data: []
                     });
                 }
+
+                const pushUser = users.id;
+                const pushType = 'service';
+                const pushBody = 'Dear ' + users.username + ", <br />You have Set Up your account " +
+                                "not to check your device on login.<br/> This could also be reversed.";
+
+                Helpers.pushNotice(pushUser, pushBody, pushType);
 
                 Wsetting.update(
                     {

@@ -88,6 +88,8 @@ exports.emailNotice = (req, res, next) => {
                         data: []
                     });
                 }
+
+
                 Wsetting.update(
                     {
                         emailnotice: 1
@@ -97,12 +99,20 @@ exports.emailNotice = (req, res, next) => {
                     }
                 )
                 .then( newsettings => {
+                    const pushUser = users.id;
+                    const pushType = 'service';
+                    const pushBody = 'Dear ' + users.username + ", <br />You have Set Up your account " +
+                                    "to accept notifications through email. <br /> We shall therefore notify you through your email. " +
+                                    " <br />This could also be reversed.";
+
+                    Helpers.pushNotice(pushUser, pushBody, pushType);
+                    
                     Wsetting.findOne({
                         where: {userid: req.userId}
                     })
                     .then(updatedsettings => {
                         var emailnotice = Helpers.returnBoolean(updatedsettings.emailnotice);
-
+                        
                         res.status(200).send({
                             statusCode: 200,
                             status: true,
@@ -191,6 +201,13 @@ exports.nemailNotice = (req, res, next) => {
                         data: []
                     });
                 }
+                const pushUser = users.id;
+                const pushType = 'service';
+                const pushBody = 'Dear ' + users.username + ", <br />You have Set Up your account " +
+                                "Not to be receiving your notice through email. <br /> You may also choose to receive you service and technical notices through SMS" +
+                                "<br />";
+
+                Helpers.pushNotice(pushUser, pushBody, pushType);
 
                 Wsetting.update(
                     {

@@ -3,6 +3,7 @@ const config = require("../config/auth.config");
 const User = db.user;
 const Role = db.role;
 const UserRole = db.userRole;
+const Wsetting = db.wsetting;
 const Cert = db.cert;
 const {v4 : uuidv4} = require('uuid');
 const joi = require('joi');
@@ -11,6 +12,32 @@ const Op = db.Sequelize.Op;
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
+
+
+const messagebird = require('messagebird')(config.otpId);
+const nodemailer = require("nodemailer");
+const Mailgen = require("mailgen");
+ 
+let options = {
+  provider: 'openstreetmap'
+};
+
+let transporter = nodemailer.createTransport({
+    service: config.message_server,
+    secure: true,
+    auth: {
+        user: config.email,
+        pass: config.password,
+    },
+});
+
+let MailGenerator = new Mailgen({
+    theme: "default",
+    product: {
+        name: config.name,
+        link: config.website,
+    },
+});
 
 getRoleById = (role_id) => {
     Role.findOne({
@@ -151,6 +178,132 @@ returnBoolean = (value) => {
 	return value;
 }
 
+notice_pusher = (userId, noticeBody, noticeType) => {
+    User.findByPk(userId)
+    .then(users => {
+        if (!users) {
+            return false;
+        }
+        Wsetting.findOne(
+            {where: {userid: userId}}
+        )
+        .then(userSettings => {
+            if (!userSettings) {
+                return false;
+            }
+            var smsMode = parseInt(userSettings.smsnotice, 10);
+            var emailMode = parseInt(userSettings.emailnotice, 10);
+
+            var serviceType = parseInt(userSettings.servicenotice, 10);
+            var technicalType = parseInt(userSettings.technicalnotice, 10);
+
+            if (noticeType == 'service') {
+                var pusherSubject = 'Wocman Technology: Services';
+                if (serviceType === 1) {
+                    if (emailMode === 1) {
+
+                        var sentMail = false;
+
+                        const pusherEmail = users.email;
+                        const pusherUsername = users.username;
+                        const pusherPhone = users.phone;
+
+                        let response = {
+                            body: {
+                              name: pusherUsername,
+                              intro: noticeBody,
+                            },
+                        };
+                        let mail = MailGenerator.generate(response);
+
+                        let message = {
+                            from: config.email,
+                            to:  pusherEmail,
+                            subject: pusherSubject,
+                            html: mail,
+                        };
+
+                        transporter.sendMail(message)
+                        .then(  sentMails => {
+                            var sentMail = true;
+                        })
+                        return sentMail;
+                    }
+                    if (smsMode === 1) {
+
+                        var messageParams = {
+                          'originator': 'MessageBird',
+                          'recipients': [
+                            pusherPhone
+                        ],
+                          'body': noticeBody
+                        };
+
+                        messagebird.messages.create(messageParams, function (err, response) {
+                            if (err) {
+                                return false;
+                            }
+                            return true;
+                        });
+                    }
+                }
+            }
+            if (noticeType == 'technical') {
+                var pusherSubject = 'Wocman Technology: Technical';
+
+                if (technicalType === 1) {
+                    if (emailMode === 1) {
+
+                        var sentMail = false;
+
+                        const pusherEmail = users.email;
+                        const pusherUsername = users.username;
+                        const pusherPhone = users.phone;
+
+                        let response = {
+                            body: {
+                              name: pusherUsername,
+                              intro: noticeBody,
+                            },
+                        };
+                        let mail = MailGenerator.generate(response);
+
+                        let message = {
+                            from: config.email,
+                            to:  pusherEmail,
+                            subject: pusherSubject,
+                            html: mail,
+                        };
+
+                        transporter.sendMail(message)
+                        .then(  sentMails => {
+                            var sentMail = true;
+                        })
+                        return sentMail;
+                    }
+                    if (smsMode === 1) {
+
+                        var messageParams = {
+                          'originator': 'MessageBird',
+                          'recipients': [
+                            pusherPhone
+                        ],
+                          'body': noticeBody
+                        };
+
+                        messagebird.messages.create(messageParams, function (err, response) {
+                            if (err) {
+                                return false;
+                            }
+                            return true;
+                        });
+                    }
+                }
+            }
+        });
+    });
+};
+
 const Helpers = {
     getRoleById: getRoleById,
     getRoleByName: getRoleByName,
@@ -168,8 +321,8 @@ const Helpers = {
     PASSWORD: config.password, 
     MAIN_URL: config.resolve+config.port,
     getJsondata: getJsondata,
-    returnBoolean: returnBoolean
-
+    returnBoolean: returnBoolean,
+    pushNotice: notice_pusher
 };
 
 module.exports = Helpers;

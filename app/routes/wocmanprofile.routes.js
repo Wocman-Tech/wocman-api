@@ -1,14 +1,15 @@
 const { authJwt } = require("../middleware");
 
 const addcertificateController = require("../controllers/users/wocman/auth/profile/addcertificate.controller");
-const changepasswordController = require("../controllers/users/wocman/auth/profile/changepassword.controller");
 const completeController = require("../controllers/users/wocman/auth/profile/complete.controller");
 const logoutController = require("../controllers/users/wocman/auth/profile/logout.controller");
 const profileController = require("../controllers/users/wocman/auth/profile/profile.controller");
 const removecertificateController = require("../controllers/users/wocman/auth/profile/removecertificate.controller");
 const reusepictureController = require("../controllers/users/wocman/auth/profile/reusepicture.controller");
+const removepictureController = require("../controllers/users/wocman/auth/profile/removepicture.controller");
 const updateprofileController = require("../controllers/users/wocman/auth/profile/updateprofile.controller");
 const profilepictureController = require("../controllers/users/wocman/auth/profile/profilepicture.controller");
+const closeaccountController = require("../controllers/users/wocman/auth/profile/closeaccount.controller");
 
 const Helpers = require("../helpers/helper.js");
 
@@ -67,60 +68,61 @@ module.exports = function(app) {
         );
         next();
     });
-
     //auth
-
     app.post(
-        Helpers.apiVersion7()+"profile-wocman",
+        Helpers.apiVersion7()+"wocman/profile",
         [authJwt.verifyToken, authJwt.isWocman],
         profileController.wocmanProfile
     );
     app.post(
-        Helpers.apiVersion7()+"complete-profile-wocman",
+        Helpers.apiVersion7()+"wocman/profile/complete",
         [authJwt.verifyToken, authJwt.isWocman],
         completeController.checkCompleteProfileWocman
     );
-
     app.post(
-        Helpers.apiVersion7()+"update-profile-wocman",
+        Helpers.apiVersion7()+"wocman/profile/update",
         [authJwt.verifyToken, authJwt.isWocman],
         updateprofileController.wocmanProfileUpdate
     );
 
+    //certificate
     app.post(
-        Helpers.apiVersion7()+"password-change-wocman",
-        [authJwt.verifyToken, authJwt.isWocman],
-        changepasswordController.wocmanChangePassword
+        Helpers.apiVersion7() + "wocman/profile/add/certificate", 
+        [authJwt.verifyToken, authJwt.isWocman, uploadCert.single('avatar')], 
+        addcertificateController.wocmanAddCertificate
+    );
+    app.post(
+        Helpers.apiVersion7() + "wocman/profile/remove/certificate", 
+        [authJwt.verifyToken, authJwt.isWocman], 
+        removecertificateController.wocmanRemoveCertificate
     );
 
     app.post(
-        Helpers.apiVersion7() + "wocman-reuse-profile-picture", 
+        Helpers.apiVersion7() + "wocman/profile/picture", 
+        [authJwt.verifyToken, authJwt.isWocman, uploadPicture.single('avatar')], 
+        profilepictureController.uploadProfilePictureWocman
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "wocman/profile/reuse/picture", 
         [authJwt.verifyToken, authJwt.isWocman], 
         reusepictureController.wocmanReuseProfilePicture
     );
 
     app.post(
-        Helpers.apiVersion7() + "wocman-logout", 
+        Helpers.apiVersion7() + "wocman/profile/remove/picture", 
+        [authJwt.verifyToken, authJwt.isWocman], 
+        removepictureController.removeProfilePicture
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "wocman/logout", 
         [authJwt.verifyToken, authJwt.isWocman], 
         logoutController.wocmanLogout
     );
-
     app.post(
-        Helpers.apiVersion7() + "auth/wocman-profile-picture", 
-        [authJwt.verifyToken, authJwt.isWocman, uploadPicture.single('avatar')], 
-        profilepictureController.uploadProfilePictureWocman
-    );
-    //certificate
-
-    app.post(
-        Helpers.apiVersion7() + "wocman-add-certificate", 
-        [authJwt.verifyToken, authJwt.isWocman, uploadCert.single('avatar')], 
-        addcertificateController.wocmanAddCertificate
-    );
-
-    app.post(
-        Helpers.apiVersion7() + "wocman-remove-certificate", 
+        Helpers.apiVersion7() + "wocman/close/account", 
         [authJwt.verifyToken, authJwt.isWocman], 
-        removecertificateController.wocmanRemoveCertificate
+        closeaccountController.wocmanaccount
     );
 };

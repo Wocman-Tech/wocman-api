@@ -100,6 +100,14 @@ exports.blacklistsettings = (req, res, next) => {
                             data: []
                         });
                     }
+
+                    const pushUser = users.id;
+                    const pushType = 'service';
+                    const pushBody = 'Dear ' + users.username + ", <br />You have blacklisted a device. " +
+                                    "<br /> You shall no longer login with this device again. This could also be reversed.";
+
+                    Helpers.pushNotice(pushUser, pushBody, pushType);
+
                     Wblackliist.update(
                         {
                         ipmode: 1 
@@ -217,6 +225,14 @@ exports.allowsettings = (req, res, next) => {
                             data: []
                         });
                     }
+
+                    const pushUser = users.id;
+                    const pushType = 'service';
+                    const pushBody = 'Dear ' + users.username + ", <br />You have that a blacklisted device be allowed to login into your account. " +
+                                    "<br /> You shall not login into your account with that device. " +
+                                    "<br/> This could also be reversed.";
+
+                    Helpers.pushNotice(pushUser, pushBody, pushType);
 
                     Wblackliist.update(
                         {

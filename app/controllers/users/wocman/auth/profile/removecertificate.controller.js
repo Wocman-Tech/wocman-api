@@ -121,13 +121,40 @@ exports.wocmanRemoveCertificate = (req, res, next) => {
                         where: {'id': cert_id}
                     })
                     .then(deleteCert => {
-                        res.status(200).send({
-                            statusCode: 200,
-                            status: true,
-                            message: "Certificate was removed",
-                            data: {
-                                accessToken:req.token
+                        Cert.findAll(
+                            {where: {'userid': user_id}}
+                        ).then(ds34dsd => {
+                            if (!ds34dsd) {
+                                User.update(
+                                    {certificatesupdate: 0},
+                                    {where: {id: users.id} }
+                                );
                             }
+
+                            const pushUser = users.id;
+                            const pushType = 'service';
+                            const pushBody = 'Dear ' + users.username + ", <br />You have removed a certificate. " +
+                                            "<br /> This would cause a review of your data " +
+                                            "<br/> We would notify you when we are done";
+
+                            Helpers.pushNotice(pushUser, pushBody, pushType);
+                        
+                            res.status(200).send({
+                                statusCode: 200,
+                                status: true,
+                                message: "Certificate was removed",
+                                data: {
+                                    accessToken:req.token
+                                }
+                            });
+                        })
+                        .catch(err => {
+                            res.status(500).send({
+                                statusCode: 500,
+                                status: false, 
+                                message: err.message,
+                                data: [] 
+                            });
                         });
                     })
                     .catch(err => {  res.status(500).send({message: err.message }); });

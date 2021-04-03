@@ -131,21 +131,31 @@ exports.wocmanProfile = (req, res, next) => {
             var profilePictures = [];
             var otherImages = [];
             var currentImage = [];
-            var pp = (users.images).split(Helpers.padTogether());
-            for (let i = 0; i <  pp.length; i++) {
-                if (pp[i] !== users.image) {
-                    var theimaeg = Helpers.pathToImages() +  'wocman/picture/'+ pp[i];
-                    if (fs.existsSync(theimaeg)) {
-                        theimaeg = Helpers.coreProjectPath() + theimaeg;
-                    }else{
-                        theimaeg = '';
-                    }
 
-                    otherImages.push(
-                        [
-                            theimaeg
-                        ]
-                    );
+            
+            if (users.images == null) {
+                var otherImages = [];
+            }else{
+                if (users.images == 'null') {
+                    var otherImages = [];
+                }else{
+                    var pp = (users.images).split(Helpers.padTogether());
+                    for (let i = 0; i <  pp.length; i++) {
+                        if (pp[i] !== users.image) {
+                            var theimaeg = Helpers.pathToImages() +  'wocman/picture/'+ pp[i];
+                            if (fs.existsSync(theimaeg)) {
+                                theimaeg = Helpers.coreProjectPath() + theimaeg;
+                            }else{
+                                theimaeg = '';
+                            }
+
+                            otherImages.push(
+                                [
+                                    theimaeg
+                                ]
+                            );
+                        }
+                    }
                 }
             }
             var theimaeg = Helpers.pathToImages() +  'wocman/picture/'+ users.image;
@@ -235,6 +245,8 @@ exports.wocmanProfile = (req, res, next) => {
                 })
                 .then(wwallet => {
                     if (!wwallet) {}else{
+                        var froozen = Helpers.returnBoolean(wwallet.froozeaccount);
+
                         wallet.push(
                             {
                                 balance: parseInt(wwallet.amount, 10), 
@@ -245,7 +257,8 @@ exports.wocmanProfile = (req, res, next) => {
                                 accountType: wwallet.accType,
                                 bankName: wwallet.bankName,
                                 accountNumber: wwallet.accNumber,
-                                accountName: wwallet.accName
+                                accountName: wwallet.accName,
+                                froozen: froozen
                             }
                         );
                     }
@@ -282,18 +295,25 @@ exports.wocmanProfile = (req, res, next) => {
                                 for (let i = 0; i < projects.length; i++) {
 
                                     var project_quoteamount = (wp_schare/100) * parseInt(projects[i].quoteamount, 10);
-
-                                    var ppp = (projects[i].images).split(Helpers.padTogether());
-                                    for (let i = 0; i <  ppp.length; i++) {
-                                            var theimage = Helpers.pathToImages() +  'wocman/projects/'+ ppp[i];
-                                        if (fs.existsSync(theimage)) {
-                                            theimage = Helpers.coreProjectPath() + theimage;
-                                            project_images.push(
-                                                [
-                                                   theimage 
-                                                ]
-                                            );
-                                        }  
+                                    if (projects[i].images == null) {
+                                        
+                                    }else{
+                                        if (projects[i].images == 'null') {
+                                           
+                                        }else{
+                                            var ppp = (projects[i].images).split(Helpers.padTogether());
+                                            for (let i = 0; i <  ppp.length; i++) {
+                                                    var theimage = Helpers.pathToImages() +  'wocman/projects/'+ ppp[i];
+                                                if (fs.existsSync(theimage)) {
+                                                    theimage = Helpers.coreProjectPath() + theimage;
+                                                    project_images.push(
+                                                        [
+                                                           theimage 
+                                                        ]
+                                                    );
+                                                }  
+                                            }
+                                        }
                                     }
                                     if (parseInt(projects[i].wocmanaccept, 10) == 0) {
                                         wpUnaccessed.push(
@@ -450,6 +470,11 @@ exports.wocmanProfile = (req, res, next) => {
                                     }
                                 );
                             }
+                            var isEmailVerified = Helpers.returnBoolean(users.verify_email);
+                            var isProfileUpdated = Helpers.returnBoolean(users.profileupdate);
+                            var isCertificateUploaded = Helpers.returnBoolean(users.certificatesupdate);
+                            var unboard = Helpers.returnBoolean(users.unboard);
+
                             var authorities = 'wocman';
                             res.status(200).send({
                                 statusCode: 200,
@@ -466,15 +491,17 @@ exports.wocmanProfile = (req, res, next) => {
                                     province: users.province,
                                     phone: users.phone,
                                     role: authorities,
-                                    verify_email: verified,
                                     profile_picture: profilePictures,
                                     certificates: certificates,
                                     projects: wprojects,
                                     wallet: wallet,
                                     notice: notice,
-                                    sccessToken: req.token,
-                                    unboard: users.unboard,
-                                    rate: rateUserWocman
+                                    accessToken: req.token,
+                                    rate: rateUserWocman,
+                                    isEmailVerified: isEmailVerified,
+                                    isProfileUpdated: isProfileUpdated,
+                                    isCertificateUploaded: isCertificateUploaded,
+                                    unboard: unboard
                                 }
                             });
                         })

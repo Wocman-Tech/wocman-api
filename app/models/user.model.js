@@ -10,7 +10,7 @@ module.exports = (sequelize, Sequelize) => {
         },
         verify_email: {
             type: Sequelize.STRING,
-            defaultValue: 1,
+            defaultValue: 0,
             allowNull: false
         },
         username: {
@@ -97,6 +97,14 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             defaultValue: null,
             allowNull: true
+        },
+        certificatesupdate: {
+            type: Sequelize.STRING,
+            defaultValue: 0
+        },
+        profileupdate: {
+            type: Sequelize.STRING,
+            defaultValue: 0
         }
     });
     return User;

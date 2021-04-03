@@ -174,6 +174,11 @@ exports.resendEmail = (req, res) => {
                 html: mail,
             };
 
+            var isEmailVerified = Helpers.returnBoolean(user.verify_email);
+            var isProfileUpdated = Helpers.returnBoolean(user.profileupdate);
+            var isCertificateUploaded = Helpers.returnBoolean(user.certificatesupdate);
+            var unboard = Helpers.returnBoolean(user.unboard);
+
             transporter.sendMail(message)
             .then(() => {
                  res.status(200).send({
@@ -184,7 +189,11 @@ exports.resendEmail = (req, res) => {
                         link: verification_link, 
                         email : user.email, 
                         role: 'wocman',
-                        sentMail: true
+                        sentMail: true,
+                        isEmailVerified: isEmailVerified,
+                        isProfileUpdated: isProfileUpdated,
+                        isCertificateUploaded: isCertificateUploaded,
+                        unboard: unboard
                     }
                 });
             })

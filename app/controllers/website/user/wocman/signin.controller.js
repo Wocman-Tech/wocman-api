@@ -108,6 +108,11 @@ exports.signInWocman = (req, res, next) => {
                         expiresIn: 86400 // 24 hours
                     });
 
+                    var unboard = Helpers.returnBoolean(user.unboard);
+                    var isEmailVerified = Helpers.returnBoolean(user.verify_email);
+                    var isProfileUpdated = Helpers.returnBoolean(user.profileupdate);
+                    var isCertificateUploaded = Helpers.returnBoolean(user.certificatesupdate);
+
                     //making sure a user was signed in appropriately
                     user.update({
                         loginlogout:0,
@@ -121,7 +126,6 @@ exports.signInWocman = (req, res, next) => {
                         isOtp: false,
                         data: {
                             email: user.email,
-                            verify_email: user.verify_email,
                             username: user.username,
                             firstname: user.firstname,
                             lastname: user.lastname,
@@ -132,8 +136,11 @@ exports.signInWocman = (req, res, next) => {
                             phone: user.phone,
                             image: user.image,
                             role: 'wocman',
-                            unboard: user.unboard,
-                            accessToken: token
+                            accessToken: token,
+                            isEmailVerified: isEmailVerified,
+                            isProfileUpdated: isProfileUpdated,
+                            isCertificateUploaded: isCertificateUploaded,
+                            unboard: unboard
                         }
                     });
                 }

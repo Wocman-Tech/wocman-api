@@ -125,6 +125,11 @@ exports.wocmanStartResetPassword = (req, res, next) => {
             if (users.changepassword == 0) {
                 var changepassword = "Not Started";
             }
+            var unboard = Helpers.returnBoolean(users.unboard);
+            var isEmailVerified = Helpers.returnBoolean(users.verify_email);
+            var isProfileUpdated = Helpers.returnBoolean(users.profileupdate);
+            var isCertificateUploaded = Helpers.returnBoolean(users.certificatesupdate);
+
             res.status(200).send({
                 statusCode: 200,
                 status: true,
@@ -134,7 +139,11 @@ exports.wocmanStartResetPassword = (req, res, next) => {
                     email: users.email,
                     changepassword: changepassword,
                     roles: authorities,
-                    sentMail: sentMail
+                    sentMail: sentMail,
+                    isEmailVerified: isEmailVerified,
+                    isProfileUpdated: isProfileUpdated,
+                    isCertificateUploaded: isCertificateUploaded,
+                    unboard: unboard
                 }
             });
         })

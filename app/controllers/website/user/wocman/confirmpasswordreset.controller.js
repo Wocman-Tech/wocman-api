@@ -106,6 +106,11 @@ exports.wocmanResetPasswordConfirm = (req, res, next) => {
                     data: []
                 });
             }
+            var isEmailVerified = Helpers.returnBoolean(users.verify_email);
+            var isProfileUpdated = Helpers.returnBoolean(users.profileupdate);
+            var isCertificateUploaded = Helpers.returnBoolean(users.certificatesupdate);
+            var unboard = Helpers.returnBoolean(users.unboard);
+
 
             var authorities = [];
 
@@ -119,7 +124,11 @@ exports.wocmanResetPasswordConfirm = (req, res, next) => {
                     username: users.username,
                     email: users.email,
                     changepassword: users.changepassword,
-                    roles: authorities
+                    roles: authorities,
+                    isEmailVerified: isEmailVerified,
+                    isProfileUpdated: isProfileUpdated,
+                    isCertificateUploaded: isCertificateUploaded,
+                    unboard: unboard
                 }
             });
         })

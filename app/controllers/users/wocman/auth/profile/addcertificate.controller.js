@@ -153,6 +153,19 @@ exports.wocmanAddCertificate = (req, res, next) => {
                 picture: file.filename
             })
             .then(hgh  => {
+
+                const pushUser = users.id;
+                const pushType = 'service';
+                const pushBody = 'Dear ' + users.username + ", <br />You have added " +
+                                "a certificate. <br /> This would be reviewed soon " +
+                                "<br />A corresponding response would be sent to you<br/>";
+
+                Helpers.pushNotice(pushUser, pushBody, pushType);
+
+                User.update(
+                    {certificatesupdate: 1},
+                    {where: {id: users.id} }
+                );
                 res.status(200).send({
                     statusCode: 200,
                     status: true,

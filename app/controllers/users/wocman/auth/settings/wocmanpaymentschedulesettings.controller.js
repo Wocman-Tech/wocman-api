@@ -89,6 +89,15 @@ exports.wpssettings = (req, res, next) => {
                         data: []
                     });
                 }
+
+                const pushUser = users.id;
+                const pushType = 'service';
+                const pushBody = 'Dear ' + users.username + ", <br />You have Set Up your payment schedule " +
+                                "to be weekly. <br /> This Would take Effect From Next Payment Shift. " +
+                                "<br/> This could also be on a monthly interval.";
+
+                Helpers.pushNotice(pushUser, pushBody, pushType);
+
                 Wsetting.update(
                     {
                     paymentschedule: 1
@@ -207,6 +216,14 @@ exports.nwpssettings = (req, res, next) => {
                         data: []
                     });
                 }
+
+                const pushUser = users.id;
+                const pushType = 'service';
+                const pushBody = 'Dear ' + users.username + ", <br />You have Set Up your payment mode " +
+                                "to be monthly. <br /> This would be effected on your next payment shift. " +
+                                "<br />This could also be weekly based.";
+
+                Helpers.pushNotice(pushUser, pushBody, pushType);
 
                 Wsetting.update(
                     {

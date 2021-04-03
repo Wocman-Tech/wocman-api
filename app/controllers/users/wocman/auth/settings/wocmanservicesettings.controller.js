@@ -91,6 +91,7 @@ exports.serviceNotice = (req, res, next) => {
                         data: []
                     });
                 }
+
                 Wsetting.update(
                     {
                     servicenotice: 1 
@@ -99,6 +100,13 @@ exports.serviceNotice = (req, res, next) => {
                         where : {id: wsettings.id}
                     }
                 ).then( newsettings => {
+                    const pushUser = users.id;
+                    const pushType = 'service';
+                    const pushBody = 'Dear ' + users.username + ", <br />You have Set Up your account " +
+                                    "to receive service notices."+ 
+                                    "<br /> We would therefore be sending you service notices from now";
+
+                    Helpers.pushNotice(pushUser, pushBody, pushType);
 
                     Wsetting.findOne({
                         where: searchuserid
@@ -198,6 +206,14 @@ exports.nserviceNotice = (req, res, next) => {
                         data: []
                     });
                 }
+
+                const pushUser = users.id;
+                const pushType = 'service';
+                const pushBody = 'Dear ' + users.username + ", <br />You have Set Up your account " +
+                                "not to receive servicenotices." +
+                                "<br />We would therefore cease sending you notifications on services.";
+
+                Helpers.pushNotice(pushUser, pushBody, pushType);
 
                 Wsetting.update(
                     {

@@ -556,6 +556,10 @@ exports.activateIs2FA = (req, res) => {
                 var token = jwt.sign({ id: user.id }, config.secret, {
                     expiresIn: 86400 // 24 hours
                 });
+                var isEmailVerified = Helpers.returnBoolean(user.verify_email);
+                var isProfileUpdated = Helpers.returnBoolean(user.profileupdate);
+                var isCertificateUploaded = Helpers.returnBoolean(user.certificatesupdate);
+                var unboard = Helpers.returnBoolean(user.unboard);
 
                 //making sure a user was signed in appropriately
                 user.update({
@@ -569,7 +573,6 @@ exports.activateIs2FA = (req, res) => {
                     isotp: false,
                     data: {
                         email: user.email,
-                        verify_email: user.verify_email,
                         username: user.username,
                         firstname: user.firstname,
                         lastname: user.lastname,
@@ -580,8 +583,11 @@ exports.activateIs2FA = (req, res) => {
                         phone: user.phone,
                         image: user.image,
                         role: 'wocman',
-                        unboard: user.unboard,
-                        accessToken: token
+                        accessToken: token,
+                        isEmailVerified: isEmailVerified,
+                        isProfileUpdated: isProfileUpdated,
+                        isCertificateUploaded: isCertificateUploaded,
+                        unboard: unboard
                     }
                 });
             }                  

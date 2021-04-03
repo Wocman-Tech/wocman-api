@@ -95,6 +95,7 @@ exports.wwDetails = (req, res, next) => {
                         }
                     });
                 }
+                var froozen = Helpers.returnBoolean(wwallet.froozeaccount);
                 res.status(200).send({
                     statusCode: 200,
                     status: true,
@@ -102,7 +103,8 @@ exports.wwDetails = (req, res, next) => {
                     data: {
                         walletDettails: wwallet,
                         accessToken: req.token,
-                        unboard: unboard
+                        unboard: unboard,
+                        frozen: frozen
                     }
                 });
             })
@@ -258,6 +260,16 @@ exports.wchangeBankDetails = (req, res, next) => {
                     }
                 ).then( newsettings => {
 
+                    const pushUser = users.id;
+                    const pushType = 'service';
+                    const pushBody = 'Dear ' + users.username + ", <br />You have Changed your bank Details. " +
+                                " <br />Please report to admin if this changes was not made by you so that we can frooze your wallet until the issue is resolved.";
+
+                    Helpers.pushNotice(pushUser, pushBody, pushType);
+
+                    var froozen = Helpers.returnBoolean(newsettings.froozeaccount);
+
+
                     res.status(200).send({
                         statusCode: 200,
                         status: true,
@@ -265,7 +277,8 @@ exports.wchangeBankDetails = (req, res, next) => {
                         data: {
                             walletDetails: newsettings,
                             accessToken: req.token,
-                            unboard: unboard
+                            unboard: unboard,
+                            frozen: frozen
                         }
                     });
                 })

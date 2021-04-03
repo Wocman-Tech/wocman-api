@@ -110,7 +110,9 @@ exports.signUpWocman = (req, res, next) => {
             .then(hasSettings => {
                 if (!hasSettings) {
                     Wsetting.create({
-                        userid: user.id
+                        userid: user.id,
+                        emailnotice: 1,
+                        servicenotice: 1
                     });
                 }
             });

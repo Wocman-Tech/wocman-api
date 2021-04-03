@@ -26,6 +26,10 @@ module.exports = (sequelize, Sequelize) => {
         },
         totalwitdralamount: {
             type: Sequelize.STRING
+        },
+        froozeaccount: {
+            type: Sequelize.STRING,
+            defaultValue: 0
         }
     });
     return WocmanWallet;

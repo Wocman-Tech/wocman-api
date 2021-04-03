@@ -120,6 +120,9 @@ exports.proceedSignIn = (req, res, next) => {
                                             weblogintoken:token
                                         });
                                         var unboard = Helpers.returnBoolean(xnewuser.unboard);
+                                        var isEmailVerified = Helpers.returnBoolean(xnewuser.verify_email);
+                                        var isProfileUpdated = Helpers.returnBoolean(xnewuser.profileupdate);
+                                        var isCertificateUploaded = Helpers.returnBoolean(xnewuser.certificatesupdate);
 
 
                                         res.status(200).send({
@@ -141,8 +144,11 @@ exports.proceedSignIn = (req, res, next) => {
                                                 phone: xnewuser.phone,
                                                 image: xnewuser.image,
                                                 role: 'wocman',
-                                                unboard: unboard,
-                                                accessToken: token
+                                                accessToken: token,
+                                                isEmailVerified: isEmailVerified,
+                                                isProfileUpdated: isProfileUpdated,
+                                                isCertificateUploaded: isCertificateUploaded,
+                                                unboard: unboard
                                             }
                                         });
                                     }else{
@@ -372,6 +378,10 @@ exports.proceedSignIn = (req, res, next) => {
                                     }
                                 );
                                 var unboard = Helpers.returnBoolean(user.unboard);
+                                var isEmailVerified = Helpers.returnBoolean(user.verify_email);
+                                var isProfileUpdated = Helpers.returnBoolean(user.profileupdate);
+                                var isCertificateUploaded = Helpers.returnBoolean(user.certificatesupdate);
+
 
 
                                 res.status(200).send({
@@ -393,8 +403,11 @@ exports.proceedSignIn = (req, res, next) => {
                                         phone: user.phone,
                                         image: user.image,
                                         role: 'wocman',
-                                        unboard: unboard,
-                                        accessToken: token
+                                        accessToken: token,
+                                        isEmailVerified: isEmailVerified,
+                                        isProfileUpdated: isProfileUpdated,
+                                        isCertificateUploaded: isCertificateUploaded,
+                                        unboard: unboard
                                     }
                                 });
                             }else{

@@ -115,10 +115,16 @@ exports.wocmanChangePassword = (req, res, next) => {
 
 
 
-         //schema
+        //schema
+        // const joiCleanSchema = Joi.object({
+        //     password: Joi.string().pattern(new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")).required(),
+        //     oldpassword: Joi.string().pattern(new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")).required(),
+        //     confirmpassword: Joi.ref('password')
+        // });
+        //schema
         const joiCleanSchema = Joi.object({
-            password: Joi.string().pattern(new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")).required(),
-            oldpassword: Joi.string().pattern(new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")).required(),
+            password: Joi.string().alphanum().min(3).max(225).required(),
+            oldpassword: Joi.string().alphanum().min(3).max(225).required(),
             confirmpassword: Joi.ref('password')
         });
 
@@ -179,6 +185,14 @@ exports.wocmanChangePassword = (req, res, next) => {
               password: bcrypt.hashSync(password, 8)
             })
             .then( (kk) => {
+
+                const pushUser = users.id;
+                const pushType = 'service';
+                const pushBody = 'Dear ' + users.username + ", <br />You have Changed your password today. " +
+                                " <br /> This would take effect from next login.";
+
+                Helpers.pushNotice(pushUser, pushBody, pushType);
+
                 res.status(200).send({
                     statusCode: 200,
                     status: true,

@@ -98,6 +98,14 @@ exports.technicalNotice = (req, res, next) => {
                     }
                 ).then( newsettings => {
 
+                    const pushUser = users.id;
+                    const pushType = 'service';
+                    const pushBody = 'Dear ' + users.username + ", <br />You have Set Up your account " +
+                                    "to receive technical notice. <br /> " +
+                                    " <br /> We would be sending you technical notice.";
+
+                    Helpers.pushNotice(pushUser, pushBody, pushType);
+
                     Wsetting.findOne({
                         where: searchuserid
                     })
@@ -196,6 +204,13 @@ exports.ntechnicalNotice = (req, res, next) => {
                         data: []
                     });
                 }
+                const pushUser = users.id;
+                const pushType = 'service';
+                const pushBody = 'Dear ' + users.username + ", <br />You have Set Up your account " +
+                                "not to receive technical notice. "+
+                                " <br /> This could also be reversed.";
+
+                Helpers.pushNotice(pushUser, pushBody, pushType);
 
                 Wsetting.update(
                     {

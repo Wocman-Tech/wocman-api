@@ -170,7 +170,7 @@ exports.wocmanProfileUpdate = (req, res, next) => {
             country: Joi.string().min(3).max(225).required(),
             state: Joi.string().min(3).max(225).required(),
             province: Joi.string().min(3).max(225).required(),
-            username: Joi.string().alphanum().min(3).max(225).required(),
+            username: Joi.string().min(3).max(225).required(),
         }); 
         const dataToValidate = {
             firstname: firstname,
@@ -215,6 +215,15 @@ exports.wocmanProfileUpdate = (req, res, next) => {
                 username:username
             })
             .then( () => {
+
+                const pushUser = users.id;
+                const pushType = 'service';
+                const pushBody = 'Dear ' + users.username + ", <br />Your wocman profile was Updated. " +
+                                " <br />If not you, do report to the admin for rectification. " +
+                                "<br/> Thanks";
+
+                Helpers.pushNotice(pushUser, pushBody, pushType);
+
                 res.status(200).send({
                     statusCode: 200,
                     status: true,
