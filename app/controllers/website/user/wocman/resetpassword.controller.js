@@ -99,7 +99,7 @@ exports.wocmanStartResetPassword = (req, res, next) => {
             let response = {
                 body: {
                   name: users.username,
-                  intro: "Welcome to Wocman Technology! We're very excited to have you on board. <br/>Thank you for completing your signup. Click or Copy this link below to any browser to login: <br/><div style='font-weight:bolder;'>"+verification_link + "</div><br/>",
+                  intro: "Welcome to Wocman Technology! We're very excited to have you on board. <br/>Your password reset process was Completed. Click or Copy this link below to any browser to login: <br/><div style='font-weight:bolder;'>"+verification_link + "</div><br/>",
                 },
             };
 
