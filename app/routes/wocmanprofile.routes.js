@@ -10,6 +10,7 @@ const removepictureController = require("../controllers/users/wocman/auth/profil
 const updateprofileController = require("../controllers/users/wocman/auth/profile/updateprofile.controller");
 const profilepictureController = require("../controllers/users/wocman/auth/profile/profilepicture.controller");
 const closeaccountController = require("../controllers/users/wocman/auth/profile/closeaccount.controller");
+const ratingController = require("../controllers/users/wocman/auth/profile/rating.controller");
 
 const Helpers = require("../helpers/helper.js");
 
@@ -97,6 +98,12 @@ module.exports = function(app) {
         removecertificateController.wocmanRemoveCertificate
     );
 
+    app.post(
+        Helpers.apiVersion7() + "wocman/profile/rating", 
+        [authJwt.verifyToken, authJwt.isWocman], 
+        ratingController.rating
+    );
+    
     app.post(
         Helpers.apiVersion7() + "wocman/profile/picture", 
         [authJwt.verifyToken, authJwt.isWocman, uploadPicture.single('avatar')], 

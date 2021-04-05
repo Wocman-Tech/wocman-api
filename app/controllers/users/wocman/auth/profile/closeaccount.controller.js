@@ -8,6 +8,7 @@ const UserRole = db.userRole;
 const Nletter = db.nletter;
 const Contactus = db.contactus;
 const Cert = db.cert;
+const Wrate = db.wrate;
 
 
 const Projects = db.projects;
@@ -117,6 +118,9 @@ exports.wocmanaccount = (req, res, next) => {
             where: {'userid': user_id}
         });
         WwWalletH.destroy({
+            where: {'userid': user_id}
+        });
+        Wrate.destroy({
             where: {'userid': user_id}
         });
         User.destroy({
