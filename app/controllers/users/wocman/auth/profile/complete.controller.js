@@ -133,17 +133,9 @@ exports.checkCompleteProfileWocman = (req, res, next) => {
             data: []
         });
     }
-    if(req.body.province && req.body.province !== ''){
-        var province = req.body.province;
-    }else{
-        return res.status(400).send(
-        {
-            statusCode: 400,
-            status: false,
-            message: "Enter a valid province field" ,
-            data: []
-        });
-    }
+   
+    var province = '';
+    
 
     if(req.body.username && req.body.username !== ''){
         var username = req.body.username;

@@ -137,17 +137,8 @@ exports.wocmanProfileUpdate = (req, res, next) => {
             });
         }
 
-        if(req.body.province && req.body.province !== ''){
-            var province = req.body.province;
-        }else{
-            return res.status(400).send(
-            {
-                statusCode: 400,
-                status: false,
-                message: "Enter Your address province",
-                data: []
-            });
-        }
+        var province = '';
+       
 
         if(req.body.username && req.body.username !== ''){
             var username = req.body.username;
