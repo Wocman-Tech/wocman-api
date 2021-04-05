@@ -13,7 +13,7 @@ const schemaJoiEmail = Joi.object({
 const schemaJoiPassword = Joi.object({
     password: Joi.string()
         .alphanum()
-        .min(3)
+        .min(8)
         .max(30)
         .required()
 
@@ -29,7 +29,7 @@ const schemaJoiMatchPassword = Joi.object({
 
     password: Joi.string()
         .alphanum()
-        .min(3)
+        .min(8)
         .max(30)
         .required(),
 
@@ -80,7 +80,7 @@ isPasswordVerify = (req, res, next) => {
         return res.status(422).json({
             statusCode: 422,
             status: false,
-            message: msgs,
+            message: 'Minimun of 8 alphanumeric characters and maximun of 30 alphanumeric characters  is required in password field',
             data: []
         })
     }else{
@@ -97,7 +97,7 @@ isPasswordConfirmed = (req, res, next) => {
         return res.status(422).json({
             statusCode: 422,
             status: false,
-            message: msgs,
+            message: 'Minimun of 8 alphanumeric characters and maximun of 30 alphanumeric characters  is required in password field',
             data: []
         })
     }else{
