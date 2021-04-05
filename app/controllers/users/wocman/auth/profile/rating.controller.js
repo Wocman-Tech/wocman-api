@@ -104,7 +104,7 @@ exports.rating = (req, res, next) => {
                 res.status(200).send({
                     statusCode: 200,
                     status: true,
-                    message: "Found a wocmna user",
+                    message: "Found a wocman rating",
                     data: {
                         rate: rateUserWocman,
                         accessToken: req.token,
