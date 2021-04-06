@@ -38,26 +38,24 @@ module.exports = function(app) {
         );
         next();
     });
-
     //chat end points
-
     app.post(
-        Helpers.apiVersion7() + "wocman-contacts", 
+        Helpers.apiVersion7() + "wocman/chat/contacts", 
         [authJwt.verifyToken, authJwt.isWocman], 
         contactController.wocmanChatContact
     );
     app.post(
-        Helpers.apiVersion7() + "wocman-contact-customer", 
+        Helpers.apiVersion7() + "wocman/chat/contact/details", 
         [authJwt.verifyToken, authJwt.isWocman], 
         customerController.wocmanContactCustomer
     );
     app.post(
-        Helpers.apiVersion7() + "wocman-contact-chatlog", 
+        Helpers.apiVersion7() + "wocman/chat/log", 
         [authJwt.verifyToken, authJwt.isWocman], 
         chatController.chatLog
     );
     app.post(
-        Helpers.apiVersion7() + "wocman-contact-chat",
+        Helpers.apiVersion7() + "wocman/chat/send",
         [authJwt.verifyToken, authJwt.isWocman], 
         chatController.chatSave
     );
