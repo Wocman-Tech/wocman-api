@@ -150,10 +150,10 @@ exports.chatLog = (req, res, next) => {
                             res.send({
                                 statusCode: 200,
                                 status: true, 
-                                message: "seen messages",
+                                message: "Found relationships",
                                 data: {
                                     accessToken: req.token,
-                                    customerid: parseInt(project.customerid, 10),
+                                    customerid: customerid,
                                     chat: chats
                                 }
                             });
