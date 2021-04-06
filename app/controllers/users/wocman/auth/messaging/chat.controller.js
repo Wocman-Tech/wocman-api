@@ -64,7 +64,7 @@ exports.chatLog = (req, res, next) => {
             { 
                 statusCode: 400,
                 status: false,
-                message: "Customer  is undefined.",
+                message: "customerid field  is undefined.",
                 data: []
             }
         );

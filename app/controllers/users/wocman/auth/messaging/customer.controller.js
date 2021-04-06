@@ -61,7 +61,7 @@ exports.wocmanContactCustomer = (req, res, next) => {
             {
                 statusCode: 400,
                 status: false,
-                message: "customerid  is undefined.",
+                message: "customerid  field is undefined.",
                 data: [] 
             }
         );
