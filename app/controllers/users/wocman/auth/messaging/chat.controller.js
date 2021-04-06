@@ -216,15 +216,25 @@ exports.chatSave = (req, res, next) => {
             { 
                 statusCode: 400,
                 status: false,
-                message: "project  is undefined.",
+                message: "customerid field  is undefined.",
                 data: []
             }
         );
     }else{
+        if (typeof message === "undefined") {
+            return res.status(400).send(
+                { 
+                    statusCode: 400,
+                    status: false,
+                    message: "message field is undefined",
+                    data: []
+                }
+            );
+        }
         //schema
         const joiClean = Joi.object().keys({ 
             customerid: Joi.number().integer().min(1),
-            message: Joi.string().min(1).max(225),
+            message: Joi.string().min(2).max(225),
         }); 
         const dataToValidate = { 
           customerid: customerid,
@@ -326,7 +336,7 @@ exports.chatSave = (req, res, next) => {
                 {
                     statusCode: 400,
                     status: false,
-                    message: "Invali customerid",
+                    message: "Invalid customerid or message",
                     data: []
                 }
             );
