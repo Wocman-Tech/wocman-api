@@ -234,7 +234,7 @@ exports.chatSave = (req, res, next) => {
         //schema
         const joiClean = Joi.object().keys({ 
             customerid: Joi.number().integer().min(1),
-            message: Joi.string().min(2).max(225),
+            message: Joi.string().min(1).max(225),
         }); 
         const dataToValidate = { 
           customerid: customerid,
@@ -274,7 +274,7 @@ exports.chatSave = (req, res, next) => {
                     for (var i = 0; i < project.length; i++) {
                         if (parseInt(project[i].wocmanaccept, 10) > 1 && parseInt(project[i].wocmanaccept, 10) < 5) {
                             gg = gg + 1;
-                            projectid = projectid;
+                            projectid = project[i].id;
                         }
                     }
                     if (gg > 0) {
