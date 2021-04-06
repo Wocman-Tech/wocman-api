@@ -131,19 +131,16 @@ exports.wocmanAddCertificate = (req, res, next) => {
         }
 
         Cert.findOne({
-            where: {'name' : cert_name }
+            where: {'name' : cert_name, 'userid' : user_id }
         }).then(ds34dsd => {
             if (!ds34dsd) {
             }else{
-                if (ds34dsd.userid == user_id) {
-
-                    return res.status(404).send({
-                        statusCode: 400,
-                        status: false,
-                        message: "Certificate Already exist for such user",
-                        data: []
-                    });
-                }
+                return res.status(404).send({
+                    statusCode: 400,
+                    status: false,
+                    message: "Certificate Already exist for such user",
+                    data: []
+                });
             }
 
             Cert.create({
@@ -154,7 +151,7 @@ exports.wocmanAddCertificate = (req, res, next) => {
             })
             .then(hgh  => {
 
-                const pushUser = users.id;
+                const pushUser = user_id;
                 const pushType = 'service';
                 const pushBody = 'Dear ' + users.username + ", <br />You have added " +
                                 "a certificate. <br /> This would be reviewed soon " +
@@ -164,7 +161,7 @@ exports.wocmanAddCertificate = (req, res, next) => {
 
                 User.update(
                     {certificatesupdate: 1},
-                    {where: {id: users.id} }
+                    {where: {id: user_id} }
                 );
                 res.status(200).send({
                     statusCode: 200,

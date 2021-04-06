@@ -137,7 +137,7 @@ exports.wocmanProfileUpdate = (req, res, next) => {
             });
         }
 
-        var province = '';
+        var province = req.body.address;
        
 
         if(req.body.username && req.body.username !== ''){
