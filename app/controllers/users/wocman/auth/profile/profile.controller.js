@@ -144,7 +144,7 @@ exports.wocmanProfile = (req, res, next) => {
                         if (pp[i] !== users.image) {
                             var theimaeg = Helpers.pathToImages() +  'wocman/picture/'+ pp[i];
                             if (fs.existsSync(theimaeg)) {
-                                theimaeg = Helpers.coreProjectPath() + theimaeg;
+                                theimaeg = config.resolve+"/"+Helpers.coreProjectPath() + theimaeg;
                             }else{
                                 theimaeg = '';
                             }
@@ -160,7 +160,7 @@ exports.wocmanProfile = (req, res, next) => {
             }
             var theimaeg = Helpers.pathToImages() +  'wocman/picture/'+ users.image;
             if (fs.existsSync(theimaeg)) {
-                theimaeg = Helpers.coreProjectPath() + theimaeg;
+                theimaeg = config.resolve+"/"+Helpers.coreProjectPath() + theimaeg;
             }else{
                 theimaeg = '';
             }
@@ -192,7 +192,7 @@ exports.wocmanProfile = (req, res, next) => {
                     for (let i = 0; i < certs9o.length; i++) {
                         var theimaeg = Helpers.pathToImages() +  'wocman/certificate/'+ certs9o[i].picture;
                         if (fs.existsSync(theimaeg)) {
-                            theimaeg = Helpers.coreProjectPath() + theimaeg;
+                            theimaeg = config.resolve+"/"+Helpers.coreProjectPath() + theimaeg;
                         }else{
                             theimaeg = '';
                         }
@@ -305,7 +305,7 @@ exports.wocmanProfile = (req, res, next) => {
                                             for (let i = 0; i <  ppp.length; i++) {
                                                     var theimage = Helpers.pathToImages() +  'wocman/projects/'+ ppp[i];
                                                 if (fs.existsSync(theimage)) {
-                                                    theimage = Helpers.coreProjectPath() + theimage;
+                                                    theimage = config.resolve+"/"+Helpers.coreProjectPath() + theimage;
                                                     project_images.push(
                                                         [
                                                            theimage 
