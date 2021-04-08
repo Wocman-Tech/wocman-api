@@ -2,7 +2,7 @@ const pathRoot = '../../../../../';
 const db = require(pathRoot+"models");
 const config = require(pathRoot+"config/auth.config");
 const AWS  = require('aws-sdk');
-AWS.config.region = 'us-east-2';
+// AWS.config.region = 'us-east-2';
 
 const s3 = new AWS.S3({
     sslEnabled: true,
