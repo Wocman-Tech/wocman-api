@@ -26,18 +26,6 @@ var storageCert = multer.diskStorage({
         cb(null, file.fieldname + '-' + uniqueSuffix)
     }
 });
-var uploadCert = multer({ 
-    storage: storageCert, 
-    fileFilter : (req, file, cb) => {
-        if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg" || file.mimetype == "image/gif") {
-            cb(null, true);
-        }else{
-            cb(null, false);
-            return cb(new Error('Only jpeg, jpg, png, gif file extensions are allowerd'));
-        }
-    }
-});
-
 var storageProfile = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, path.join('', 'app/', 'uploads/wocman/picture'))
@@ -47,18 +35,9 @@ var storageProfile = multer.diskStorage({
         cb(null, file.fieldname + '-' + uniqueSuffix)
     }
 });
-var uploadPicture = multer({ 
-    storage: storageProfile, 
-    fileFilter : (req, file, cb) => {
-        if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg" || file.mimetype == "image/gif") {
-            cb(null, true);
 
-        }else{
-            cb(null, false);
-            return cb(new Error('Only jpeg, jpg, png, gif file extensions are allowerd'));
-        }
-    }
-});
+const uploadPicture = multer({storageProfile}).single('avatar')
+const uploadCertificate = multer({storageCert}).single('avatar')
 
 
 module.exports = function(app) {
@@ -89,7 +68,7 @@ module.exports = function(app) {
     //certificate
     app.post(
         Helpers.apiVersion7() + "wocman/profile/add/certificate", 
-        [authJwt.verifyToken, authJwt.isWocman, uploadCert.single('avatar')], 
+        [authJwt.verifyToken, authJwt.isWocman, uploadCertificate ], 
         addcertificateController.wocmanAddCertificate
     );
     app.post(
@@ -106,7 +85,7 @@ module.exports = function(app) {
     
     app.post(
         Helpers.apiVersion7() + "wocman/profile/picture", 
-        [authJwt.verifyToken, authJwt.isWocman, uploadPicture.single('avatar')], 
+        [authJwt.verifyToken, authJwt.isWocman, uploadPicture], 
         profilepictureController.uploadProfilePictureWocman
     );
 

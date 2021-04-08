@@ -1,6 +1,13 @@
 const pathRoot = '../../../../../';
 const db = require(pathRoot+"models");
 const config = require(pathRoot+"config/auth.config");
+const AWS  = require('aws-sdk');
+AWS.config.region = 'us-east-2';
+
+const s3 = new AWS.S3({
+    accessKeyId: process.env.AWS_ID,
+    secretAccessKey: process.env.AWS_SECRET
+})
 const fs = require('fs');
 const User = db.user;
 const Role = db.role;
@@ -50,9 +57,7 @@ let MailGenerator = new Mailgen({
   },
 });
 
-
 const Op = db.Sequelize.Op;
-
 
 exports.uploadProfilePictureWocman =  (req, res, next) => {
 
@@ -67,37 +72,74 @@ exports.uploadProfilePictureWocman =  (req, res, next) => {
             data: []
         });
     }
-
-    const file = req.file;
+    const file = req.file;//this is the file name
     if (!file) {
         return res.status(400).send({
             statusCode: 400,
             status: false,
-            message: "Profile Picture not uploaded.",
+            message: "avatar filed was undefined",
             data: []
         });
     }
-    User.findByPk(user_id).then(users => {
-        if (!users) {
-            return res.status(404).send({
-                statusCode: 404,
+    // console.log(file);
+    let myFile =  file.originalname.split(".")
+    const fileType = myFile[myFile.length - 1]
+    const dsf = uuidv4();
+
+    const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `${dsf}.${fileType}`,
+        Body:  file.buffer
+    }
+
+    s3.upload(params, (error, data) => {
+        if(error){
+            res.status(500).send(error)
+        }
+
+        // res.status(200).send(data)
+        var fileUrl = data.Location;
+        if (typeof fileUrl === 'undefined') {
+            return res.status(400).send(
+            {
+                statusCode: 400,
                 status: false,
-                message: "User Not found.",
-                date: []
+                message: "Upload Not successful",
+                data: []
             });
         }
-        users.update({
-            image: file.filename,
-            images: users.images+Helpers.padTogether()+file.filename
-        })
-        .then( () => {
-            res.send({
-                statusCode: 200,
-                status: true,
-                message: "Profile picture uploaded successfully",
-                data: {
-                    accessToken: req.token
-                }
+       
+        User.findByPk(user_id).then(users => {
+            if (!users) {
+                return res.status(404).send({
+                    statusCode: 404,
+                    status: false,
+                    message: "User Not found.",
+                    date: []
+                });
+            }
+            users.update({
+                image: fileUrl,
+                images: users.images+Helpers.padTogether()+fileUrl
+            })
+            .then( () => {
+                res.send({
+                    statusCode: 200,
+                    status: true,
+                    message: "Profile picture uploaded successfully",
+                    data: {
+                        imageUrl: fileUrl,
+                        accessToken: req.token
+                    }
+                });
+            })
+            .catch(err => {
+                res.status(500).send({
+                    statusCode: 500,
+                    status: false, 
+                    message: err.message,
+                    data: [] 
+                });
             });
         })
         .catch(err => {
@@ -108,13 +150,6 @@ exports.uploadProfilePictureWocman =  (req, res, next) => {
                 data: [] 
             });
         });
-    })
-    .catch(err => {
-        res.status(500).send({
-            statusCode: 500,
-            status: false, 
-            message: err.message,
-            data: [] 
-        });
     });
+    
 };
