@@ -151,5 +151,4 @@ exports.uploadProfilePictureWocman =  (req, res, next) => {
             });
         });
     });
-    
 };

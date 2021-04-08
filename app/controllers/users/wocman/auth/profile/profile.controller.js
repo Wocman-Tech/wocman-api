@@ -9,6 +9,8 @@ const Nletter = db.nletter;
 const Contactus = db.contactus;
 const Cert = db.cert;
 
+const urlExistSync = require("url-exist-sync");
+
 
 const Projects = db.projects;
 const Project = db.projecttype;
@@ -142,33 +144,29 @@ exports.wocmanProfile = (req, res, next) => {
                     var pp = (users.images).split(Helpers.padTogether());
                     for (let i = 0; i <  pp.length; i++) {
                         if (pp[i] !== users.image) {
-                            var theimaeg = Helpers.pathToImages() +  'wocman/picture/'+ pp[i];
-                            if (fs.existsSync(theimaeg)) {
-                                theimaeg = config.resolve+"/"+Helpers.coreProjectPath() + theimaeg;
-                            }else{
-                                theimaeg = '';
+                            var linkExist =  urlExistSync(pp[i]);
+                            if (linkExist === true) {
+                                var theimaeg = pp[i];
+                                otherImages.push(
+                                    [
+                                        theimaeg
+                                    ]
+                                );
                             }
 
-                            otherImages.push(
-                                [
-                                    theimaeg
-                                ]
-                            );
                         }
                     }
                 }
             }
-            var theimaeg = Helpers.pathToImages() +  'wocman/picture/'+ users.image;
-            if (fs.existsSync(theimaeg)) {
-                theimaeg = config.resolve+"/"+Helpers.coreProjectPath() + theimaeg;
-            }else{
-                theimaeg = '';
+            var linkExist =  urlExistSync(users.image);
+            if (linkExist === true) {
+                var theimaeg = users.image;
+                currentImage.push(
+                    [
+                        theimaeg
+                    ]
+                );
             }
-            currentImage.push(
-                [
-                    theimaeg
-                ]
-            );
 
             profilePictures.push(
                 {
@@ -190,11 +188,12 @@ exports.wocmanProfile = (req, res, next) => {
                 if (!certs9o) {
                 }else{
                     for (let i = 0; i < certs9o.length; i++) {
-                        var theimaeg = Helpers.pathToImages() +  'wocman/certificate/'+ certs9o[i].picture;
-                        if (fs.existsSync(theimaeg)) {
-                            theimaeg = config.resolve+"/"+Helpers.coreProjectPath() + theimaeg;
+                        var linkExist =  urlExistSync(certs9o[i].picture);
+
+                        if (linkExist === true) {
+                            var theimaeg = certs9o[i].picture;
                         }else{
-                            theimaeg = '';
+                            var theimaeg = '';
                         }
                         if (parseInt(certs9o[i].status, 10) == 0) {
 
@@ -303,9 +302,10 @@ exports.wocmanProfile = (req, res, next) => {
                                         }else{
                                             var ppp = (projects[i].images).split(Helpers.padTogether());
                                             for (let i = 0; i <  ppp.length; i++) {
-                                                    var theimage = Helpers.pathToImages() +  'wocman/projects/'+ ppp[i];
-                                                if (fs.existsSync(theimage)) {
-                                                    theimage = config.resolve+"/"+Helpers.coreProjectPath() + theimage;
+                                                var linkExist =  urlExistSync(projects[i].images);
+
+                                                if (linkExist === true) {
+                                                    var theimage = projects[i].images;
                                                     project_images.push(
                                                         [
                                                            theimage 
@@ -479,7 +479,7 @@ exports.wocmanProfile = (req, res, next) => {
                             res.status(200).send({
                                 statusCode: 200,
                                 status: true,
-                                message: "Found a wocmna user",
+                                message: "Found a wocman user",
                                 data: {
                                     username: users.username,
                                     email: users.email,
