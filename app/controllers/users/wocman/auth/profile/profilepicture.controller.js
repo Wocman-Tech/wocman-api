@@ -5,6 +5,7 @@ const AWS  = require('aws-sdk');
 AWS.config.region = 'us-east-2';
 
 const s3 = new AWS.S3({
+    sslEnabled: true,
     accessKeyId: process.env.AWS_ID,
     secretAccessKey: process.env.AWS_SECRET
 })
