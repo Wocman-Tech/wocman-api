@@ -88,7 +88,7 @@ exports.uploadProfilePictureWocman =  (req, res, next) => {
     const dsf = uuidv4();
 
     const params = {
-        ACL: "public-read-write",
+        ACL: "private",
         Bucket: process.env.AWS_BUCKET_NAME,
         Key: `${dsf}.${fileType}`,
         Body:  file.buffer
