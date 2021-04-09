@@ -89,7 +89,7 @@ exports.uploadProfilePictureWocman =  (req, res, next) => {
 
     const params = {
         ACL: "private",
-        Bucket: process.env.AWS_BUCKET_NAME,
+        Bucket: "wocmantechnologyuploads",
         Key: `${dsf}.${fileType}`,
         Body:  file.buffer
     }
