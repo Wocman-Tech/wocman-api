@@ -24,7 +24,7 @@ const Wshear = db.wshear;
 const WAChat = db.waChat;
 const WCChat = db.wcChat;
 const WWallet = db.wWallet;
-var bu7 = false;
+
 const Helpers = require(pathRoot+"helpers/helper.js");
 const { verifySignUp } = require(pathRoot+"middleware");
 const { EMAIL, PASSWORD, MAIN_URL } = require(pathRoot+"helpers/helper.js");
@@ -99,7 +99,6 @@ exports.uploadProfilePictureWocman =  (req, res, next) => {
             res.status(500).send(error)
         }
 
-        // res.status(200).send(data)
         var fileUrl = data.Location;
         if (typeof fileUrl === 'undefined') {
             return res.status(400).send(
