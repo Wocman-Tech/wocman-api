@@ -107,7 +107,7 @@ function initial1() {
         name: "Computer, accessories Installations and Maintenance"
     });
 }
-initial1();
+// initial1();
 
 // simple route
 app.get("/", (req, res) => {
