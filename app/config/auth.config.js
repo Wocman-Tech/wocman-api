@@ -19,7 +19,10 @@ if (workstation.toLowerCase() === "web") {
         website: "https://wocman.netlify.app",
         otpId: "8C5YFUT5NWJo8TD7tVQ20o4QF",
         googleAppClientID: "832018209601-v1h3d5qgu10p3m4pv6l1jvgq9gcrl9v1.apps.googleusercontent.com",
-        googleAppClientSecret: "o1pyycovPehN0loXowHRh0aR"
+        googleAppClientSecret: "o1pyycovPehN0loXowHRh0aR",
+        awsS3AccessKeyId: "AKIAUPJAS3S6WTQ37DUN",
+        awsS3SecretAccessKey: "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",
+        awsS3BucketName: "wocmantechnologyuploads"
     }
 }
 
@@ -39,6 +42,9 @@ if(workstation.toLowerCase() === "localhost"){
         website: "https://wocman.netlify.app",
         otpId: "8C5YFUT5NWJo8TD7tVQ20o4QF",
         googleAppClientID: "832018209601-v1h3d5qgu10p3m4pv6l1jvgq9gcrl9v1.apps.googleusercontent.com",
-        googleAppClientSecret: "o1pyycovPehN0loXowHRh0aR"
+        googleAppClientSecret: "o1pyycovPehN0loXowHRh0aR",
+        awsS3AccessKeyId: "AKIAUPJAS3S6WTQ37DUN",
+        awsS3SecretAccessKey: "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",
+        awsS3BucketName: "wocmantechnologyuploads"
     }
 }

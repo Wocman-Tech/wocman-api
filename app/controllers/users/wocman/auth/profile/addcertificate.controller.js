@@ -7,8 +7,8 @@ AWS.config.region = 'us-east-2';
 
 const s3 = new AWS.S3({
     sslEnabled: true,
-    accessKeyId: process.env.AWS_ID,
-    secretAccessKey: process.env.AWS_SECRET
+    accessKeyId: config.awsS3AccessKeyId,
+    secretAccessKey: config.awsS3SecretAccessKey
 })
 const User = db.user;
 const Role = db.role;
@@ -107,7 +107,7 @@ exports.wocmanAddCertificate = (req, res, next) => {
 
     const params = {
         ACL: "public-read-write",
-        Bucket: process.env.AWS_BUCKET_NAME,
+        Bucket: config.awsS3BucketName,
         Key: `${dsf}.${fileType}`,
         Body:  file.buffer
     }

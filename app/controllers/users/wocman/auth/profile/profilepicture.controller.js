@@ -6,8 +6,8 @@ AWS.config.region = 'us-east-2';
 
 const s3 = new AWS.S3({
     sslEnabled: true,
-    accessKeyId: "AKIAUPJAS3S6WTQ37DUN",
-    secretAccessKey: "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"
+    accessKeyId: config.awsS3AccessKeyId,
+    secretAccessKey: config.awsS3SecretAccessKey
 })
 const fs = require('fs');
 const User = db.user;
@@ -89,7 +89,7 @@ exports.uploadProfilePictureWocman =  (req, res, next) => {
 
     const params = {
         ACL: "private",
-        Bucket: "wocmantechnologyuploads",
+        Bucket: config.awsS3BucketName,
         Key: `${dsf}.${fileType}`,
         Body:  file.buffer
     }
