@@ -105,6 +105,10 @@ module.exports = (sequelize, Sequelize) => {
         profileupdate: {
             type: Sequelize.STRING,
             defaultValue: 0
+        },
+        isSkilled: {
+            type: Sequelize.STRING,
+            defaultValue: 0
         }
     });
     return User;

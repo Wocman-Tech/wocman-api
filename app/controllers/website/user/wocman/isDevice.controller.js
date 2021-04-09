@@ -551,6 +551,8 @@ exports.activateIsDevice = (req, res) => {
                         var isProfileUpdated = Helpers.returnBoolean(user.profileupdate);
                         var isCertificateUploaded = Helpers.returnBoolean(user.certificatesupdate);
                         var unboard = Helpers.returnBoolean(user.unboard);
+                        var isSkilled = Helpers.returnBoolean(user.isSkilled);
+
                         
 
                         //making sure a user was signed in appropriately
@@ -579,6 +581,7 @@ exports.activateIsDevice = (req, res) => {
                                 isEmailVerified: isEmailVerified,
                                 isProfileUpdated: isProfileUpdated,
                                 isCertificateUploaded: isCertificateUploaded,
+                                isSkilled: isSkilled,
                                 unboard: unboard
                             }
                         });

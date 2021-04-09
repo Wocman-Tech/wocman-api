@@ -8,6 +8,8 @@ const UserRole = db.userRole;
 const Nletter = db.nletter;
 const Contactus = db.contactus;
 const Cert = db.cert;
+const Skills = db.skills;
+const Wskills = db.wskills;
 
 const urlExistSync = require("url-exist-sync");
 
@@ -107,6 +109,35 @@ exports.wocmanProfile = (req, res, next) => {
             }else{
                 rateUserWocman = 0;
             }
+
+            var skills = [];
+            Skills.findAll()
+            .then(skillsg6 => {
+                if (!skillsg6) {}else{
+                    for (var i = 0; i < skillsg6.length; i++) {
+
+                        const skillname = skillsg6[i].name;
+                        var skillid = skillsg6[i].id;
+
+                        Wskills.findOne({
+                            where: {'userid': req.userId, 'skillid': skillid}
+                        })
+                        .then(wskills => {
+                            if (!wskills) {}else{
+                                var skillsId = wskills.id;
+                                var description = wskills.description;
+                                skills.push(
+                                    {
+                                        id: skillsId,
+                                        name: skillname,
+                                        description:description
+                                    }
+                                );
+                            }
+                        });
+                    }
+                }
+            });
 
             var notice = [];
             
@@ -474,6 +505,7 @@ exports.wocmanProfile = (req, res, next) => {
                             var isProfileUpdated = Helpers.returnBoolean(users.profileupdate);
                             var isCertificateUploaded = Helpers.returnBoolean(users.certificatesupdate);
                             var unboard = Helpers.returnBoolean(users.unboard);
+                            var isSkilled = Helpers.returnBoolean(users.isSkilled);
 
                             var authorities = 'wocman';
                             res.status(200).send({
@@ -496,11 +528,13 @@ exports.wocmanProfile = (req, res, next) => {
                                     projects: wprojects,
                                     wallet: wallet,
                                     notice: notice,
+                                    skills: skills,
                                     accessToken: req.token,
                                     rate: rateUserWocman,
                                     isEmailVerified: isEmailVerified,
                                     isProfileUpdated: isProfileUpdated,
                                     isCertificateUploaded: isCertificateUploaded,
+                                    isSkilled: isSkilled,
                                     unboard: unboard
                                 }
                             });

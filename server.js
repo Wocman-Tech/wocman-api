@@ -47,6 +47,7 @@ app.use(passport.session());
 const db = require("./app/models");
 const Role = db.role;
 const WCchat = db.wcChat;
+const Skills = db.skills;
 
 db.sequelize.sync();
 // force: true will drop the table if it already exists
@@ -79,6 +80,34 @@ function initial() {
         name: "customer"
     });
 }
+function initial1() {
+
+    Skills.create({
+        id: 1,
+        name: "Barbing Services"
+    });
+ 
+    Skills.create({
+        id: 2,
+        name: "Plumbering Services"
+    });
+ 
+    Skills.create({
+        id: 3,
+        name: "Electrical Installations and Maintenance"
+    });
+
+    Skills.create({
+        id: 4,
+        name: "Mechanical Installations and Maintenance"
+    });
+
+    Skills.create({
+        id: 5,
+        name: "Computer, accessories Installations and Maintenance"
+    });
+}
+// initial1();
 
 // simple route
 app.get("/", (req, res) => {

@@ -11,6 +11,8 @@ const updateprofileController = require("../controllers/users/wocman/auth/profil
 const profilepictureController = require("../controllers/users/wocman/auth/profile/profilepicture.controller");
 const closeaccountController = require("../controllers/users/wocman/auth/profile/closeaccount.controller");
 const ratingController = require("../controllers/users/wocman/auth/profile/rating.controller");
+const addskillController = require("../controllers/users/wocman/auth/profile/addskill.controller");
+const removeskillController = require("../controllers/users/wocman/auth/profile/removeskill.controller");
 
 const Helpers = require("../helpers/helper.js");
 
@@ -76,6 +78,26 @@ module.exports = function(app) {
         [authJwt.verifyToken, authJwt.isWocman], 
         removecertificateController.wocmanRemoveCertificate
     );
+
+    //Skills
+    app.post(
+        Helpers.apiVersion7() + "wocman/profile/add/skill", 
+        [authJwt.verifyToken, authJwt.isWocman, uploadCertificate ], 
+        addskillController.wocmanAddSkill
+    );
+    
+    app.post(
+        Helpers.apiVersion7() + "wocman/profile/remove/skill", 
+        [authJwt.verifyToken, authJwt.isWocman], 
+        removeskillController.wocmanRemoveSkill
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "wocman/profile/skill", 
+        [authJwt.verifyToken, authJwt.isWocman], 
+        addskillController.wocmanListSkills
+    );
+    
 
     app.post(
         Helpers.apiVersion7() + "wocman/profile/rating", 

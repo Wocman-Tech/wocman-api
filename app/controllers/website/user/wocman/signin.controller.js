@@ -112,6 +112,8 @@ exports.signInWocman = (req, res, next) => {
                     var isEmailVerified = Helpers.returnBoolean(user.verify_email);
                     var isProfileUpdated = Helpers.returnBoolean(user.profileupdate);
                     var isCertificateUploaded = Helpers.returnBoolean(user.certificatesupdate);
+                    var isSkilled = Helpers.returnBoolean(user.isSkilled);
+
 
                     //making sure a user was signed in appropriately
                     user.update({
@@ -140,6 +142,7 @@ exports.signInWocman = (req, res, next) => {
                             isEmailVerified: isEmailVerified,
                             isProfileUpdated: isProfileUpdated,
                             isCertificateUploaded: isCertificateUploaded,
+                            isSkilled: isSkilled,
                             unboard: unboard
                         }
                     });

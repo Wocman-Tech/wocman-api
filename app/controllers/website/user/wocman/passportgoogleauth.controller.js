@@ -123,6 +123,8 @@ exports.proceedSignIn = (req, res, next) => {
                                         var isEmailVerified = Helpers.returnBoolean(xnewuser.verify_email);
                                         var isProfileUpdated = Helpers.returnBoolean(xnewuser.profileupdate);
                                         var isCertificateUploaded = Helpers.returnBoolean(xnewuser.certificatesupdate);
+                                        var isSkilled = Helpers.returnBoolean(xnewuser.isSkilled);
+
 
 
                                         res.status(200).send({
@@ -148,6 +150,7 @@ exports.proceedSignIn = (req, res, next) => {
                                                 isEmailVerified: isEmailVerified,
                                                 isProfileUpdated: isProfileUpdated,
                                                 isCertificateUploaded: isCertificateUploaded,
+                                                isSkilled: isSkilled,
                                                 unboard: unboard
                                             }
                                         });
@@ -381,6 +384,8 @@ exports.proceedSignIn = (req, res, next) => {
                                 var isEmailVerified = Helpers.returnBoolean(user.verify_email);
                                 var isProfileUpdated = Helpers.returnBoolean(user.profileupdate);
                                 var isCertificateUploaded = Helpers.returnBoolean(user.certificatesupdate);
+                                var isSkilled = Helpers.returnBoolean(user.isSkilled);
+
 
 
 
@@ -407,6 +412,7 @@ exports.proceedSignIn = (req, res, next) => {
                                         isEmailVerified: isEmailVerified,
                                         isProfileUpdated: isProfileUpdated,
                                         isCertificateUploaded: isCertificateUploaded,
+                                        isSkilled: isSkilled,
                                         unboard: unboard
                                     }
                                 });
