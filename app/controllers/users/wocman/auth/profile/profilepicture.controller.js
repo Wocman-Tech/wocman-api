@@ -6,8 +6,8 @@ AWS.config.region = 'us-east-2';
 
 const s3 = new AWS.S3({
     sslEnabled: true,
-    accessKeyId: process.env.AWS_ID,
-    secretAccessKey: process.env.AWS_SECRET
+    accessKeyId: "AKIAUPJAS3S6WTQ37DUN",
+    secretAccessKey: "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"
 })
 const fs = require('fs');
 const User = db.user;
