@@ -1,13 +1,13 @@
 module.exports = (sequelize, Sequelize) => {
-    const Skills = sequelize.define("skills", {
-        name: {
+    const Wcategory = sequelize.define("wcategories", {
+        userid: {
             type: Sequelize.STRING,
             allowNull: false
         },
         categoryid: {
-        	type: Sequelize.STRING,
+            type: Sequelize.STRING,
             allowNull: false
         }
     });
-    return Skills;
+    return Wcategory;
 };

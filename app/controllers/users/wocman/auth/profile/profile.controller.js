@@ -10,6 +10,10 @@ const Contactus = db.contactus;
 const Cert = db.cert;
 const Skills = db.skills;
 const Wskills = db.wskills;
+const Competency = db.competency;
+const Wcompetency = db.wcompetency;
+const Category = db.category;
+const Wcategory = db.wcategory;
 
 const urlExistSync = require("url-exist-sync");
 
@@ -118,6 +122,7 @@ exports.wocmanProfile = (req, res, next) => {
 
                         const skillname = skillsg6[i].name;
                         var skillid = skillsg6[i].id;
+                        var category_id = skillsg6[i].categoryid;
 
                         Wskills.findOne({
                             where: {'userid': req.userId, 'skillid': skillid}
@@ -126,13 +131,21 @@ exports.wocmanProfile = (req, res, next) => {
                             if (!wskills) {}else{
                                 var skillsId = wskills.id;
                                 var description = wskills.description;
-                                skills.push(
-                                    {
-                                        id: skillsId,
-                                        name: skillname,
-                                        description:description
-                                    }
-                                );
+                                Category.findOne({
+                                    where: {id: category_id}
+                                })
+                                .then(wcategory => {
+                                    if (!wcategory) {}else{
+                                        skills.push(
+                                            {
+                                                id: skillsId,
+                                                category: wcategory.name,
+                                                name: skillname,
+                                                description:description
+                                            }
+                                        );
+                                    } 
+                                });
                             }
                         });
                     }
@@ -158,6 +171,49 @@ exports.wocmanProfile = (req, res, next) => {
                             );
                         }
                     }
+                }
+            });
+            var competence = [];
+            Wcompetency.findOne({
+                where: Searchuserid
+            })
+            .then(wcompetency => {
+                if (!wcompetency) {}else{
+                    var competency_id = wcompetency.competencyid;
+                    Competency.findOne({
+                        where: {id: competency_id}
+                    })
+                    .then(isCompetency => {
+                        if (!isCompetency) {}else{
+                            competence.push(
+                                {
+                                    competency: isCompetency.name, 
+                                }
+                            );
+                        }
+                    }); 
+                }
+            });
+
+            var category = [];
+            Wcategory.findOne({
+                where: Searchuserid
+            })
+            .then(wcategory => {
+                if (!wcategory) {}else{
+                    var category_id = wcategory.categoryid;
+                    Category.findOne({
+                        where: {id: category_id}
+                    })
+                    .then(isCategory => {
+                        if (!isCategory) {}else{
+                            category.push(
+                                {
+                                    category: isCategory.name, 
+                                }
+                            );
+                        }
+                    }); 
                 }
             });
 
@@ -529,6 +585,7 @@ exports.wocmanProfile = (req, res, next) => {
                                     wallet: wallet,
                                     notice: notice,
                                     skills: skills,
+                                    competence: competence,
                                     accessToken: req.token,
                                     rate: rateUserWocman,
                                     isEmailVerified: isEmailVerified,

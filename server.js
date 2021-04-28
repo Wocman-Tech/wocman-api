@@ -48,12 +48,16 @@ const db = require("./app/models");
 const Role = db.role;
 const WCchat = db.wcChat;
 const Skills = db.skills;
+const Competency = db.competency;
+const Category = db.category;
 
 db.sequelize.sync();
 // force: true will drop the table if it already exists
 // db.sequelize.sync({force: true}).then(() => {
 //   console.log('Drop and Resync Database with { force: true }');
 //   initial();
+//   initial1();
+//   initial2();
 // });
 
 
@@ -84,30 +88,68 @@ function initial1() {
 
     Skills.create({
         id: 1,
+        categoryid: '1',
         name: "Barbing Services"
     });
  
     Skills.create({
         id: 2,
+        categoryid: '1',
         name: "Plumbering Services"
     });
  
     Skills.create({
         id: 3,
+        categoryid: '2',
         name: "Electrical Installations and Maintenance"
     });
 
     Skills.create({
         id: 4,
+        categoryid: '3',
         name: "Mechanical Installations and Maintenance"
     });
 
     Skills.create({
         id: 5,
+        categoryid: '2',
         name: "Computer, accessories Installations and Maintenance"
     });
 }
+function initial2() {
+
+    Competency.create({
+        id: 1,
+        name: "Beginner"
+    });
+ 
+    Competency.create({
+        id: 2,
+        name: "Intermediate"
+    });
+ 
+    Competency.create({
+        id: 3,
+        name: "Experienced"
+    });
+
+    Category.create({
+        id: 1,
+        name: "Tradesmen"
+    });
+ 
+    Category.create({
+        id: 2,
+        name: "Technicians"
+    });
+ 
+    Category.create({
+        id: 3,
+        name: "Professionals"
+    });
+}
 // initial1();
+initial2();
 
 // simple route
 app.get("/", (req, res) => {

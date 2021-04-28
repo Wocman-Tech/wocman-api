@@ -13,6 +13,8 @@ const closeaccountController = require("../controllers/users/wocman/auth/profile
 const ratingController = require("../controllers/users/wocman/auth/profile/rating.controller");
 const addskillController = require("../controllers/users/wocman/auth/profile/addskill.controller");
 const removeskillController = require("../controllers/users/wocman/auth/profile/removeskill.controller");
+const categoryController = require("../controllers/users/wocman/auth/profile/category.controller");
+const competenceController = require("../controllers/users/wocman/auth/profile/competency.controller");
 
 const Helpers = require("../helpers/helper.js");
 
@@ -80,6 +82,30 @@ module.exports = function(app) {
     );
 
     //Skills
+    app.post(
+        Helpers.apiVersion7() + "wocman/profile/add/competency", 
+        [authJwt.verifyToken, authJwt.isWocman ], 
+        competenceController.wocmanAddCompetence
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "wocman/profile/get/competency", 
+        [authJwt.verifyToken, authJwt.isWocman ], 
+        competenceController.wocmanListCompetencies
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "wocman/profile/add/category", 
+        [authJwt.verifyToken, authJwt.isWocman ], 
+        categoryController.wocmanAddCategory
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "wocman/profile/get/category", 
+        [authJwt.verifyToken, authJwt.isWocman ], 
+        categoryController.wocmanListCategories
+    );
+
     app.post(
         Helpers.apiVersion7() + "wocman/profile/add/skill", 
         [authJwt.verifyToken, authJwt.isWocman, uploadCertificate ], 

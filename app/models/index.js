@@ -28,6 +28,10 @@ db.sequelize = sequelize;
 
 db.user = require("../models/user.model.js")(sequelize, Sequelize);
 db.role = require("../models/role.model.js")(sequelize, Sequelize);
+db.competency = require("../models/competency.model.js")(sequelize, Sequelize);
+db.wcompetency = require("../models/wcompetency.model.js")(sequelize, Sequelize);
+db.category = require("../models/category.model.js")(sequelize, Sequelize);
+db.wcategory = require("../models/wcategory.model.js")(sequelize, Sequelize);
 db.skills = require("../models/skills.model.js")(sequelize, Sequelize);
 db.wskills = require("../models/wskills.model.js")(sequelize, Sequelize);
 db.userRole = require("../models/userrole.model.js")(sequelize, Sequelize);

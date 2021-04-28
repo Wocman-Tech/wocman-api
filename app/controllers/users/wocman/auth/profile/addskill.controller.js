@@ -18,7 +18,8 @@ const Contactus = db.contactus;
 const Cert = db.cert;
 const Skills = db.skills;
 const Wskills = db.wskills;
-
+const Wcategory = db.wcategory;
+const Category = db.category;
 
 const Projects = db.projects;
 const Project = db.projecttype;
@@ -113,63 +114,85 @@ exports.wocmanAddSkill = (req, res, next) => {
 
         Skills.findOne({
             where: {'id' : skillid}
-        }).then(ds34dsd => {
-            if (!ds34dsd) {
+        }).then(ds34drsd => {
+            if (!ds34drsd) {
             	return res.status(404).send({
 	                statusCode: 400,
 	                status: false,
-	                message: "Skill category does not exist",
+	                message: "Skill does not exist",
 	                data:[]
 	            });
             }
-            Wskills.findOne({
-	            where: {'skillid' : skillid, 'userid': user_id}
-	        }).then(ds34dsd => {
-	            if (ds34dsd) {
-	            	return res.status(404).send({
-		                statusCode: 400,
-		                status: false,
-		                message: "Skill added already",
-		                data:[]
-		            });
-	            }
-	            Wskills.create({
-	                userid: user_id,
-	                skillid: skillid,
-	                description: description
-	            })
-	            .then(hgh  => {
+            var category_id = ds34drsd.categoryid;
 
-	                const pushUser = user_id;
-	                const pushType = 'service';
-	                const pushBody = 'Dear ' + users.username + ", <br />You have added " +
-	                                "a Skill. <br /> This would be reviewed soon " +
-	                                "<br />A corresponding response would be sent to you<br/>";
+            Wcategory.findOne({
+                where: {'userid' : user_id, 'categoryid': category_id}
+            }).then(ffdfdfcategry => {
+                if (!ffdfdfcategry) {
+                    return res.status(404).send({
+                        statusCode: 400,
+                        status: false,
+                        message: "This skill does not match your wocman category if any!",
+                        data:[]
+                    });
+                }
+                Wskills.findOne({
+    	            where: {'skillid' : skillid, 'userid': user_id}
+    	        }).then(ds34dsd => {
+    	            if (ds34dsd) {
+    	            	return res.status(404).send({
+    		                statusCode: 400,
+    		                status: false,
+    		                message: "Skill added already",
+    		                data:[]
+    		            });
+    	            }
+    	            Wskills.create({
+    	                userid: user_id,
+    	                skillid: skillid,
+    	                description: description
+    	            })
+    	            .then(hgh  => {
 
-	                Helpers.pushNotice(pushUser, pushBody, pushType);
+    	                const pushUser = user_id;
+    	                const pushType = 'service';
+    	                const pushBody = 'Dear ' + users.username + ", <br />You have added " +
+    	                                "a Skill. <br /> This would be reviewed soon " +
+    	                                "<br />A corresponding response would be sent to you<br/>";
 
-	                User.update(
-	                    {isSkilled: 1},
-	                    {where: {id: user_id} }
-	                );
-	                res.status(200).send({
-	                    statusCode: 200,
-	                    status: true,
-	                    message: "Skill was added",
-	                    data: {
-	                        accessToken: req.token
-	                    }
-	                });
-	            })
-	            .catch(err => {
-	                res.status(500).send({
-	                    statusCode: 500,
-	                    status: false, 
-	                    message: err.message,
-	                    data: [] 
-	                });
-	            });
-	        })
+    	                Helpers.pushNotice(pushUser, pushBody, pushType);
+
+    	                User.update(
+    	                    {isSkilled: 1},
+    	                    {where: {id: user_id} }
+    	                );
+    	                res.status(200).send({
+    	                    statusCode: 200,
+    	                    status: true,
+    	                    message: "Skill was added",
+    	                    data: {
+    	                        accessToken: req.token
+    	                    }
+    	                });
+    	            })
+    	            .catch(err => {
+    	                res.status(500).send({
+    	                    statusCode: 500,
+    	                    status: false, 
+    	                    message: err.message,
+    	                    data: [] 
+    	                });
+    	            });
+    	        })
+                .catch(err => {
+                    res.status(500).send({
+                        statusCode: 500,
+                        status: false, 
+                        message: err.message,
+                        data: [] 
+                    });
+                });
+            })
             .catch(err => {
                 res.status(500).send({
                     statusCode: 500,
@@ -178,8 +201,6 @@ exports.wocmanAddSkill = (req, res, next) => {
                     data: [] 
                 });
             });
-
-
         })
         .catch(err => {
             res.status(500).send({
@@ -189,7 +210,6 @@ exports.wocmanAddSkill = (req, res, next) => {
                 data: [] 
             });
         });
-        
     })
     .catch(err => {
         res.status(500).send({
@@ -223,26 +243,60 @@ exports.wocmanListSkills = (req, res, next) => {
                 data:[]
             });
         }
-
-        Skills.findAll().then(fgrtyrtyfgf => {
-            if (!fgrtyrtyfgf) {
-            	return res.status(404).send({
-	                statusCode: 400,
-	                status: false,
-	                message: "Skill category does not exist",
-	                data:[]
-	            });
+        Wcategory.findOne({
+            where: {'userid' : user_id}
+        }).then(ffdfdfcategry => {
+            if (!ffdfdfcategry) {
+                return res.status(404).send({
+                    statusCode: 400,
+                    status: false,
+                    message: "Create Category First",
+                    data:[]
+                });
             }
-            
-            res.status(200).send({
-                statusCode: 200,
-                status: true,
-                message: "Skill was found",
-                data: {
-                	skills: fgrtyrtyfgf,
-                    accessToken: req.token
+            var category_id = ffdfdfcategry.categoryid;
+            Category.findOne({
+                where: {'id': category_id}
+            })
+            .then(isCategory => {
+                if (!isCategory) {
+                    var categoryName = '';
+                }else{
+                    var categoryName = isCategory.name;
                 }
+                Skills.findAll({
+                    where : {categoryid: category_id}
+                }).then(fgrtyrtyfgf => {
+                    if (!fgrtyrtyfgf) {
+                    	return res.status(404).send({
+        	                statusCode: 400,
+        	                status: false,
+        	                message: "Skill does not exist",
+        	                data:[]
+        	            });
+                    }
+                    
+                    res.status(200).send({
+                        statusCode: 200,
+                        status: true,
+                        message: "Skill was found",
+                        data: {
+                            category: categoryName,
+                        	skills: fgrtyrtyfgf,
+                            accessToken: req.token
+                        }
+                    });
+                })
+                .catch(err => {
+                    res.status(500).send({
+                        statusCode: 500,
+                        status: false, 
+                        message: err.message,
+                        data: [] 
+                    });
+                });
             });
+
         })
         .catch(err => {
             res.status(500).send({
@@ -252,7 +306,6 @@ exports.wocmanListSkills = (req, res, next) => {
                 data: [] 
             });
         });
-        
     })
     .catch(err => {
         res.status(500).send({
