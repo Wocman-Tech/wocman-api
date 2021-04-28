@@ -149,7 +149,7 @@ function initial2() {
     });
 }
 // initial1();
-// initial2();
+initial2();
 
 // simple route
 app.get("/", (req, res) => {
