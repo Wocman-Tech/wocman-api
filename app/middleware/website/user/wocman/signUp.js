@@ -276,6 +276,20 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
     });
    
 };
+isLink  = (req, res, next) => {
+    if (typeof req.body.verifylink === "undefined") {
+        return res.status(400).send(
+            {
+                statusCode: 400,
+                status: false,
+                message: "verifylink field not added",
+                data: [] 
+            }
+        );
+    }else{
+        next();
+    }
+};
 
 const verifySignUp = {
     checkDuplicateUsernameOrEmail: checkDuplicateUsernameOrEmail,
@@ -285,6 +299,7 @@ const verifySignUp = {
     isLinkVerify: isLinkVerify,
     isToken : isToken,
     isPasswordConfirmed: isPasswordConfirmed,
-    isOtp: isOtp
+    isOtp: isOtp,
+    isLink: isLink
 };
 module.exports = verifySignUp;

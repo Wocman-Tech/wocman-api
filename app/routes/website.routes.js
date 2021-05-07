@@ -127,6 +127,7 @@ module.exports = function(app) {
             verifyWocmanSignUp.isEmailVerify, 
             verifyWocmanSignUp.isPasswordVerify, 
             verifyWocmanSignUp.isPasswordConfirmed,
+            verifyWocmanSignUp.isLink,
             verifyWocmanSignUp.checkDuplicateUsernameOrEmail
         ],
         signupController.signUpWocman

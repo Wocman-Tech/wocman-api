@@ -36,6 +36,7 @@ let options = {
 const otp = Math.floor(100000 + Math.random() * 900000);
 
 
+
 let transporter = nodemailer.createTransport({
   service: config.message_server,
   secure: true,
@@ -58,11 +59,8 @@ const Op = db.Sequelize.Op;
 
 
 exports.signUpWocman = (req, res, next) => {
-    var emailLink6 = req.body.emailLink;
 
-    const verify_email_1 = uuidv4();
-    var verify_email = bcrypt.hashSync(verify_email_1, 8);
-    verify_email = verify_email.replace(/[^\w\s]/gi, "");
+    var verifyLink = req.body.verifylink;
 
     var Searchemail = {};
     
@@ -121,7 +119,7 @@ exports.signUpWocman = (req, res, next) => {
             let response = {
                 body: {
                   name: "Wocman",
-                  intro: "Welcome to Wocman Technology! We're very excited to have you on board as a wocman. <br/ >Copy this OTP to process your registration: <div style='font-weight:bolder;'>" + verification_link + "</div>",
+                  intro: "Welcome to Wocman Technology! We're very excited to have you on board as a wocman. <br/ >Copy this OTP to process your registration: <div style='font-weight:bolder;'>" + verification_link + "</div><br/><a href='"+ verifyLink +"'>Click Here to Verify</a>",
                 },
             };
 
