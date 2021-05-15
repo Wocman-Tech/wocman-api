@@ -331,22 +331,25 @@ exports.wocmanProfile = (req, res, next) => {
                 })
                 .then(wwallet => {
                     if (!wwallet) {}else{
-                        var froozen = Helpers.returnBoolean(wwallet.froozeaccount);
+                        if (typeof (wwallet.froozeaccount) == 'undefined') {}else{
 
-                        wallet.push(
-                            {
-                                balance: parseInt(wwallet.amount, 10), 
-                                witdrawal: parseInt(wwallet.totalwitdralamount, 10), 
-                                totalIncome: (parseInt(wwallet.amount, 10) + parseInt(wwallet.totalwitdralamount, 10)),
-                                lastWitdrawal: parseInt(wwallet.currentwitdralamount, 10),
-                                walletId: wwallet.walletid,
-                                accountType: wwallet.accType,
-                                bankName: wwallet.bankName,
-                                accountNumber: wwallet.accNumber,
-                                accountName: wwallet.accName,
-                                froozen: froozen
-                            }
-                        );
+                            var froozen = Helpers.returnBoolean(wwallet.froozeaccount);
+
+                            wallet.push(
+                                {
+                                    balance: parseInt(wwallet.amount, 10), 
+                                    witdrawal: parseInt(wwallet.totalwitdralamount, 10), 
+                                    totalIncome: (parseInt(wwallet.amount, 10) + parseInt(wwallet.totalwitdralamount, 10)),
+                                    lastWitdrawal: parseInt(wwallet.currentwitdralamount, 10),
+                                    walletId: wwallet.walletid,
+                                    accountType: wwallet.accType,
+                                    bankName: wwallet.bankName,
+                                    accountNumber: wwallet.accNumber,
+                                    accountName: wwallet.accName,
+                                    froozen: froozen
+                                }
+                            );
+                        }
                     }
                     var wprojects = [];
 
