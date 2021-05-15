@@ -21,8 +21,10 @@ const cookieSession = require('cookie-session');
 const { resolve, port, website }  = require("./app/config/auth.config");
 
 var corsOptions = {
-    origin: [resolve+port, "http://localhost:3000", "http://localhost:8081", website ],
-    default: resolve+port
+    // origin: [resolve+port, "http://localhost:3000", "http://localhost:8081", website ],
+    // default: resolve+port
+    origin:  "*",
+    default: "*"
 };
 
 app.use(cors(corsOptions));

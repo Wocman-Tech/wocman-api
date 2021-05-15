@@ -84,7 +84,7 @@ exports.wwDetails = (req, res, next) => {
             })
             .then(wwallet => {
                 if (!wwallet) {
-                    res.status(200).send({
+                    return res.status(200).send({
                         statusCode: 200,
                         status: true,
                         message: "Wallet Details Not Found",
