@@ -245,28 +245,33 @@ exports.wocmanProfile = (req, res, next) => {
                     var pp = (users.images).split(Helpers.padTogether());
                     for (let i = 0; i <  pp.length; i++) {
                         if (pp[i] !== users.image) {
-                            var linkExist =  urlExistSync(pp[i]);
-                            if (linkExist === true) {
-                                var theimaeg = pp[i];
-                                otherImages.push(
-                                    [
-                                        theimaeg
-                                    ]
-                                );
+                            if (pp[i] == 'null') {}else{
+                                var linkExist =  urlExistSync(pp[i]);
+                                if (linkExist === true) {
+                                    var theimaeg = pp[i];
+                                    otherImages.push(
+                                        [
+                                            theimaeg
+                                        ]
+                                    );
+                                }
                             }
-
                         }
                     }
                 }
             }
-            var linkExist =  urlExistSync(users.image);
-            if (linkExist === true) {
-                var theimaeg = users.image;
-                currentImage.push(
-                    [
-                        theimaeg
-                    ]
-                );
+            if (users.image == null) {}else{
+                if (users.image == 'null') {}else{
+                    var linkExist =  urlExistSync(users.image);
+                    if (linkExist === true) {
+                        var theimaeg = users.image;
+                        currentImage.push(
+                            [
+                                theimaeg
+                            ]
+                        );
+                    }
+                }
             }
 
             profilePictures.push(
@@ -381,7 +386,7 @@ exports.wocmanProfile = (req, res, next) => {
                     var wp_schare = 0;
                     var Searchshare = {}
                     Searchshare = {'id': 1};
-                     var verified = false;
+                    var verified = false;
                     if (parseInt(users.verify_email, 10) == 1) {
                         verified = true;
                     }
