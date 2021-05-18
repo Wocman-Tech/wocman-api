@@ -58,9 +58,9 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
     var SearchemailLink = {};
 
     if(email_link && email_link !== ''){
-        SearchemailLink = { 'email': email_link};
+        SearchemailLink = {'email': email_link};
     }else{
-        SearchemailLink = { 'email': {$not: null}};
+        SearchemailLink = {'email': {$not: null}};
     }
 
     User.findOne({
@@ -86,7 +86,7 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
         var isEmailVerified1 = Helpers.returnBoolean(users.verify_email);
 
         if (isEmailVerified1 == true) {
-            return res.status(400).send(
+            return res.status(200).send(
             {
                 statusCode: 200,
                 status: true,
@@ -100,43 +100,45 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
                     unboard: unboard1
                 ]
             });
+        }else{
+            
+            User.update(
+                {
+                    verify_email: 1
+                },
+                {
+                    where: {email : users.email}
+                }
+            );
+            var isEmailVerified = true;
+            var isProfileUpdated = Helpers.returnBoolean(users.profileupdate);
+            var isCertificateUploaded = Helpers.returnBoolean(users.certificatesupdate);
+            var isSkilled = Helpers.returnBoolean(users.isSkilled);
+            var unboard = Helpers.returnBoolean(users.unboard);
+
+            if (isEmailVerified !== true && isEmailVerified !== false) {
+                isEmailVerified = false;
+            }
+      
+            var authorities = [];
+
+            authorities.push("ROLE_" + "wocman".toUpperCase());
+            
+            res.status(200).send({
+                statusCode: 200,
+                status: true,
+                message: "Email Verified",
+                data: {
+                    accessToken: token,
+                    isEmailVerified: isEmailVerified,
+                    isProfileUpdated: isProfileUpdated,
+                    isCertificateUploaded: isCertificateUploaded,
+                    isSkilled: isSkilled,
+                    unboard: unboard
+                }
+            });
         }
 
-        User.update(
-            {
-                verify_email: 1
-            },
-            {
-                where: {email : users.email}
-            }
-        );
-        var isEmailVerified = true;
-        var isProfileUpdated = Helpers.returnBoolean(users.profileupdate);
-        var isCertificateUploaded = Helpers.returnBoolean(users.certificatesupdate);
-        var isSkilled = Helpers.returnBoolean(users.isSkilled);
-        var unboard = Helpers.returnBoolean(users.unboard);
-
-        if (isEmailVerified !== true && isEmailVerified !== false) {
-            isEmailVerified = false;
-        }
-  
-        var authorities = [];
-
-        authorities.push("ROLE_" + "wocman".toUpperCase());
-        
-        res.status(200).send({
-            statusCode: 200,
-            status: true,
-            message: "Email Verified",
-            data: {
-                accessToken: token,
-                isEmailVerified: isEmailVerified,
-                isProfileUpdated: isProfileUpdated,
-                isCertificateUploaded: isCertificateUploaded,
-                isSkilled: isSkilled,
-                unboard: unboard
-            }
-        });
     })
     .catch(err => {
         return  res.status(500).send({
