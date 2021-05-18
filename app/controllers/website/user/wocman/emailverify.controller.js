@@ -84,6 +84,15 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
                 where: {email : users.email}
             }
         );
+        var isEmailVerified = true;
+        var isProfileUpdated = Helpers.returnBoolean(users.profileupdate);
+        var isCertificateUploaded = Helpers.returnBoolean(users.certificatesupdate);
+        var isSkilled = Helpers.returnBoolean(users.isSkilled);
+        var unboard = Helpers.returnBoolean(users.unboard);
+
+        if (isEmailVerified !== true && isEmailVerified !== false) {
+            isEmailVerified = false;
+        }
   
         var token = jwt.sign({ id: users.id }, config.secret, {
             expiresIn: 86400 // 24 hours
@@ -96,9 +105,14 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
         res.status(200).send({
             statusCode: 200,
             status: true,
-            message: "Link available",
+            message: "Email Verified",
             data: {
-                accessToken: token
+                accessToken: token,
+                isEmailVerified: isEmailVerified,
+                isProfileUpdated: isProfileUpdated,
+                isCertificateUploaded: isCertificateUploaded,
+                isSkilled: isSkilled,
+                unboard: unboard
             }
         });
     })
