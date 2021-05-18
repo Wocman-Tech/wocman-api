@@ -58,9 +58,9 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
     var SearchemailLink = {};
 
     if(email_link && email_link !== ''){
-        SearchemailLink = {'verify_email': otp, 'email': email_link};
+        SearchemailLink = { 'email': email_link};
     }else{
-        SearchemailLink = {'verify_email': {$not: null},  'email': {$not: null}};
+        SearchemailLink = { 'email': {$not: null}};
     }
 
     User.findOne({
@@ -72,10 +72,36 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
             {
                 statusCode: 404,
                 status: false,
-                message: "user not exist",
+                message: "User not Found",
                 data: []
             });
         }
+        var token = jwt.sign({ id: users.id }, config.secret, {
+            expiresIn: 86400 // 24 hours
+        });
+        var isProfileUpdated1 = Helpers.returnBoolean(users.profileupdate);
+        var isCertificateUploaded1 = Helpers.returnBoolean(users.certificatesupdate);
+        var isSkilled1 = Helpers.returnBoolean(users.isSkilled);
+        var unboard1 = Helpers.returnBoolean(users.unboard);
+        var isEmailVerified1 = Helpers.returnBoolean(users.verify_email);
+
+        if (isEmailVerified1 == true) {
+            return res.status(400).send(
+            {
+                statusCode: 200,
+                status: true,
+                message: "Email Already Verified",
+                data: [
+                    accessToken: token,
+                    isEmailVerified: isEmailVerified1,
+                    isProfileUpdated: isProfileUpdated1,
+                    isCertificateUploaded: isCertificateUploaded1,
+                    isSkilled: isSkilled1,
+                    unboard: unboard1
+                ]
+            });
+        }
+
         User.update(
             {
                 verify_email: 1
@@ -94,10 +120,6 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
             isEmailVerified = false;
         }
   
-        var token = jwt.sign({ id: users.id }, config.secret, {
-            expiresIn: 86400 // 24 hours
-        });
-
         var authorities = [];
 
         authorities.push("ROLE_" + "wocman".toUpperCase());
