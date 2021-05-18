@@ -120,6 +120,9 @@ exports.signInWocman = (req, res, next) => {
                         loginlogout:0,
                         weblogintoken:token
                     });
+                    if (isEmailVerified !== true && isEmailVerified !== false) {
+                        isEmailVerified = false;
+                    }
                     res.status(200).send({
                         statusCode: 200,
                         status: true,

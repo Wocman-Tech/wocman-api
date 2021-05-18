@@ -553,6 +553,10 @@ exports.activateIsDevice = (req, res) => {
                         var unboard = Helpers.returnBoolean(user.unboard);
                         var isSkilled = Helpers.returnBoolean(user.isSkilled);
 
+                        if (isEmailVerified !== true && isEmailVerified !== false) {
+                            isEmailVerified = false;
+                        }
+
                         
 
                         //making sure a user was signed in appropriately

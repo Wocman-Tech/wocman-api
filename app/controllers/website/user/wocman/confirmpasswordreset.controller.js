@@ -110,6 +110,11 @@ exports.wocmanResetPasswordConfirm = (req, res, next) => {
             var isProfileUpdated = Helpers.returnBoolean(users.profileupdate);
             var isCertificateUploaded = Helpers.returnBoolean(users.certificatesupdate);
             var unboard = Helpers.returnBoolean(users.unboard);
+            var isSkilled = Helpers.returnBoolean(users.isSkilled);
+
+            if (isEmailVerified !== true && isEmailVerified !== false) {
+                isEmailVerified = false;
+            }
 
 
             var authorities = [];
@@ -128,6 +133,7 @@ exports.wocmanResetPasswordConfirm = (req, res, next) => {
                     isEmailVerified: isEmailVerified,
                     isProfileUpdated: isProfileUpdated,
                     isCertificateUploaded: isCertificateUploaded,
+                    isSkilled: isSkilled,
                     unboard: unboard
                 }
             });

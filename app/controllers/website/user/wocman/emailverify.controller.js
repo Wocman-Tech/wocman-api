@@ -177,7 +177,12 @@ exports.resendEmail = (req, res) => {
             var isEmailVerified = Helpers.returnBoolean(user.verify_email);
             var isProfileUpdated = Helpers.returnBoolean(user.profileupdate);
             var isCertificateUploaded = Helpers.returnBoolean(user.certificatesupdate);
+            var isSkilled = Helpers.returnBoolean(user.isSkilled);
             var unboard = Helpers.returnBoolean(user.unboard);
+
+            if (isEmailVerified !== true && isEmailVerified !== false) {
+                isEmailVerified = false;
+            }
 
             transporter.sendMail(message)
             .then(() => {
@@ -193,6 +198,7 @@ exports.resendEmail = (req, res) => {
                         isEmailVerified: isEmailVerified,
                         isProfileUpdated: isProfileUpdated,
                         isCertificateUploaded: isCertificateUploaded,
+                        isSkilled: isSkilled,
                         unboard: unboard
                     }
                 });

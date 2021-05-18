@@ -126,7 +126,9 @@ exports.proceedSignIn = (req, res, next) => {
                                         var isSkilled = Helpers.returnBoolean(xnewuser.isSkilled);
 
 
-
+                                        if (isEmailVerified !== true && isEmailVerified !== false) {
+                                            isEmailVerified = false;
+                                        }
                                         res.status(200).send({
                                             statusCode: 200,
                                             status: true,
@@ -386,7 +388,9 @@ exports.proceedSignIn = (req, res, next) => {
                                 var isCertificateUploaded = Helpers.returnBoolean(user.certificatesupdate);
                                 var isSkilled = Helpers.returnBoolean(user.isSkilled);
 
-
+                                if (isEmailVerified !== true && isEmailVerified !== false) {
+                                    isEmailVerified = false;
+                                }
 
 
                                 res.status(200).send({

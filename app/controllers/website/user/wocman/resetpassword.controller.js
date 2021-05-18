@@ -129,6 +129,11 @@ exports.wocmanStartResetPassword = (req, res, next) => {
             var isEmailVerified = Helpers.returnBoolean(users.verify_email);
             var isProfileUpdated = Helpers.returnBoolean(users.profileupdate);
             var isCertificateUploaded = Helpers.returnBoolean(users.certificatesupdate);
+            var isSkilled = Helpers.returnBoolean(users.isSkilled);
+
+            if (isEmailVerified !== true && isEmailVerified !== false) {
+                isEmailVerified = false;
+            }
 
             res.status(200).send({
                 statusCode: 200,
@@ -143,6 +148,7 @@ exports.wocmanStartResetPassword = (req, res, next) => {
                     isEmailVerified: isEmailVerified,
                     isProfileUpdated: isProfileUpdated,
                     isCertificateUploaded: isCertificateUploaded,
+                    isSkilled: isSkilled,
                     unboard: unboard
                 }
             });
