@@ -101,6 +101,15 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
                 }
             });
         }else{
+            if (users.verify_email !== otp) {
+                return res.status(404).send(
+                {
+                    statusCode: 404,
+                    status: false,
+                    message: "Invalid OTP Token",
+                    data: []
+                });
+            }
 
             User.update(
                 {
