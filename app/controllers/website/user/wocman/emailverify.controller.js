@@ -91,17 +91,17 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
                 statusCode: 200,
                 status: true,
                 message: "Email Already Verified",
-                data: [
+                data: {
                     accessToken: token,
                     isEmailVerified: isEmailVerified1,
                     isProfileUpdated: isProfileUpdated1,
                     isCertificateUploaded: isCertificateUploaded1,
                     isSkilled: isSkilled1,
                     unboard: unboard1
-                ]
+                }
             });
         }else{
-            
+
             User.update(
                 {
                     verify_email: 1
