@@ -138,6 +138,7 @@ exports.wocmanAddSkill = (req, res, next) => {
                     });
                 }
                 var catName  = ds34drsd.name;
+                
                 //remove all
                 Wcategory.destroy({
                     where: {'userid': user_id}
