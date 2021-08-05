@@ -121,7 +121,7 @@ isPasswordVerify = (req, res, next) => {
             return res.status(422).json({
                 statusCode: 422,
                 status: false,
-                message: 'Minimun of 8 alphanumeric characters and maximun of 30 alphanumeric characters  is required in password field',
+                message: 'Minimun of 8 alphanumeric characters and maximun of 30 alphanumeric characters  is required and no special character is required in password field',
                 data: []
             })
         }else{
@@ -148,7 +148,7 @@ isPasswordConfirmed = (req, res, next) => {
             return res.status(422).json({
                 statusCode: 422,
                 status: false,
-                message: 'Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character is required in repeat_password field',
+                message: 'Minimum eight characters, at least one uppercase letter, one lowercase letter and one number  is required in repeat_password field',
                 data: []
             })
         }else{

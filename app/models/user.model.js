@@ -106,6 +106,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             defaultValue: 0
         },
+        featured: {
+            type: Sequelize.STRING,
+            defaultValue: 0
+        },
         isSkilled: {
             type: Sequelize.STRING,
             defaultValue: 0

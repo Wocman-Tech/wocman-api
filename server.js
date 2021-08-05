@@ -158,14 +158,55 @@ app.get("/", (req, res) => {
     res.json({ message: "Testing a web app api with node by justice" });
 });
 
-// routes
+
+//*-----------------------------------------*//
+
+    // website routes
+
+//*-----------------------------------------*//
+
+
 require('./app/routes/website.routes')(app);
 
-require('./app/routes/wocmanprofile.routes')(app);
-require('./app/routes/wocmanmessaging.routes')(app);
+
+//*-----------------------------------------*//
+
+    // wocman routes
+    
+//*-----------------------------------------*//
+
+
 require('./app/routes/wocmandashboard.routes')(app);
+require('./app/routes/wocmanprofile.routes')(app);
+require('./app/routes/wocmansettings.routes')(app);
+require('./app/routes/wocmanmessaging.routes')(app);
+
 require('./app/routes/wocmanproject.routes')(app);
 require('./app/routes/wocmanwallet.routes')(app);
-require('./app/routes/wocmansettings.routes')(app);
+
+
+
+//*-----------------------------------------*//
+
+    // customer routes
+    
+//*-----------------------------------------*//
+
+
+
+require('./app/routes/customerdashboard.routes')(app);
+require('./app/routes/customerprofile.routes')(app);
+require('./app/routes/customersettings.routes')(app);
+require('./app/routes/customermessaging.routes')(app);
+require('./app/routes/customerwocstation.routes')(app);
+
+
+
+//*-----------------------------------------*//
+
+    // admin routes
+    
+//*-----------------------------------------*//
+
 
 require('./app/routes/adminuser.routes')(app);

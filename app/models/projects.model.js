@@ -26,10 +26,12 @@ module.exports = (sequelize, Sequelize) => {
         },
         datetimeset: {
             type: Sequelize.STRING,
-            allowNull: false
+            defaultValue: null,
+            allowNull: true
         },
         country: {
             type: Sequelize.STRING,
+            defaultValue: 'nigeria',
             allowNull: false
         },
         state: {
@@ -52,6 +54,11 @@ module.exports = (sequelize, Sequelize) => {
             defaultValue: 0,
             allowNull: false
         },
+        customerstart: {
+            type: Sequelize.STRING,
+            defaultValue: null,
+            allowNull: true
+        },
         wocmanstartdatetime: {
             type: Sequelize.STRING,
             defaultValue: null,
@@ -63,6 +70,11 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: true
         },
         customeracceptcomplete: {
+            type: Sequelize.STRING,
+            defaultValue: null,
+            allowNull: true
+        },
+        projectreport: {
             type: Sequelize.STRING,
             defaultValue: null,
             allowNull: true

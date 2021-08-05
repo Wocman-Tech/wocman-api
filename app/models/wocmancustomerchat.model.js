@@ -9,6 +9,12 @@ module.exports = (sequelize, Sequelize) => {
         message: {
             type: Sequelize.STRING
         },
+        messagetype: {
+            type: Sequelize.STRING
+        },
+        messagelinks: {
+            type: Sequelize.STRING
+        },
         seen: {
             type: Sequelize.STRING
         },

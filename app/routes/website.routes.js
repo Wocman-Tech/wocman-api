@@ -3,6 +3,9 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const cookieSession = require('cookie-session');
 
+const { verifyCustomerUser } = require("../middleware/customer");
+const { verifyWocmanUser } = require("../middleware/wocman");
+
 const { resolve, port, website }  = require("../config/auth.config");
 
 
@@ -28,6 +31,16 @@ const
     } = require("../middleware/website/user/admin");
 
 
+const 
+    {   
+        verifyCustomerSignUp, 
+        verifyCustomerSignIn, 
+        verifyCustomerSignUpLink, 
+        verifyCustomerSendPasswordEmail, 
+        verifyCustomerChangePasswordEmail, 
+        verifyCustomerResetIn 
+    } = require("../middleware/website/user/customer");
+
 
 const isDeviceVC = require("../controllers/website/user/wocman/isDevice.controller");
 const isOtpVC = require("../controllers/website/user/wocman/isOtp.controller");
@@ -39,6 +52,16 @@ const signinController = require("../controllers/website/user/wocman/signin.cont
 const signinPassportGoogleController = require("../controllers/website/user/wocman/passportgoogleauth.controller");
 const signupController = require("../controllers/website/user/wocman/signup.controller");
 
+
+const customerisDeviceVC = require("../controllers/website/user/customer/isDevice.controller");
+const customerisOtpVC = require("../controllers/website/user/customer/isOtp.controller");
+const customerconfirmpasswordresetController = require("../controllers/website/user/customer/confirmpasswordreset.controller");
+const customeremailverifyController = require("../controllers/website/user/customer/emailverify.controller");
+const customerresetpasswordController = require("../controllers/website/user/customer/resetpassword.controller");
+const customersendchangepasswordController = require("../controllers/website/user/customer/requestpasswordreset.controller");
+const customersigninController = require("../controllers/website/user/customer/signin.controller");
+const customersigninPassportGoogleController = require("../controllers/website/user/customer/passportgoogleauth.controller");
+const customersignupController = require("../controllers/website/user/customer/signup.controller");
 
 const adminconfirmpasswordresetController = require("../controllers/website/user/admin/confirmpasswordresetemail.controller");
 const adminemailverifyController = require("../controllers/website/user/admin/emailverify.controller");
@@ -114,7 +137,11 @@ module.exports = function(app) {
         contactController.contactus
     );
 
-    //wocman Website Endpoints
+
+    // ------------------------------- //
+        //wocman Website Endpoints
+    // ---------------------------- //
+
 
 
     //a wocman user wants to register,
@@ -142,7 +169,8 @@ module.exports = function(app) {
     app.post(
         Helpers.apiVersion7()+"wocman-signup-resend-verification",
         [
-            verifyWocmanSignUp.isEmailVerify
+            verifyWocmanSignUp.isEmailVerify,
+            verifyWocmanUser.isWocman
         ],
         emailverifyController.resendEmail
     );
@@ -151,6 +179,7 @@ module.exports = function(app) {
         Helpers.apiVersion7()+"wocman-signup-verification",
         [
             verifyWocmanSignUp.isEmailVerify,
+            verifyWocmanUser.isWocman,
             verifyWocmanSignUp.isOtp
         ],
         emailverifyController.checkVerifyEmailLinkWocman
@@ -168,6 +197,7 @@ module.exports = function(app) {
             verifyWocmanSignIn.isEmailVerify, 
             verifyWocmanSignIn.isPasswordVerify, 
             verifyWocmanSignIn.checkRole,
+            verifyWocmanUser.isWocman,
             isDeviceVC.isDevice,
             isOtpVC.is2FA
         ],
@@ -177,7 +207,8 @@ module.exports = function(app) {
     app.post(
         Helpers.apiVersion7()+"wocman-signin-resend-isdevice",
         [
-            verifyWocmanSignIn.isEmailVerify
+            verifyWocmanSignIn.isEmailVerify,
+            verifyWocmanUser.isWocman
         ],
         isDeviceVC.resendIsDevice
     );
@@ -189,6 +220,7 @@ module.exports = function(app) {
             verifyWocmanSignIn.isEmailVerify, 
             verifyWocmanSignIn.isPasswordVerify, 
             verifyWocmanSignIn.checkRole,
+            verifyWocmanUser.isWocman,
             isOtpVC.is2FA
         ],
         isDeviceVC.activateIsDevice
@@ -197,7 +229,8 @@ module.exports = function(app) {
     app.post(
         Helpers.apiVersion7()+"wocman-signin-resend-otp",
         [
-            verifyWocmanSignIn.isEmailVerify
+            verifyWocmanSignIn.isEmailVerify,
+            verifyWocmanUser.isWocman
         ],
         isOtpVC.resendIs2FA
     );
@@ -207,7 +240,8 @@ module.exports = function(app) {
         [
             verifyWocmanSignIn.isEmailVerify,
             verifyWocmanSignIn.isPasswordVerify, 
-            verifyWocmanSignIn.checkRole
+            verifyWocmanSignIn.checkRole,
+            verifyWocmanUser.isWocman
         ],
         isOtpVC.activateIs2FA
     );
@@ -219,6 +253,7 @@ module.exports = function(app) {
         Helpers.apiVersion7()+'google-auth/wocman-signin',
         [
             verifyWocmanSignUp.isToken,
+            verifyWocmanUser.isWocman
         ],
         signinPassportGoogleController.proceedSignIn
     );
@@ -227,7 +262,10 @@ module.exports = function(app) {
     //this sends an email to them with a password recovery link
     app.post(
         Helpers.apiVersion7()+"password-reset-wocman",
-        [verifySendPasswordEmail.isEmailVerify],
+        [
+            verifySendPasswordEmail.isEmailVerify,
+            verifyWocmanUser.isWocman
+        ],
         sendchangepasswordController.wocmanResetPassword
     );
 
@@ -236,11 +274,139 @@ module.exports = function(app) {
     //this would reset their password for them
     app.post(
         Helpers.apiVersion7()+"wocman-password-reset",
-        [verifyResetIn.isEmailVerify, verifyResetIn.isPasswordVerify, verifyResetIn.isOtp],
+        [
+            verifyResetIn.isEmailVerify,
+            verifyResetIn.isPasswordVerify,
+            verifyWocmanUser.isWocman,
+            verifyResetIn.isOtp,
+        ],
         resetpasswordController.wocmanStartResetPassword
     );
 
-    //admin Website Endpoints
+
+    // ------------------------------- //
+        //Customer
+    // ------------------------------- //
+
+    app.post(
+        Helpers.apiVersion7() + "auth/customer/signup",
+        [
+            verifyCustomerSignUp.isEmailVerify, 
+            verifyCustomerSignUp.isPasswordVerify, 
+            verifyCustomerSignUp.isPasswordConfirmed,
+            verifyCustomerSignUp.isLink,
+            verifyCustomerSignUp.checkDuplicateUsernameOrEmail
+        ],
+        customersignupController.signUpCustomer
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/customer/signup/resend-verification",
+        [
+            verifyCustomerSignUp.isEmailVerify, verifyCustomerUser.isCustomer
+        ],
+        customeremailverifyController.resendEmail
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/customer/signup/verification",
+        [
+            verifyCustomerSignUp.isEmailVerify,
+            verifyCustomerUser.isCustomer,
+            verifyCustomerSignUp.isOtp
+        ],
+        customeremailverifyController.checkVerifyEmailLinkCustomer
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/customer/signin",
+        [
+            verifyCustomerSignIn.isEmailVerify, 
+            verifyCustomerSignIn.isPasswordVerify, 
+            verifyCustomerSignIn.checkRole,
+            verifyCustomerUser.isCustomer,
+            customerisDeviceVC.isCustomerDevice,
+            customerisOtpVC.isCustomer2FA
+        ],
+        customersigninController.signInCustomer
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/customer/signin/resend-isdevice",
+        [
+            verifyCustomerSignIn.isEmailVerify, verifyCustomerUser.isCustomer
+        ],
+        customerisDeviceVC.resendIsCustomerDevice
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/customer/device-ip-confirm",
+        [
+            verifyCustomerSignIn.isEmailVerify, 
+            verifyCustomerSignIn.isPasswordVerify, 
+            verifyCustomerSignIn.checkRole,
+            verifyCustomerUser.isCustomer,
+            customerisOtpVC.isCustomer2FA
+        ],
+        customerisDeviceVC.activateIsCustomerDevice
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/customer/signin/resend-otp",
+        [
+            verifyCustomerSignIn.isEmailVerify,
+            verifyCustomerUser.isCustomer
+        ],
+        customerisOtpVC.resendIsCustomer2FA
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/customer/signin/activate-otp",
+        [
+            verifyCustomerSignIn.isEmailVerify,
+            verifyCustomerSignIn.isPasswordVerify, 
+            verifyCustomerSignIn.checkRole,
+            verifyCustomerUser.isCustomer
+        ],
+        customerisOtpVC.activateIsCustomer2FA
+    );
+
+    app.post(
+        Helpers.apiVersion7()+'auth/customer/google/signin',
+        [
+            verifyCustomerSignUp.isToken,
+            verifyCustomerUser.isCustomer
+        ],
+        customersigninPassportGoogleController.proceedSignIn
+    );
+   
+    app.post(
+        Helpers.apiVersion7()+"auth/customer/password/reset",
+        [
+            verifyCustomerSendPasswordEmail.isEmailVerify,
+            verifyCustomerUser.isCustomer
+        ],
+        customersendchangepasswordController.customerResetPassword
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/customer/reset/password",
+        [
+            verifyCustomerResetIn.isEmailVerify, 
+            verifyCustomerResetIn.isPasswordVerify, 
+            verifyCustomerResetIn.isOtp,
+            verifyCustomerUser.isCustomer
+        ],
+        customerresetpasswordController.customerStartResetPassword
+    );
+
+
+
+    // ------------------------------- //
+        //admin Website Endpoints
+    // ------------------------------- //
+
+
 
     app.get(
         Helpers.apiVersion7()+"admin-signup-verification/:link",
