@@ -343,6 +343,12 @@ exports.wocmanDetails = (req, res, next) => {
             }
 
             if (!Array.isArray(userc) || !userc.length) {
+                return res.status(404).send({
+                    statusCode: 404,
+                    status: false, 
+                    message: 'Could not Find Featured wocman',
+                    data: [] 
+                });
             }else{
                 for (let i = 0; i < userc.length; i++) {
 

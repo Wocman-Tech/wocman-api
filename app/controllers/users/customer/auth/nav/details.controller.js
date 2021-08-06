@@ -108,7 +108,7 @@ exports.customerNav = (req, res, next) => {
             res.status(200).send({
                 statusCode: 200,
                 status: true,
-                message: "Found a wocman user",
+                message: "Found a customer user",
                 data: {
                     username: users.username,
                     email: users.email,
