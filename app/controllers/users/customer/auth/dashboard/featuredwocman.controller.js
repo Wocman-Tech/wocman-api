@@ -112,12 +112,14 @@ exports.uploadProject = (req, res, next) => {
 
             const file = req.files;//this are the files
             //be sure project never existed
-            Projects.findAll(
+            Projects.findOne(
                 {
                     where: {
-                        description: decription,
-                        projectid: project_id,
-                        customerid: customer_id
+                        [Op.and]:[
+                            {description: decription},
+                            {projectid: project_id},
+                            {customerid: customer_id}
+                        ]
                     }
                 }
             ).then(existProject => {
