@@ -91,7 +91,7 @@ exports.wocmanChatContact = (req, res, next) => {
                 if (parseInt(projectBase[i].wocmanaccept) > 1 && parseInt(projectBase[i].wocmanaccept) < 5) {
 
                     customers.push({
-                        customerid: projectBase[i].customerid 
+                        customerid: projectBase[i].customerid,
                         projectid: projectBase[i].projectid,
                         project: projectBase[i].description
                     })
