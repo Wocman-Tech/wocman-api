@@ -50,11 +50,4 @@ workstation : "localhost"
 
 #note:(05/08/2021)
 
-
-1 modified projects model by setting the defaultValue of country field to 'nigeria'
-1 modified projects model by setting the defaultValue of defaultValue field to 'null'
-1 modified projects model by adding customerstart field
-1 modified projects model by adding projectreport field
-
-2 modified users model by adding featured field name: this would assist to show if user is featured or not
-3 modified wocmancustomer model by adding  messagetype and messagelinks field name: this would assist to show if it was a text or media
+wocmanchat: tracker field name: this would assist to show if it was a text or media

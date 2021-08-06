@@ -9,17 +9,12 @@ const Helpers = require("../helpers/helper.js");
 const path = require("path");
 const multer = require("multer");
 
-var storageChat = multer.diskStorage({
+var storage = multer.memoryStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join('', 'app/', 'uploads/customer/picture'))
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)+ path.extname(file.originalname);
-        cb(null, file.fieldname + '-' + uniqueSuffix)
+        cb(null, '');
     }
 });
-
-const uploadChat = multer({storageChat}).any('avatar')
+const uploadChat = multer({storage: storage}).array('avatar')
 
 
 module.exports = function(app) {

@@ -18,6 +18,9 @@ module.exports = (sequelize, Sequelize) => {
         seen: {
             type: Sequelize.STRING
         },
+        tracker: {
+            type: Sequelize.STRING
+        },
         projectid: {
             type: Sequelize.STRING
         }

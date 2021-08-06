@@ -262,9 +262,9 @@ exports.chatSave = (req, res, next) => {
             message: Joi.string().min(1).max(225),
         }); 
         const dataToValidate = { 
-          wocmanid: wocmanid,
-          projectid: projectid,
-          message: message
+            wocmanid: wocmanid,
+            projectid: projectid,
+            message: message
         }
         // const result = Joi.validate(dataToValidate, joiClean);
         const result = joiClean.validate(dataToValidate);
@@ -297,73 +297,80 @@ exports.chatSave = (req, res, next) => {
                         });
                         return;
                     }
-                    var messagelink = [];
-                    //check on the message type
-                    if (messageType == 'media') {
-                        //change the message
+                    const chat_tracker = uuidv4();
 
-                        const file = req.files;//this is the file name
-                        if (!file) {
-                            return res.status(400).send({
-                                statusCode: 400,
-                                status: false,
-                                message: "avatar filed was undefined",
-                                data: []
-                            });
-                        }
-                        file.map((item) => {
-                            let myFile =  item.originalname.split(".")
-                            const fileType = myFile[myFile.length - 1];
-                            const dsf = uuidv4();
-
-                            const params = {
-                                ACL: "private",
-                                Bucket: config.awsS3BucketName,
-                                Key: `${dsf}.${fileType}`,
-                                Body:  item.buffer
-                            }
-
-                            s3.upload(params, (error, data) => {
-                                if(error){
-                                    // res.status(500).send(error)
-                                }
-
-                                var fileUrl = data.Location;
-                                if (typeof fileUrl === 'undefined') {
-                                    messagelink.push(fileUrl);
-                                }
-                            })
-                        })
-                    }
-
-                    // create links
-                    var all_image_url = '';
-                    for (var i = 0; i < messagelink.length; i++) {
-                        if (1 == 0) {
-                            all_image_url =  messagelink[i];
-                        }else{
-                            all_image_url = all_image_url + Helpers.padTogether()+  messagelink[i];
-                        }
-                    }
-                    
                     WCChat.create({
                         senderid: parseInt(req.userId, 10),
                         receiverid: parseInt(wocmanid, 10),
                         message: message,
                         messagetype: messageType,
-                        messagelinks: all_image_url,
+                        messagelinks: '',
                         seen: seen,
+                        tracker: chat_tracker,
                         projectid: parseInt(projectid, 10)
                     }).then(chats => {
                         if (!chats) {
-                          res.status(404).send({
-                             statusCode: 404,
-                            status: false,
-                            message: "Chat Not Sent",
-                            data: []
-                          });
-                          return;
+                            res.status(404).send({
+                                statusCode: 404,
+                                status: false,
+                                message: "Chat Not Sent",
+                                data: []
+                            });
+                            return;
                         }
+
+                        //check on the message type
+                        if (messageType == 'media') {
+                            const file = req.files;//this are the files
+
+
+                            var images = [];
+                            file.map((item) => {
+                                let myFile =  item.originalname.split(".")
+                                const fileType = myFile[myFile.length - 1]
+                                const dsf = uuidv4();
+
+                                var params = {
+                                    ACL: "public-read-write",
+                                    Bucket: config.awsS3BucketName,
+                                    Key: item.originalname,
+                                    Body:  item.buffer
+                                }
+
+                                s3.upload(params, (error, data, res) => {
+                                    if(error){
+                                        // res.status(500).send(error)
+                                        console.log(error);
+                                    }else{
+                                        var fileUrl = data.Location;
+                                        if (typeof fileUrl === 'undefined') {
+                                            //empty file
+                                        }else{
+                                            images.push({fileUrl});
+                                        }
+                                    }
+                                    // save project
+                                    var all_image_url = '';
+                                    for (var i = 0; i < images.length; i++) {
+                                        if (i == 0) {
+                                            all_image_url =  images[i].fileUrl;
+                                        }else{
+                                            all_image_url = all_image_url + Helpers.padTogether() +  images[i].fileUrl;
+                                        }
+                                    }
+                                    console.log(all_image_url);
+                                    WCChat.update(
+                                        {
+                                            messagelinks: all_image_url
+                                        },
+                                        {
+                                            where: {'tracker': chat_tracker}
+                                        }
+                                    );
+                                });
+                            });
+                        }
+                        
                         res.send({
                             statusCode: 200,
                             status: true, 

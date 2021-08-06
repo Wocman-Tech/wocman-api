@@ -64,11 +64,11 @@ let transporter = nodemailer.createTransport({
 });
 
 let MailGenerator = new Mailgen({
-  theme: "default",
-  product: {
-    name: config.name,
-    link: config.website,
-  },
+    theme: "default",
+    product: {
+        name: config.name,
+        link: config.website,
+    },
 });
 
 //changes(04/08/2021)
@@ -110,66 +110,106 @@ exports.uploadProject = (req, res, next) => {
 
             var customer_id =  req.userId;
 
-            var images = [];
             var project_id =  projecttypeid;//i want the admin to study this request and tie it to the appropriate project type.
             //inserting into the project table
 
             const file = req.files;//this are the files
-
-            file.map((item) => {
-                let myFile =  item.originalname.split(".")
-                const fileType = myFile[myFile.length - 1]
-                const dsf = uuidv4();
-
-                const params = {
-                    ACL: "public-read-write",
-                    Bucket: config.awsS3BucketName,
-                    Key: `${dsf}.${fileType}`,
-                    Body:  item.buffer
+            //be sure project never existed
+            Projects.findAll(
+                {
+                    where: {
+                        description: decription,
+                        projectid: project_id,
+                        customerid: customer_id
+                    }
                 }
+            ).then(existProject => {
+                if (!existProject) {
 
-                s3.upload(params, (error, data) => {
-                    if(error){
-                        // res.status(500).send(error)
-                    }
-                    var fileUrl = data.Location;
-                    if (typeof fileUrl === 'undefined') {
-                        //empty file
-                    }else{
-                        images.push(data.Location);
-                    }
+                    //create one
+                    Projects.create({
+                        description: decription,
+                        address: address,
+                        city: city,
+                        projectid: project_id,
+                        customerid: customer_id,
+                        images: ''
+                    })
+                    .then(projectCallback  => {
+                        var images = [];
+                        file.map((item) => {
+                            let myFile =  item.originalname.split(".")
+                            const fileType = myFile[myFile.length - 1]
+                            const dsf = uuidv4();
+
+                            var params = {
+                                ACL: "public-read-write",
+                                Bucket: config.awsS3BucketName,
+                                Key: item.originalname,
+                                Body:  item.buffer
+                            }
+
+                            s3.upload(params, (error, data, res) => {
+                                if(error){
+                                    // res.status(500).send(error)
+                                    console.log(error);
+                                }else{
+                                    var fileUrl = data.Location;
+                                    if (typeof fileUrl === 'undefined') {
+                                        //empty file
+                                    }else{
+                                        images.push({fileUrl});
+                                    }
+                                }
+                                // console.log(images);
+                                // save project
+                                var all_image_url = '';
+                                for (var i = 0; i < images.length; i++) {
+                                    if (i == 0) {
+                                        all_image_url =  images[i].fileUrl;
+                                    }else{
+                                        all_image_url = all_image_url + Helpers.padTogether() +  images[i].fileUrl;
+                                    }
+                                }
+                                Projects.update(
+                                    {
+                                        images: all_image_url
+                                    },
+                                    {
+                                        where: {'description': decription}
+                                    }
+                                );
+                            });
+                        });
+                    
+                        // return
+                        res.status(200).send({
+                            statusCode: 200,
+                            status: true,
+                            message: "Project Created",
+                            data: {
+                                accessToken: req.token
+                            }
+                        });
+                    })
+                }else{
+                    return res.status(400).send(
+                    {
+                        statusCode: 400,
+                        status: false,
+                        message: "Project Existed",
+                        data: []
+                    });
+                }
+            })
+            .catch(err => {
+                res.status(500).send({
+                    statusCode: 500,
+                    status: false, 
+                    message: err.message,
+                    data: [] 
                 });
             });
-            // save project
-            var all_image_url = '';
-            for (var i = 0; i < images.length; i++) {
-                if (1 == 0) {
-                    all_image_url =  images[i];
-                }else{
-                    all_image_url = all_image_url + Helpers.padTogether()+  images[i];
-                }
-            }
-
-            //create one
-            Projects.create({
-                description: decription,
-                address: address,
-                city: city,
-                projectid: project_id,
-                customerid: customer_id,
-                images: all_image_url
-            })
-            .then(hgh  => {
-                // return
-                res.status(200).send({
-                    statusCode: 200,
-                    status: true,
-                    message: "Project Created",
-                    data: {
-                        accessToken: req.token
-                    }
-                });
-            })
         }
     }
 };
@@ -201,14 +241,13 @@ exports.listProject = (req, res, next) => {
                 if (!Array.isArray(projects) || !projects.length) {
                 }else{
                     for (let i = 0; i < projects.length; i++) {
-                        if (parseInt(projects.wocmanid, 10) > 0 && parseInt(projects.projectcomplete, 10) != 1) {
+                        if (parseInt(projects[i].wocmanid, 10) > 0 && parseInt(projects[i].projectcomplete, 10) != 1) {
                             jobs.push({
-                                description: projects.description,
-                                wocmanid: projects.wocmanid,
-                                projectid: projects.projectid,
-                                images: projects.images
+                                description: projects[i].description,
+                                wocmanid: projects[i].wocmanid,
+                                projectid: projects[i].projectid,
+                                images: projects[i].images
                             })
-                            console.log(jobs);
                         }
                     }
                 }
