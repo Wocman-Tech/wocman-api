@@ -94,13 +94,13 @@ exports.customeraccount = (req, res, next) => {
             where: {'userid': user_id}
         });
         Projects.destroy({
-            where: {'customer': user_id}
+            where: {'customerid': user_id}
         });
         Wipblacklist.destroy({
             where: {'userid': user_id}
         });
         WAChat.destroy({
-            where: {'customer': user_id}
+            where: {'customerid': user_id}
         });
         WCChat.destroy({
             where: {'senderid': user_id}

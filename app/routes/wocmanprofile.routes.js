@@ -21,27 +21,14 @@ const Helpers = require("../helpers/helper.js");
 const path = require("path");
 const multer = require("multer");
 
-var storageCert = multer.diskStorage({
+var storage = multer.memoryStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join('', 'app/', 'uploads/wocman/certificate'))
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)+ path.extname(file.originalname);
-        cb(null, file.fieldname + '-' + uniqueSuffix)
-    }
-});
-var storageProfile = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join('', 'app/', 'uploads/wocman/picture'))
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)+ path.extname(file.originalname);
-        cb(null, file.fieldname + '-' + uniqueSuffix)
+        cb(null, '');
     }
 });
 
-const uploadPicture = multer({storageProfile}).single('avatar')
-const uploadCertificate = multer({storageCert}).single('avatar')
+const uploadPicture = multer({storage: storage}).single('avatar')
+const uploadCertificate = multer({storage: storage}).single('avatar')
 
 
 module.exports = function(app) {
@@ -108,7 +95,7 @@ module.exports = function(app) {
 
     app.post(
         Helpers.apiVersion7() + "wocman/profile/add/skill", 
-        [authJwt.verifyToken, authJwt.isWocman, uploadCertificate ], 
+        [authJwt.verifyToken, authJwt.isWocman ], 
         addskillController.wocmanAddSkill
     );
     

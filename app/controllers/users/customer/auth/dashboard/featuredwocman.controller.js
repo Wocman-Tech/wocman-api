@@ -71,9 +71,6 @@ let MailGenerator = new Mailgen({
     },
 });
 
-//changes(04/08/2021)
-//added  defaultValue: 'nigeria' for country field in projects.model.js
-//added  featured field in user.model.js
            
 const Op = db.Sequelize.Op;
 

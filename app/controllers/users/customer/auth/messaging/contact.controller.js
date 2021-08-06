@@ -64,13 +64,13 @@ var bcrypt = require("bcryptjs");
 exports.wocmanChatContact = (req, res, next) => {
     User.findByPk(req.userId).then(user => {
         if (!user) {
-          res.status(404).send({
-            statusCode: 404,
-            status: false,
-            message: "User Not Found",
-            data: []
-          });
-          return;
+            res.status(404).send({
+                statusCode: 404,
+                status: false,
+                message: "User Not Found",
+                data: []
+            });
+            return;
         }
         var unboard = Helpers.returnBoolean(user.unboard);
         Projects.findAll({
@@ -78,13 +78,13 @@ exports.wocmanChatContact = (req, res, next) => {
         }).then(projectBase => {
             var wocmen = [];
             if (!projectBase) {
-              res.status(404).send({
-                statusCode: 404,
-                status: false,
-                message: "Project Not Found",
-                data: []
-              });
-              return;
+                res.status(404).send({
+                    statusCode: 404,
+                    status: false,
+                    message: "Project Not Found",
+                    data: []
+                });
+                return;
             }
             for (var i = 0; i < projectBase.length; i++) {
                 

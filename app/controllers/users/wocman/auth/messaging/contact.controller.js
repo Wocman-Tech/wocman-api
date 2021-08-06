@@ -92,6 +92,8 @@ exports.wocmanChatContact = (req, res, next) => {
 
                     customers.push({
                         customerid: projectBase[i].customerid 
+                        projectid: projectBase[i].projectid,
+                        project: projectBase[i].description
                     })
                 }
             }

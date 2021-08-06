@@ -68,7 +68,7 @@ exports.customerLogout = (req, res, next) => {
         req.session = null;
         user.update({
             loginlogout:1,
-            weblogintoken:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsImlhdCI6MTYwNDYyOTY3NSwiZXhwIjoxNjA0NzE2MDc1fQ.w9OuLfh-BohX7stJGQyuvXsaKViDMLzqhYwMNaq_0fs'
+            weblogintoken:'eyJhbr432iJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MT765mlhdCI6MTYwNDYyOTY3NSwiZXhwIjoxNjA0NzE2MDc1fQ.w9OuLfh-BohX7stJGQyuvXs5lkKMLzqhYwMNaq_0fs'
         });
         res.status(200).send({
             statusCode: 200,

@@ -80,13 +80,13 @@ exports.wocmanContactCustomer = (req, res, next) => {
         
             User.findByPk(req.userId).then(user => {
                 if (!user) {
-                  res.status(404).send({
-                    statusCode: 404,
-                    status: false,
-                    message: "User Not Found",
-                    data: []
-                  });
-                  return;
+                    res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "User Not Found",
+                        data: []
+                    });
+                    return;
                 }
                 var unboard = Helpers.returnBoolean(user.unboard);
                 var gg = 0;
@@ -99,6 +99,7 @@ exports.wocmanContactCustomer = (req, res, next) => {
                         ['createdAt', 'DESC']
                     ]
                 }).then(project => {
+
 
                     if (!project) {
                         res.status(404).send({
@@ -118,13 +119,13 @@ exports.wocmanContactCustomer = (req, res, next) => {
 
                         User.findByPk(wocmanid).then(customeruser => {
                             if (!customeruser) {
-                              res.status(404).send({
-                                statusCode: 404,
-                                status: false,
-                                message: "Wocman Not Found",
-                                data: []
-                              });
-                              return;
+                                res.status(404).send({
+                                    statusCode: 404,
+                                    status: false,
+                                    message: "Wocman Not Found",
+                                    data: []
+                                });
+                                return;
                             }
                             res.status(200).send({
                                 statusCode: 200,

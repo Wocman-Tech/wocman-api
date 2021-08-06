@@ -358,7 +358,7 @@ exports.chatSave = (req, res, next) => {
                                             all_image_url = all_image_url + Helpers.padTogether() +  images[i].fileUrl;
                                         }
                                     }
-                                    console.log(all_image_url);
+                                    // console.log(all_image_url);
                                     WCChat.update(
                                         {
                                             messagelinks: all_image_url

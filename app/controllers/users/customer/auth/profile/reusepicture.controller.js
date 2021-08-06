@@ -97,7 +97,7 @@ exports.ReuseProfilePicture = (req, res, next) => {
                     res.status(200).send({
                         statusCode: 200,
                         status: true,
-                        message: "Profile is re-used",
+                        message: "Profile picture is re-used",
                         data: {
                             accessToken: req.token
                         }
