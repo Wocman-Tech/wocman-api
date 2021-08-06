@@ -208,6 +208,7 @@ exports.listProject = (req, res, next) => {
                                 projectid: projects.projectid,
                                 images: projects.images
                             })
+                            console.log(jobs);
                         }
                     }
                 }
