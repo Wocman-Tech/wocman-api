@@ -185,7 +185,7 @@ exports.listProject = (req, res, next) => {
     }else{
         var customer_id =  req.userId;
 
-        var jobs =  [];
+        let jobs =  [];
 
         if(req.userId && req.userId !== ''){
             Searchuserid = {'customerid': req.userId};
