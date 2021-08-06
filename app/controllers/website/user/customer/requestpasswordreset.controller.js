@@ -114,7 +114,7 @@ exports.customerResetPassword = (req, res, next) => {
                     data: {
                         link: otp, 
                         email : dfg43.email, 
-                        role: 'wocman',
+                        role: 'customer',
                         sentMail: sentMail
                     }
                 });

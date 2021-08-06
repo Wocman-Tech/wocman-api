@@ -212,17 +212,23 @@ exports.listProject = (req, res, next) => {
                     }
                 }
             }
-        });
-
-        
-        res.status(200).send({
-            statusCode: 200,
-            status: true,
-            message: "Jobs",
-            data: {
-                accessToken: req.token,
-                jobs: jobs
-            }
+            res.status(200).send({
+                statusCode: 200,
+                status: true,
+                message: "Jobs",
+                data: {
+                    accessToken: req.token,
+                    jobs: jobs
+                }
+            });
+        })
+        .catch(err => {
+            res.status(500).send({
+                statusCode: 500,
+                status: false, 
+                message: err.message,
+                data: [] 
+            });
         });
     }
 };
