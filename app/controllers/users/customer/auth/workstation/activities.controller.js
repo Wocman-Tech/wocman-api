@@ -390,6 +390,17 @@ exports.reportProject = (req, res, next) => {
         );
     }else{
 
+        if (typeof projectreport === "undefined") {
+            return res.status(400).send(
+                {
+                    statusCode: 400,
+                    status: false,
+                    message: "report field  is undefined.",
+                    data: [] 
+                }
+            );
+        }
+
         //schema
         const joiClean = Joi.object().keys({ 
             projectid: Joi.number().integer().min(1), 
