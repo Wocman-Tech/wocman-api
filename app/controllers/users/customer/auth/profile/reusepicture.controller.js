@@ -28,6 +28,7 @@ const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
+const urlExistSync = require("url-exist-sync");
  
 let options = {
   provider: 'openstreetmap'
@@ -69,17 +70,11 @@ exports.ReuseProfilePicture = (req, res, next) => {
     }else{
         
         var theimaeg = image;
-        if (!fs.existsSync(theimaeg)) {
+
+        var linkExist =  urlExistSync(theimaeg);
+        if (linkExist === true) {
             
-            return res.status(404).send(
-                {
-                    statusCode: 404,
-                    status: false,
-                    message: "Image does not exist.",
-                    data: []
-                }
-            );
-        }else{
+            
             User.findByPk(req.userId).then(user => {
                 if (!user) {
                   res.status(400).send({
@@ -120,6 +115,16 @@ exports.ReuseProfilePicture = (req, res, next) => {
                     data: [] 
                 });
             });
+        }else{
+            return res.status(404).send(
+                {
+                    statusCode: 404,
+                    status: false,
+                    message: "Image does not exist.",
+                    data: []
+                }
+            );
+        
         }
     }
 };
