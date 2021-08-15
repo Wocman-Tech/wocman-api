@@ -437,7 +437,7 @@ exports.chatSave = (req, res, next) => {
                 {
                     statusCode: 400,
                     status: false,
-                    message: "Invalid customerid or message",
+                    message: result.error,
                     data: []
                 }
             );
