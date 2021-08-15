@@ -91,7 +91,7 @@ isAdmin = (req, res, next) => {
             res.status(403).send({
                 statusCode: 403,
                 status: false,
-                message: "User Not Found",
+                message: "Admin User Not Found",
                 data: []
             });
             return;

@@ -22,7 +22,8 @@ if (workstation.toLowerCase() === "web") {
         googleAppClientSecret: "o1pyycovPehN0loXowHRh0aR",
         awsS3AccessKeyId: "AKIAUPJAS3S6WTQ37DUN",
         awsS3SecretAccessKey: "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",
-        awsS3BucketName: "wocmantechnologyuploads"
+        awsS3BucketName: "wocmantechnologyuploads",
+        companyPassword: 'rathH-5Rhsa-sa755bB0o!d'
     }
 }
 
@@ -45,6 +46,7 @@ if(workstation.toLowerCase() === "localhost"){
         googleAppClientSecret: "o1pyycovPehN0loXowHRh0aR",
         awsS3AccessKeyId: "AKIAUPJAS3S6WTQ37DUN",
         awsS3SecretAccessKey: "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",
-        awsS3BucketName: "wocmantechnologyuploads"
+        awsS3BucketName: "wocmantechnologyuploads",
+        companyPassword: 'rathH-5Rhsa-sa755bB0o!d'
     }
 }

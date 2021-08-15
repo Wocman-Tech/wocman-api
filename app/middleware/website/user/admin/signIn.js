@@ -13,49 +13,66 @@ const schemaJoiEmail = Joi.object({
 });
 const schemaJoiPassword = Joi.object({
     password: Joi.string()
-        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required()
+        .alphanum()
+        .min(8)
+        .max(30)
+        .required()
 
 });
-
-
-
 isEmailVerify = (req, res, next) => {
-    var joyresult = schemaJoiEmail.validate({ email: req.body.email });
-    var { value, error } = joyresult;
-    if (!(typeof error === 'undefined')) { 
-        var msg = Helpers.getJsondata(error, 'details')[0];
-        var msgs = Helpers.getJsondata(msg, 'message');
-        return res.status(422).json({
-            statusCode: 422,
-            status: false,
-            message: msgs,
-            data: []
-        })
+    if (typeof req.body.email === "undefined") {
+        return res.status(400).send(
+            {
+                statusCode: 400,
+                status: false,
+                message: "Include an email field",
+                data: [] 
+            }
+        );
     }else{
-        next();
+        var joyresult = schemaJoiEmail.validate({ email: req.body.email });
+        var { value, error } = joyresult;
+        if (!(typeof error === 'undefined')) { 
+            var msg = Helpers.getJsondata(error, 'details')[0];
+            var msgs = Helpers.getJsondata(msg, 'message');
+            return res.status(422).json({
+                statusCode: 422,
+                status: false,
+                message: "Invalid Email Address",
+                data: []
+            })
+        }else{
+            next();
+        }
     }
 };
-
-
-
 isPasswordVerify = (req, res, next) => {
-    var joyresult = schemaJoiPassword.validate({ password: req.body.password});
-    var { value, error } = joyresult;
-    if (!(typeof error === 'undefined')) { 
-        var msg = Helpers.getJsondata(error, 'details')[0];
-        var msgs = Helpers.getJsondata(msg, 'message');
-        return res.status(422).json({
-            statusCode: 422,
-            status: false,
-            message: msgs,
-            data: []
-        })
+    if (typeof req.body.password === "undefined") {
+        return res.status(400).send(
+            {
+                statusCode: 400,
+                status: false,
+                message: "Include a password field",
+                data: [] 
+            }
+        );
     }else{
-        next();
+        var joyresult = schemaJoiPassword.validate({ password: req.body.password});
+        var { value, error } = joyresult;
+        if (!(typeof error === 'undefined')) { 
+            var msg = Helpers.getJsondata(error, 'details')[0];
+            var msgs = Helpers.getJsondata(msg, 'message');
+            return res.status(422).json({
+                statusCode: 422,
+                status: false,
+                message: 'Minimun of 8 alphanumeric characters and maximun of 30 alphanumeric characters  is required  and no special character is required in password field',
+                data: []
+            })
+        }else{
+            next();
+        }
     }
 };
-
-
 checkRolesExisted = (req, res, next) => {
 
    if (typeof req.body.email === "undefined") {
@@ -82,11 +99,11 @@ checkRolesExisted = (req, res, next) => {
         .then(users => {
             if (!users) {
                 return res.status(404).send({
-                        statusCode: 404,
-                        status: false,
-                        message: "User Not found.",
-                        data: []
-                    });
+                    statusCode: 404,
+                    status: false,
+                    message: "User Not found.",
+                    data: []
+                });
             }
             if(users.id && users.id !== ''){
                 userId = {'userid': users.id}

@@ -1,4 +1,4 @@
-const pathRoot = '../../../../';
+const pathRoot = '../../../../../';
 const db = require(pathRoot+"models");
 const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
@@ -8,7 +8,9 @@ const UserRole = db.userRole;
 const Nletter = db.nletter;
 const Contactus = db.contactus;
 const Cert = db.cert;
-
+const Rootadmin = db.rootadmin;
+const Account = db.accounts;
+const Wrate = db.wrate;
 
 const Projects = db.projects;
 const Project = db.projecttype;
@@ -50,61 +52,65 @@ let MailGenerator = new Mailgen({
   },
 });
 
-exports.allContacts = (req, res, next) => {
-    Contactus.findAndCountAll()
-    .then(result => {
-        res.status(200).send({
-            statusCode: 200,
-            status: true,
-            message: "Found Contact us messages",
-            data: result.rows
-        });
-    })
-    .catch((err)=> {
-        res.status(500).send({
-            statusCode: 500,
-            status: false, 
-            message: err.message,
-            data: [] 
-        });
-    });
-};
 
-exports.oneContact = (req, res, next) => {
-    var id =  req.params.id;
-    Contactus.findByPk(id)
-    .then(result => {
-        res.status(200).send({
-            statusCode: 200,
-            status: true,
-            message: "Found Contact us messages",
-            data: result
-        });
-    })
-    .catch((err)=> {
-        res.status(500).send({
-            statusCode: 500,
-            status: false, 
-            message: err.message,
-            data: [] 
-        });
-    });
-};
+const Op = db.Sequelize.Op;
 
-exports.deleteContact = (req, res, next) => {
-    var ids = req.params.id;
-    Contactus.destroy({
-        where: {id: ids}
-    })
-    .then(result => {
-        res.status(200).send({
-            statusCode: 200,
-            status: true,
-            message: "Deleted Contact Us Message",
+exports.removeProfilePicture = (req, res, next) => {
+    
+    if(req.userId && req.userId !== ''){
+        var user_id = req.userId;
+    }else{
+        return res.status(400).send(
+        {
+            statusCode: 400,
+            status: false,
+            message: "User could not be verified",
             data: []
         });
+    }
+
+    
+    
+    User.findByPk(user_id).then(users => {
+        if (!users) {
+            return res.status(404).send({
+                statusCode: 404,
+                status: false,
+                message: "User Not found.",
+                data: []
+            });
+        }
+
+        if (req.isprofile == 0) {
+            return res.status(404).send({
+                statusCode: 404,
+                status: false,
+                message: "Unauthorized admin",
+                data: []
+            });
+        }
+        if (users.image == null) {
+            return res.status(404).send({
+                statusCode: 404,
+                status: false,
+                message: "No image Found",
+                data: []
+            });
+        }
+        User.update(
+            {image: null}, 
+            {where: {id: user_id}}
+        )            
+        res.status(200).send({
+            statusCode: 200,
+            status: true,
+            message: "Image was removed",
+            data: {
+                accessToken:req.token
+            }
+        });
     })
-    .catch((err)=> {
+    .catch(err => {
         res.status(500).send({
             statusCode: 500,
             status: false, 

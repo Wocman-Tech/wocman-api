@@ -86,7 +86,7 @@ module.exports = (sequelize, Sequelize) => {
         },
         projectcomplete: {
             type: Sequelize.STRING,
-            defaultValue: null,
+            defaultValue: 0,
             allowNull: true
         }
     });

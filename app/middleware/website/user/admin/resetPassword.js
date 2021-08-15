@@ -14,53 +14,110 @@ const schemaJoiEmail = Joi.object({
 });
 const schemaJoiPassword = Joi.object({
     password: Joi.string()
-        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required()
+        .alphanum()
+        .min(8)
+        .max(30)
+        .required()
 
 });
-
-
+const schemaJoiOtp = Joi.object({
+    otp: Joi.string().min(5).required()
+});
 
 isEmailVerify = (req, res, next) => {
-    var joyresult = schemaJoiEmail.validate({ email: req.body.email });
-    var { value, error } = joyresult;
-    if (!(typeof error === 'undefined')) { 
-        var msg = Helpers.getJsondata(error, 'details')[0];
-        var msgs = Helpers.getJsondata(msg, 'message');
-        return res.status(422).json({
-            statusCode: 422,
-            status: false,
-            message: msgs,
-            data: []
-        })
+    var email = req.body.email;
+    if (typeof email === "undefined") {
+        return res.status(400).send(
+            {
+                statusCode: 400,
+                status: false, 
+                message: "add a valid email field",
+                data: [] 
+            }
+        );
     }else{
-        next();
+        var joyresult = schemaJoiEmail.validate({ email: email });
+        var { value, error } = joyresult;
+        if (!(typeof error === 'undefined')) { 
+            var msg = Helpers.getJsondata(error, 'details')[0];
+            var msgs = Helpers.getJsondata(msg, 'message');
+            return res.status(422).json({
+                statusCode: 422,
+                status: false,
+                message: 'Invalid Email Address',
+                data: []
+            })
+        }else{
+            next();
+        }
     }
 };
 
 
 
 isPasswordVerify = (req, res, next) => {
-    var joyresult = schemaJoiPassword.validate({ password: req.body.password});
-    var { value, error } = joyresult;
-    if (!(typeof error === 'undefined')) { 
-        var msg = Helpers.getJsondata(error, 'details')[0];
-        var msgs = Helpers.getJsondata(msg, 'message');
-        return res.status(422).json({
-            statusCode: 422,
-            status: false,
-            message: msgs,
-            data: []
-        })
+    var password = req.body.password;
+    if (typeof password === "undefined") {
+        return res.status(400).send(
+            {
+                statusCode: 400,
+                status: false, 
+                message: "add a valid password field",
+                data: [] 
+            }
+        );
     }else{
-        next();
+        var joyresult = schemaJoiPassword.validate({ password: password});
+        var { value, error } = joyresult;
+        if (!(typeof error === 'undefined')) { 
+            var msg = Helpers.getJsondata(error, 'details')[0];
+            var msgs = Helpers.getJsondata(msg, 'message');
+            return res.status(422).json({
+                statusCode: 422,
+                status: false,
+                message: 'Minimun of 8 alphanumeric characters and maximun of 30 alphanumeric characters  is required and no special character is required in password field',
+                data: []
+            })
+        }else{
+            next();
+        }
     }
 };
 
 
+isOtp = (req, res, next) => {
+    var otpToken = req.body.otpToken;
+    if (typeof otpToken === "undefined" || otpToken.length != 6) {
+        return res.status(400).send(
+            {
+                statusCode: 400,
+                status: false, 
+                message: "add a valid otpToken field",
+                data: [] 
+            }
+        );
+    }else{
+        var joyresult = schemaJoiOtp.validate({ otp: otpToken });
+        var { value, error } = joyresult;
+        if (!(typeof error === 'undefined')) { 
+            var msg = Helpers.getJsondata(error, 'details')[0];
+            var msgs = Helpers.getJsondata(msg, 'message');
+            return res.status(422).json({
+                statusCode: 422,
+                status: false,
+                message: 'Minimum and maximun of six characters field is required',
+                data: []
+            })
+        }else{
+            next();
+        }
+    }
+}
 
 const verifyResetIn = {
     isEmailVerify: isEmailVerify,
-    isPasswordVerify: isPasswordVerify
+    isPasswordVerify: isPasswordVerify,
+    isOtp: isOtp
 };
 
 module.exports = verifyResetIn;

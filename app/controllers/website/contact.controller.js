@@ -2,6 +2,17 @@ const pathRoot = '../../';
 const db = require(pathRoot+"models");
 const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
+
+const AWS  = require('aws-sdk');
+AWS.config.region = 'us-east-2';
+
+const s3 = new AWS.S3({
+    sslEnabled: true,
+    accessKeyId: config.awsS3AccessKeyId,
+    secretAccessKey: config.awsS3SecretAccessKey
+})
+const ImageStore = db.imageStore;
+
 const User = db.user;
 const Role = db.role;
 const UserRole = db.userRole;
@@ -60,6 +71,7 @@ exports.contactus = (req, res, next) => {
     var phone =  req.body.phone;
     var inquiry =  req.body.inquiry;
     var message =  req.body.message;
+    const tracker = uuidv4();
 
     if (typeof emailAddress === "undefined") {
         return res.status(400).send(
@@ -114,12 +126,51 @@ exports.contactus = (req, res, next) => {
                     }else{
 
 
+                        const file = req.files;
+                        const tracker = uuidv4();
+                        if(typeof file === 'undefined'){
+
+                        }else{
+                            file.map((item) => {
+                                let myFile =  item.originalname.split(".")
+                                const fileType = myFile[myFile.length - 1]
+
+                                var params = {
+                                    ACL: "public-read-write",
+                                    Bucket: config.awsS3BucketName,
+                                    Key: item.originalname,
+                                    Body:  item.buffer
+                                }
+
+                                s3.upload(params, (error, data, res) => {
+                                    if(error){
+                                        // res.status(500).send(error)
+                                        console.log(error);
+                                    }else{
+                                        var fileUrl = data.Location;
+                                        if (typeof fileUrl === 'undefined') {
+                                            //empty file
+                                        }else{
+                                            ImageStore.create(
+                                                {
+                                                    image: fileUrl,
+                                                    tracker: tracker
+                                                }
+                                            );
+                                        }
+                                    }
+                                });
+                            });
+                        }
+
+
                         Contactus.create({
                             name: name,
                             email: emailAddress,
                             phone: phone,
                             enquiry: inquiry,
-                            message: message
+                            message: message,
+                            tracker: tracker
                         })
                         .then(hgh  => {
                             res.status(200).send({

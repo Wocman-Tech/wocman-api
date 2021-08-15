@@ -1,4 +1,4 @@
-const pathRoot = '../../../../';
+const pathRoot = '../../../../../';
 const db = require(pathRoot+"models");
 const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
@@ -8,7 +8,9 @@ const UserRole = db.userRole;
 const Nletter = db.nletter;
 const Contactus = db.contactus;
 const Cert = db.cert;
-
+const Rootadmin = db.rootadmin;
+const Account = db.accounts;
+const Wrate = db.wrate;
 
 const Projects = db.projects;
 const Project = db.projecttype;
@@ -50,61 +52,36 @@ let MailGenerator = new Mailgen({
   },
 });
 
-exports.AllNewsletter = (req, res, next) => {
-    Nletter.findAndCountAll()
-    .then(result => {
-        res.status(200).send({
-            statusCode: 200,
-            status: true,
-            message: "Found news letters",
-            data: result.rows
-        });
-    })
-    .catch((err)=> {
-        res.status(500).send({
-            statusCode: 500,
-            status: false, 
-            message: err.message,
-            data: [] 
-        });
-    });
-};
 
-exports.oneNewsletter = (req, res, next) => {
-    var id =  req.params.id;
-    Nletter.findByPk(id)
-    .then(result => {
-        res.status(200).send({
-            statusCode: 200,
-            status: true,
-            message: "Found news letters",
-            data: result
-        });
-    })
-    .catch((err)=> {
-        res.status(500).send({
-            statusCode: 500,
-            status: false, 
-            message: err.message,
-            data: [] 
-        });
-    });
-};
+const Op = db.Sequelize.Op;
 
-exports.deleteNewsletter = (req, res, next) => {
-    var ids = req.params.id;
-    Nletter.destroy({
-        where: {id: ids}
-    })
-    .then(result => {
-        res.status(200).send({
-            statusCode: 200,
-            status: true,
-            message: "Deleted news letters",
+exports.adminLogout = (req, res, next) => {
+    // Username
+    User.findByPk(req.userId).then(user => {
+        if (!user) {
+          res.status(400).send({
+            statusCode: 400,
+            status: false,
+            message: "User Not Found",
             data: []
+          });
+          return;
+        }
+        req.session = null;
+        user.update({
+            loginlogout:1,
+            weblogintoken:'eyJhbr432iJIUzI1NiIsInR5cCI6dfgdfgdfgdgfgdawqd45645hgrnLHItrt.YwNDYyOTY3NSwiZXhwIjoxNjA0NzE2MDc1fQ.w9OuLfh-BohX7stJGQyuvXs5lkKMLzqhYwMNaq_0fs'
+        });
+        res.status(200).send({
+            statusCode: 200,
+            status: true,
+            message: "Logded Out",
+            data: {
+                accessToken: null 
+            }
         });
     })
-    .catch((err)=> {
+    .catch(err => {
         res.status(500).send({
             statusCode: 500,
             status: false, 

@@ -24,7 +24,7 @@ isLinkVerify = (req, res, next) => {
         return res.status(422).json({
             statusCode: 422,
             status: false,
-            message: msgs,
+            message: 'Invalid Link',
             data: []
         })
     }else{

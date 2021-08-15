@@ -69,7 +69,7 @@ exports.wocmanContactCustomer = (req, res, next) => {
 
         //schema
         const joiClean = Joi.object().keys({ 
-            customerid: Joi.number().integer().min(1), 
+            customerid: Joi.string().min(1), 
         }); 
         const dataToValidate = { 
           customerid: customerid 
@@ -179,7 +179,7 @@ exports.wocmanContactCustomer = (req, res, next) => {
                     data: [] 
                 });
             });
-         }else{
+        }else{
             return res.status(400).send(
                 {
                     statusCode: 400,

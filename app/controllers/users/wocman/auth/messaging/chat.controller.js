@@ -82,7 +82,7 @@ exports.chatLog = (req, res, next) => {
     }else{
         //schema
         const joiClean = Joi.object().keys({ 
-            customerid: Joi.number().integer().min(1),
+            customerid: Joi.string().min(1),
             chatLimit: Joi.number().integer().min(1).max(100),
             perPage: Joi.number().integer().min(1).max(100),
             page: Joi.number().integer().min(1).max(100),
@@ -267,7 +267,7 @@ exports.chatSave = (req, res, next) => {
         }
         //schema
         const joiClean = Joi.object().keys({ 
-            customerid: Joi.number().integer().min(1),
+            customerid: Joi.string().min(1),
             message: Joi.string().min(1).max(225),
             message: Joi.string().min(1).max(225),
 
@@ -431,3 +431,4 @@ exports.chatSave = (req, res, next) => {
         }
     }
 };
+

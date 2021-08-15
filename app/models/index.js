@@ -44,6 +44,7 @@ db.wshear = require("../models/wshear.model.js")(sequelize, Sequelize);
 
 
 db.waChat = require("../models/wocmanadminchat.model.js")(sequelize, Sequelize);
+db.imageStore = require("../models/imagestore.model.js")(sequelize, Sequelize);
 
 db.wcChat = require("../models/wocmancustomerchat.model.js")(sequelize, Sequelize);
 db.wWallet = require("../models/wocmanwallet.model.js")(sequelize, Sequelize);
@@ -58,5 +59,8 @@ db.nletter = require("../models/nletter.model.js")(sequelize, Sequelize);
 
 db.contactus = require("../models/contactus.model.js")(sequelize, Sequelize);
 
+db.accounts = require("../models/accounts.model.js")(sequelize, Sequelize);
+
+db.rootadmin = require("../models/adminroot.model.js")(sequelize, Sequelize);
 
 module.exports = db;

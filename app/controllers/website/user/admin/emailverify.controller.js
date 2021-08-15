@@ -34,90 +34,227 @@ let options = {
 };
 
 let transporter = nodemailer.createTransport({
-  service: config.message_server,
-  secure: true,
-  auth: {
-    user: EMAIL,
-    pass: PASSWORD,
-  },
+    service: config.message_server,
+    secure: true,
+    auth: {
+        user: EMAIL,
+        pass: PASSWORD,
+    },
 });
 
 let MailGenerator = new Mailgen({
-  theme: "default",
-  product: {
-    name: config.name,
-    link: config.website,
-  },
+    theme: "default",
+    product: {
+        name: config.name,
+        link: config.website,
+    },
 });
 
 
 const Op = db.Sequelize.Op;
 
-exports.checkVerifyEmailLinkWocman = (req, res) => {
-    var email_link =  req.params.link;
-
-    var whereQuery = {};
-
+exports.verifyEmailAdmin = (req, res) => {
+    var email_link =  req.body.email;
+    var otp =  req.body.otpToken;
     var SearchemailLink = {};
-    // console.log(email_link);
-    if (typeof email_link === "undefined") {
-        return res.status(400).send(
-            {
-                statusCode: 400,
-                status: false,
-                message: "Email link is undefined.",
-                data: []
-            }
-          );
+
+    if(email_link && email_link !== ''){
+        SearchemailLink = {'email': email_link};
     }else{
+        SearchemailLink = {'email': {$not: null}};
+    }
 
-        if(email_link && email_link !== ''){
-            SearchemailLink = {'verify_email': email_link};
-        }else{
-            SearchemailLink = {'verify_email': {$not: null}};
+    User.findOne({
+        where: SearchemailLink 
+    })
+    .then(users => {
+        if (!users) {
+            return res.status(404).send(
+            {
+                statusCode: 404,
+                status: false,
+                message: "User not Found",
+                data: []
+            });
         }
-        whereQuery = SearchemailLink;
+        var token = jwt.sign({ id: users.id }, config.secret, {
+            expiresIn: 86400 // 24 hours
+        });
+        var isProfileUpdated1 = Helpers.returnBoolean(users.profileupdate);
+        var unboard1 = Helpers.returnBoolean(users.unboard);
+        var isEmailVerified1 = Helpers.returnBoolean(users.verify_email);
 
-        User.findOne({
-            where: whereQuery 
-        })
-        .then(users => {
-            if (!users) {
+        if (isEmailVerified1 == true) {
+            return res.status(200).send(
+            {
+                statusCode: 200,
+                status: true,
+                message: "Email Already Verified",
+                data: {
+                    accessToken: token,
+                    isEmailVerified: isEmailVerified1,
+                    isProfileUpdated: isProfileUpdated1,
+                    unboard: unboard1
+                }
+            });
+        }else{
+            if (users.verify_email !== otp) {
                 return res.status(404).send(
                 {
                     statusCode: 404,
                     status: false,
-                    message: "Email link does not exist.",
-                     data: []
+                    message: "Invalid OTP Token",
+                    data: []
                 });
-          
+            }
+
+            User.update(
+                {
+                    verify_email: 1
+                },
+                {
+                    where: {email : users.email}
+                }
+            );
+            var isEmailVerified = true;
+            var isProfileUpdated = Helpers.returnBoolean(users.profileupdate);
+            var unboard = Helpers.returnBoolean(users.unboard);
+
+            if (isEmailVerified !== true && isEmailVerified !== false) {
+                isEmailVerified = false;
             }
       
-            var token = jwt.sign({ id: users.id }, config.secret, {
-                expiresIn: 86400 // 24 hours
-            });
-
             var authorities = [];
 
-            authorities.push("ROLE_" + "admin".toUpperCase());
+            authorities.push("ROLE_" + "customer".toUpperCase());
             
             res.status(200).send({
                 statusCode: 200,
                 status: true,
-                message: "Link available",
+                message: "Email Verified",
                 data: {
-                    accessToken: token
+                    accessToken: token,
+                    isEmailVerified: isEmailVerified,
+                    isProfileUpdated: isProfileUpdated,
+                    unboard: unboard
                 }
-                
             });
+        }
+
+    })
+    .catch(err => {
+        return  res.status(500).send({
+            statusCode: 500,
+            status: false, 
+            message: err.message,
+            data: [] 
+        });
+    }); 
+};
+
+exports.resendEmail = (req, res) => {
+    const otpValue = Math.floor(100000 + Math.random() * 900000);
+
+    var Searchemail = {};
+    
+    if(req.body.email && req.body.email !== ''){
+        Searchemail = {'email': req.body.email}
+    }else{
+        Searchemail = {'email': {$not: null}};
+    }
+
+    User.findOne({
+      where: Searchemail 
+    })
+    .then(user => {
+        if (!user) {
+            return res.status(404).send(
+            { 
+                statusCode: 404,
+                status: false,
+                message: "Email does not exist",
+                data: []
+            });
+        }
+        if (user.verify_email == 1) {
+            return res.status(404).send(
+            { 
+                statusCode: 404,
+                status: false,
+                message: "Signup Has been verified, please login",
+                data: []
+            });
+        }
+        User.update(
+            {
+                verify_email: otpValue
+            },
+            {
+                where: {email: user.email}
+            }
+        )
+        .then( emailSent => {
+
+            var verification_link = otpValue;
+
+            let response = {
+                body: {
+                    name: "Admin",
+                    intro: "Welcome to Wocman Technology! We're very excited to have you on board as an admin. <br/ >Copy this OTP to process your registration: <div style='font-weight:bolder;'>" + verification_link + "</div><br/>",
+                },
+            };
+
+            let mail = MailGenerator.generate(response);
+
+            let message = {
+                from: EMAIL,
+                to:  user.email,
+                subject: "Signup Verification Resent Successful",
+                html: mail,
+            };
+
+            var isEmailVerified = Helpers.returnBoolean(user.verify_email);
+            var isProfileUpdated = Helpers.returnBoolean(user.profileupdate);
+            var unboard = Helpers.returnBoolean(user.unboard);
+
+            if (isEmailVerified !== true && isEmailVerified !== false) {
+                isEmailVerified = false;
+            }
+
+            transporter.sendMail(message)
+            .then(() => {
+            })
+            res.status(200).send({
+                statusCode: 200,
+                status: true,
+                message: "Email  was resent successfully!",
+                data: {
+                    link: verification_link, 
+                    email : user.email, 
+                    role: 'admin',
+                    sentMail: true,
+                    isEmailVerified: isEmailVerified,
+                    isProfileUpdated: isProfileUpdated,
+                    unboard: unboard
+                }
+            });
+
         })
         .catch(err => {
-            return  res.status(500).send({
+            return res.status(500).send({
                 statusCode: 500,
                 status: false, 
                 message: err.message,
                 data: [] 
             });
-        }); 
-    }
+        });
+    })
+    .catch(err => {
+        return res.status(500).send({
+            statusCode: 500,
+            status: false, 
+            message: err.message,
+            data: [] 
+        });
+    });
 };

@@ -34,20 +34,20 @@ let options = {
 };
 
 let transporter = nodemailer.createTransport({
-  service: config.message_server,
-  secure: true,
-  auth: {
-    user: EMAIL,
-    pass: PASSWORD,
-  },
+    service: config.message_server,
+    secure: true,
+    auth: {
+        user: EMAIL,
+        pass: PASSWORD,
+    },
 });
 
 let MailGenerator = new Mailgen({
-  theme: "default",
-  product: {
-    name: config.name,
-    link: config.website,
-  },
+    theme: "default",
+    product: {
+        name: config.name,
+        link: config.website,
+    },
 });
 
 exports.allAdmin = (req, res, next) => {
@@ -57,7 +57,7 @@ exports.allAdmin = (req, res, next) => {
         where: {roleid: 1}
     })
     .then(resultRole => {
-       if (!resultRole) {
+        if (!resultRole) {
             return res.status(401).send({
                 statusCode: 401,
                 status: false,

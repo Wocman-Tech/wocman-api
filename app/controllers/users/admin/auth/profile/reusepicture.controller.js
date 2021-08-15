@@ -8,7 +8,9 @@ const UserRole = db.userRole;
 const Nletter = db.nletter;
 const Contactus = db.contactus;
 const Cert = db.cert;
-
+const Rootadmin = db.rootadmin;
+const Account = db.accounts;
+const Wrate = db.wrate;
 
 const Projects = db.projects;
 const Project = db.projecttype;
@@ -28,6 +30,7 @@ const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
+const urlExistSync = require("url-exist-sync");
  
 let options = {
   provider: 'openstreetmap'
@@ -46,43 +49,66 @@ let MailGenerator = new Mailgen({
   theme: "default",
   product: {
     name: config.name,
-    link: MAIN_URL,
+    link: config.website,
   },
 });
 
-exports.deleteAdmin = (req, res, next) => {
-    var ids = req.params.id;
-    UserRole.findOne({
-        where: {userid: ids}
-    })
-    .then(userrole => {
-        Role.findOne({
-            where: {id: userrole.roleid}
-        }).then(roles => {
-            if (!(roles.name == 'admin')) {
-                return res.status(400).send({
+
+const Op = db.Sequelize.Op;
+
+exports.ReuseProfilePicture = (req, res, next) => {
+    // Username
+    var image =  req.body.image_link;
+    
+    if (typeof image === "undefined") {
+        return res.status(400).send(
+            {
+                statusCode: 400,
+                status: false,
+                message: "Image link is undefined.",
+                data: []
+            }
+          );
+    }else{
+        
+        var theimaeg = image;
+
+        var linkExist =  urlExistSync(theimaeg);
+        if (linkExist === true) {
+            
+            
+            User.findByPk(req.userId).then(user => {
+                if (!user) {
+                  res.status(400).send({
                     statusCode: 400,
                     status: false,
-                    message: "Not An Admin Profile",
+                    message: "User Not Found",
                     data: []
-                });
-            }
-            UserRole.destroy({
-                where: {userid: ids}
-            })
-            .then(result => {
-                User.destroy({
-                    where: {id: ids}
+                  });
+                  return;
+                }
+                if (req.isprofile == 0) {
+                    return res.status(404).send({
+                        statusCode: 404,
+                        status: false,
+                        message: "Unauthorized admin",
+                        data: []
+                    });
+                }
+                user.update({
+                    image: image
                 })
-                .then(result => {
+                .then(() => {
                     res.status(200).send({
                         statusCode: 200,
                         status: true,
-                        message: "Deleted Admin Profile",
-                        data: []
+                        message: "Profile picture is re-used",
+                        data: {
+                            accessToken: req.token
+                        }
                     });
                 })
-                .catch((err)=> {
+                .catch(err => {
                     res.status(500).send({
                         statusCode: 500,
                         status: false, 
@@ -91,7 +117,7 @@ exports.deleteAdmin = (req, res, next) => {
                     });
                 });
             })
-            .catch((err)=> {
+            .catch(err => {
                 res.status(500).send({
                     statusCode: 500,
                     status: false, 
@@ -99,22 +125,16 @@ exports.deleteAdmin = (req, res, next) => {
                     data: [] 
                 });
             });
-        })
-        .catch((err)=> {
-            res.status(500).send({
-                statusCode: 500,
-                status: false, 
-                message: err.message,
-                data: [] 
-            });
-        });
-    })
-    .catch((err)=> {
-        res.status(500).send({
-            statusCode: 500,
-            status: false, 
-            message: err.message,
-            data: [] 
-        });
-    });
+        }else{
+            return res.status(404).send(
+                {
+                    statusCode: 404,
+                    status: false,
+                    message: "Image does not exist.",
+                    data: []
+                }
+            );
+        
+        }
+    }
 };

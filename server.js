@@ -210,3 +210,11 @@ require('./app/routes/customerwocstation.routes')(app);
 
 
 require('./app/routes/adminuser.routes')(app);
+require('./app/routes/admindashboard.routes')(app);
+require('./app/routes/adminwocman.routes')(app);
+require('./app/routes/admincustomer.routes')(app);
+require('./app/routes/adminwebsite.routes')(app);
+require('./app/routes/adminproject.routes')(app);
+require('./app/routes/adminaccounts.routes')(app);
+require('./app/routes/adminprofile.routes')(app);
+require('./app/routes/adminsettings.routes')(app);

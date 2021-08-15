@@ -5,6 +5,7 @@ const cookieSession = require('cookie-session');
 
 const { verifyCustomerUser } = require("../middleware/customer");
 const { verifyWocmanUser } = require("../middleware/wocman");
+const { verifyAdminUser, rootAction, initiateAdmin } = require("../middleware/admin");
 
 const { resolve, port, website }  = require("../config/auth.config");
 
@@ -63,11 +64,12 @@ const customersigninController = require("../controllers/website/user/customer/s
 const customersigninPassportGoogleController = require("../controllers/website/user/customer/passportgoogleauth.controller");
 const customersignupController = require("../controllers/website/user/customer/signup.controller");
 
+const adminisDeviceVC = require("../controllers/website/user/admin/isDevice.controller");
+const adminisOtpVC = require("../controllers/website/user/admin/isOtp.controller");
 const adminconfirmpasswordresetController = require("../controllers/website/user/admin/confirmpasswordresetemail.controller");
 const adminemailverifyController = require("../controllers/website/user/admin/emailverify.controller");
 const adminresetpasswordController = require("../controllers/website/user/admin/resetpassword.controller");
-const adminsendchangepasswordController = require("../controllers/website/user/admin/sendchangepasswordemail.controller");
-const adminsignupController = require("../controllers/website/user/admin/signup.controller");
+const adminsendchangepasswordController = require("../controllers/website/user/admin/requestpasswordreset.controller");
 const adminSigninController = require("../controllers/website/user/admin/signin.controller");
 
 const newsletterController = require("../controllers/website/addnewsletter.controller");
@@ -83,26 +85,12 @@ const failUrl = website + '/wocman?token=null';
 const path = require("path");
 const multer = require("multer");
 
-var storageCert = multer.diskStorage({
+var storage = multer.memoryStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join('', 'app/', 'uploads/wocman/certificate'))
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)+ path.extname(file.originalname);
-        cb(null, file.fieldname + '-' + uniqueSuffix)
+        cb(null, '');
     }
 });
-var uploadCert = multer({ 
-    storage: storageCert, 
-    fileFilter : (req, file, cb) => {
-        if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg" || file.mimetype == "image/gif") {
-            cb(null, true);
-        }else{
-            cb(null, false);
-            return cb(new Error('Only jpeg, jpg, png, gif file extensions are allowerd'));
-        }
-    }
-});
+const uploadJob = multer({storage: storage}).array('avatar')
 
 module.exports = function(app) {
     app.use(function(req, res, next) {
@@ -132,7 +120,8 @@ module.exports = function(app) {
             contactUs.isNameVerify, 
             contactUs.isInquiryVerify, 
             contactUs.isPhoneVerify, 
-            contactUs.isMessageVerify
+            contactUs.isMessageVerify,
+            uploadJob
         ], 
         contactController.contactus
     );
@@ -403,53 +392,119 @@ module.exports = function(app) {
 
 
     // ------------------------------- //
-        //admin Website Endpoints
+        //admin  Endpoints
     // ------------------------------- //
 
-
-
-    app.get(
-        Helpers.apiVersion7()+"admin-signup-verification/:link",
-        [verifyAdminSignUpLink.isLinkVerify],
-        adminemailverifyController.checkVerifyEmailLinkWocman
-    );
-
     app.post(
-        Helpers.apiVersion7()+"password-reset-admin",
-        [verifyAdminSendPasswordEmail.isEmailVerify],
-        adminsendchangepasswordController.wocmanResetPassword
-    );
-
-    app.get(
-        Helpers.apiVersion7()+"admin-password-reset/:link",
-        [verifyAdminChangePasswordEmail.isLinkVerify],
-        adminconfirmpasswordresetController.wocmanResetPasswordConfirm
-    );
-
-    app.post(
-        Helpers.apiVersion7()+"admin-password-reset",
-        [verifyAdminResetIn.isEmailVerify, verifyAdminResetIn.isPasswordVerify],
-        adminresetpasswordController.wocmanStartResetPassword
-    );
-
-    app.post(
-        Helpers.apiVersion7() + "auth/admin-signup",
-        [
-            verifyAdminSignUp.isEmailVerify, 
-            verifyAdminSignUp.isPasswordVerify, 
-            verifyAdminSignUp.isPasswordConfirmed,
-            verifyAdminSignUp.checkDuplicateUsernameOrEmail
+        Helpers.apiVersion7()+"auth/admin/signup/resend-verification",
+        [   
+            initiateAdmin.isInitiateAdmin,
+            rootAction.isRootAction,
+            verifyAdminUser.isAdmin,
+            verifyAdminSignIn.isEmailVerify
         ],
-        adminsignupController.signUpWocman
+        adminemailverifyController.resendEmail
     );
 
     app.post(
-        Helpers.apiVersion7()+"auth/admin-signin",
+        Helpers.apiVersion7()+"auth/admin/signup/verification",
         [
+            initiateAdmin.isInitiateAdmin,
+            rootAction.isRootAction,
+            verifyAdminUser.isAdmin,
+            verifyAdminSignIn.isEmailVerify,
+            verifyAdminResetIn.isOtp
+        ],
+        adminemailverifyController.verifyEmailAdmin
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/admin/signin",
+        [
+            initiateAdmin.isInitiateAdmin,
+            rootAction.isRootAction,
+            verifyAdminUser.isAdmin,
             verifyAdminSignIn.isEmailVerify, 
             verifyAdminSignIn.isPasswordVerify, 
-            verifyAdminSignIn.checkRole
+            verifyAdminSignIn.checkRole,
+            adminisDeviceVC.isAdminDevice,
+            adminisOtpVC.isAdmin2FA
         ],
-        adminSigninController.signInWocman
+        adminSigninController.signInAdmin
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/admin/signin/resend-isdevice",
+        [
+            initiateAdmin.isInitiateAdmin,
+            rootAction.isRootAction,
+            verifyAdminUser.isAdmin,
+            verifyAdminSignIn.isEmailVerify
+        ],
+        adminisDeviceVC.resendIsAdminDevice
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/admin/device-ip-confirm",
+        [
+            initiateAdmin.isInitiateAdmin,
+            rootAction.isRootAction,
+            verifyAdminUser.isAdmin,
+            verifyAdminSignIn.isEmailVerify, 
+            verifyAdminSignIn.isPasswordVerify, 
+            verifyAdminSignIn.checkRole,
+            adminisOtpVC.isAdmin2FA
+        ],
+        adminisDeviceVC.activateIsAdminDevice
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/admin/signin/resend-otp",
+        [
+            initiateAdmin.isInitiateAdmin,
+            rootAction.isRootAction,
+            verifyAdminUser.isAdmin,
+            verifyAdminSignIn.isEmailVerify
+
+        ],
+        adminisOtpVC.resendIsAdmin2FA
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/admin/signin/activate-otp",
+        [
+            initiateAdmin.isInitiateAdmin,
+            rootAction.isRootAction,
+            verifyAdminUser.isAdmin,
+            verifyAdminSignIn.isEmailVerify,
+            verifyAdminSignIn.isPasswordVerify, 
+            verifyAdminSignIn.checkRole
+
+        ],
+        adminisOtpVC.activateIsAdmin2FA
+    );
+   
+    app.post(
+        Helpers.apiVersion7()+"auth/admin/password/reset",
+        [
+            initiateAdmin.isInitiateAdmin,
+            rootAction.isRootAction,
+            verifyAdminUser.isAdmin,
+            verifyAdminSendPasswordEmail.isEmailVerify
+        ],
+        adminsendchangepasswordController.adminResetPassword
+    );
+
+    app.post(
+        Helpers.apiVersion7()+"auth/admin/reset/password",
+        [
+            initiateAdmin.isInitiateAdmin,
+            rootAction.isRootAction,
+            verifyAdminUser.isAdmin,
+            verifyAdminResetIn.isEmailVerify, 
+            verifyAdminResetIn.isPasswordVerify, 
+            verifyAdminResetIn.isOtp
+        ],
+        adminresetpasswordController.adminStartResetPassword
     );
 };

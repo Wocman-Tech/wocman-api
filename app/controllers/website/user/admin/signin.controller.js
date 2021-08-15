@@ -16,6 +16,8 @@ const Wshear = db.wshear;
 const WAChat = db.waChat;
 const WCChat = db.wcChat;
 const WWallet = db.wWallet;
+const Wsetting = db.wsetting;
+
 
 const Helpers = require(pathRoot+"helpers/helper.js");
 const { verifySignUp } = require(pathRoot+"middleware");
@@ -30,151 +32,129 @@ var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
  
 let options = {
-  provider: 'openstreetmap'
+    provider: 'openstreetmap'
 };
 
 let transporter = nodemailer.createTransport({
-  service: config.message_server,
-  secure: true,
-  auth: {
-    user: EMAIL,
-    pass: PASSWORD,
-  },
+    service: config.message_server,
+    secure: true,
+    auth: {
+        user: EMAIL,
+        pass: PASSWORD,
+    },
 });
 
 let MailGenerator = new Mailgen({
-  theme: "default",
-  product: {
-    name: config.name,
-    link: config.website,
-  },
+    theme: "default",
+    product: {
+        name: config.name,
+        link: config.website,
+    },
 });
-
-
 const Op = db.Sequelize.Op;
 
-exports.signInWocman = (req, res, next) => {
-
-    if (typeof req.body.password === "undefined") {
-        return res.status(400).send(
-            {
-                statusCode: 400,
-                status: false, 
-                message: "Password field is undefined.",
-                data: [] 
-            }
-        );
+exports.signInAdmin = (req, res, next) => {
+    var searchemail = {};
+    var searchPassword = {};
+    if(req.body.password && req.body.password !== ''){
+        searchPassword = {'password': req.body.password};
     }else{
+        searchPassword = {'password': {$not: null}};
+    }
+    if(req.body.email && req.body.email !== ''){
+        searchemail = {'email': req.body.email}
+    }else{
+        searchemail = {'email': {$not: null}};
+    }
 
-        if (typeof req.body.email === "undefined") {
-            return res.status(400).send(
-                {
-                    statusCode: 400,
-                    status: false, 
-                    message: "Email field is undefined.",
-                    data: []
-                }
-            );
+    User.findOne({
+        where: searchemail
+    })
+    .then(user => {
+        if (!user) {
+            return res.status(404).send({
+                statusCode: 404,
+                status: false,
+                message: "User Not found.",
+                date: []
+            });
         }else{
-
-            var searchemail = {};
-            var searchPassword = {};
-            if(req.body.password && req.body.password !== ''){
-                searchPassword = {'password': req.body.password};
+            // console.log(user.signuptype);
+            if (user.signuptype !== 'admin') {
+                return res.status(401).send({
+                    statusCode: 401,
+                    status: false,
+                    accessToken: null,
+                    message: "Use the google sign up",
+                    data: []
+                });
             }else{
-                searchPassword = {'password': {$not: null}};
-            }
-            if(req.body.email && req.body.email !== ''){
-                searchemail = {'email': req.body.email}
-            }else{
-                searchemail = {'email': {$not: null}};
-            }
-
-            User.findOne({
-                where: searchemail
-                
-            })
-            .then(user => {
-                if (!user) {
-                    return res.status(404).send({
-                        statusCode: 404,
-                        status: false,
-                        message: "User Not found.",
-                        date: []
-                    });
-                }
 
                 var passwordIsValid = bcrypt.compareSync(
                     req.body.password,
                     user.password
                 );
-
                 if (!passwordIsValid) {
                     return res.status(401).send({
                         statusCode: 401,
                         status: false,
-                          accessToken: null,
-                          message: "Invalid Password!",
-                          data: []
+                        accessToken: null,
+                        message: "Invalid Password!",
+                        data: []
+                    });
+                }else{
+
+                    var token = jwt.sign({ id: user.id }, config.secret, {
+                        expiresIn: 86400 // 24 hours
+                    });
+
+                    var unboard = Helpers.returnBoolean(user.unboard);
+                    var isEmailVerified = Helpers.returnBoolean(user.verify_email);
+                    var isProfileUpdated = Helpers.returnBoolean(user.profileupdate);
+                    
+
+                    //making sure a user was signed in appropriately
+                    user.update({
+                        loginlogout:0,
+                        weblogintoken:token
+                    });
+                    if (isEmailVerified !== true && isEmailVerified !== false) {
+                        isEmailVerified = false;
+                    }
+                    res.status(200).send({
+                        statusCode: 200,
+                        status: true,
+                        message: "Login successful",
+                        isdevice: false,
+                        isOtp: false,
+                        data: {
+                            email: user.email,
+                            username: user.username,
+                            firstname: user.firstname,
+                            lastname: user.lastname,
+                            address: user.address,
+                            country: user.country,
+                            state: user.state,
+                            province: user.province,
+                            phone: user.phone,
+                            image: user.image,
+                            role: 'admin',
+                            accessToken: token,
+                            isEmailVerified: isEmailVerified,
+                            isProfileUpdated: isProfileUpdated,
+                            unboard: unboard
+                        }
                     });
                 }
-
-                var token = jwt.sign({ id: user.id }, config.secret, {
-                    expiresIn: 86400 // 24 hours
-                });
-
-                //making sure a user was signed in appropriately
-                user.update({
-                    loginlogout:0,
-                    weblogintoken:token
-                });
-
-                UserRole.findOne({
-                    where: {userid: user.id}
-                })
-                .then(userrole => {
-                    Role.findOne({
-                        where: {id: userrole.roleid}
-                    }).then(roles => {
-
-                        var authorities = [];
-                        authorities.push("ROLE_" + "admin".toUpperCase());
-                        res.status(200).send({
-                            statusCode: 200,
-                            status: true,
-                            message: "Login successful",
-                            data: {
-                                accessToken: token,
-                                role: roles.name
-                            }
-                        })
-                        .catch(err => {
-                            res.status(500).send({
-                                statusCode: 500,
-                                status: false, 
-                                message: err.message,
-                                data: [] 
-                            });
-                        });
-                    })
-                    .catch(err => {
-                        res.status(500).send({
-                            statusCode: 500,
-                            status: false, 
-                            message: err.message,
-                            data: [] 
-                        });
-                    });
-                });
-            })
-            .catch(err => {
-                res.status(500).send({
-                    statusCode: 500,
-                    status: false, 
-                    message: err.message,
-                    data: [] 
-                });
-            });
+            }
         }
-    }
+    })
+    .catch(err => {
+        res.status(500).send({
+            statusCode: 500,
+            status: false, 
+            message: err.message,
+            data: [] 
+        });
+    });
 };

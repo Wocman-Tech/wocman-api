@@ -14,19 +14,31 @@ const schemaJoiEmail = Joi.object({
 });
 
 isEmailVerify = (req, res, next) => {
-    var joyresult = schemaJoiEmail.validate({ email: req.body.email });
-    var { value, error } = joyresult;
-    if (!(typeof error === 'undefined')) { 
-        var msg = Helpers.getJsondata(error, 'details')[0];
-        var msgs = Helpers.getJsondata(msg, 'message');
-        return res.status(422).json({
-            statusCode: 422,
-            status: false,
-            message: msgs,
-            data: []
-        })
+    var email = req.body.email;
+    if (typeof email === "undefined") {
+        return res.status(400).send(
+            {
+                statusCode: 400,
+                status: false, 
+                message: "add a valid email field",
+                data: [] 
+            }
+        );
     }else{
-        next();
+        var joyresult = schemaJoiEmail.validate({ email: email });
+        var { value, error } = joyresult;
+        if (!(typeof error === 'undefined')) { 
+            var msg = Helpers.getJsondata(error, 'details')[0];
+            var msgs = Helpers.getJsondata(msg, 'message');
+            return res.status(422).json({
+                statusCode: 422,
+                status: false,
+                message: "Invalid Email Address",
+                data: []
+            })
+        }else{
+            next();
+        }
     }
 };
 

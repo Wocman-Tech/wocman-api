@@ -1,64 +1,20 @@
 const { authJwt } = require("../middleware");
-const { isIdVerify } = require("../middleware/admin");
-
-const newsletterController = require("../controllers/users/admin/auth/newslettersubscribers.controller");
-const contactController = require("../controllers/users/admin/auth/contactus.controller");
+const { isIdVerify, verifyAdminUser, rootAdmin, rootAction, initiateAdmin } = require("../middleware/admin");
 
 const adminAllAdminController = require("../controllers/users/admin/auth/admin/alladmin.controller");
 const adminOneAdminController = require("../controllers/users/admin/auth/admin/oneadmin.controller");
-const adminDeleteOneAdminController = require("../controllers/users/admin/auth/admin/deleteadmin.controller");
 
-const adminAllWocmanController = require("../controllers/users/admin/auth/wocman/allwocman.controller");
-const adminOneWocmanController = require("../controllers/users/admin/auth/wocman/onewocman.controller");
-const adminDeleteOneWocmanController = require("../controllers/users/admin/auth/wocman/deletewocman.controller");
+const adminSignupController = require("../controllers/users/admin/auth/admin/signup.controller");
+const adminRootController = require("../controllers/users/admin/auth/admin/rootadmin.controller");
+
+const adminRootCloseController = require("../controllers/users/admin/auth/admin/closeaccount.controller");
 
 const Helpers = require("../helpers/helper.js");
 
 const path = require("path");
 const multer = require("multer");
 
-var storageCert = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join('', 'app/', 'uploads/wocman/certificate'))
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)+ path.extname(file.originalname);
-        cb(null, file.fieldname + '-' + uniqueSuffix)
-    }
-});
-var uploadCert = multer({ 
-    storage: storageCert, 
-    fileFilter : (req, file, cb) => {
-        if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg" || file.mimetype == "image/gif") {
-            cb(null, true);
-        }else{
-            cb(null, false);
-            return cb(new Error('Only jpeg, jpg, png, gif file extensions are allowerd'));
-        }
-    }
-});
-
-var storageProfile = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join('', 'app/', 'uploads/wocman/picture'))
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)+ path.extname(file.originalname);
-        cb(null, file.fieldname + '-' + uniqueSuffix)
-    }
-});
-var uploadPicture = multer({ 
-    storage: storageProfile, 
-    fileFilter : (req, file, cb) => {
-        if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg" || file.mimetype == "image/gif") {
-            cb(null, true);
-
-        }else{
-            cb(null, false);
-            return cb(new Error('Only jpeg, jpg, png, gif file extensions are allowerd'));
-        }
-    }
-});
+const  { verifyAdminSignUp } = require("../middleware/website/user/admin");
 
 
 module.exports = function(app) {
@@ -70,76 +26,134 @@ module.exports = function(app) {
         next();
     });
 
-    //auth
-    app.get(
-        Helpers.apiVersion7() + "get-all-newsletterssubscribers", 
-        [authJwt.verifyToken, authJwt.isAdmin], 
-        newsletterController.AllNewsletter
+    app.post(
+        Helpers.apiVersion7() + "auth/admin/signup",
+        [
+            authJwt.verifyToken,
+            authJwt.isAdmin,
+            rootAdmin.isRootAdmin,
+            rootAction.isRootAction,
+            verifyAdminSignUp.isEmailVerify, 
+            verifyAdminSignUp.isPasswordVerify, 
+            verifyAdminSignUp.isPasswordConfirmed,
+            verifyAdminSignUp.checkDuplicateUsernameOrEmail
+        ],
+        adminSignupController.signUpAdmin
     );
 
     app.get(
-        Helpers.apiVersion7() + "get-one-newsletterssubscribers/:id", 
-        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify], 
-        newsletterController.oneNewsletter
-    );
-
-    app.get(
-        Helpers.apiVersion7() + "delete-one-newsletterssubscribers/:id", 
-        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify], 
-        newsletterController.deleteNewsletter
-    );
-
-    app.get(
-        Helpers.apiVersion7() + "get-all-contactus", 
-        [authJwt.verifyToken, authJwt.isAdmin], 
-        contactController.allContacts
-    );
-
-    app.get(
-        Helpers.apiVersion7() + "get-one-contactus/:id", 
-        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify], 
-        contactController.oneContact
-    );
-
-    app.get(
-        Helpers.apiVersion7() + "delete-one-contactus/:id", 
-        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify], 
-        contactController.deleteContact
-    );
-
-    app.get(
-        Helpers.apiVersion7() + "get-all-wocman",
-        [authJwt.verifyToken, authJwt.isAdmin],
-        adminAllWocmanController.allWocman
-    );
-
-    app.get(
-        Helpers.apiVersion7() + "get-one-wocman/:id",
-        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify],
-        adminOneWocmanController.oneWocman
-    );
-
-    app.get(
-        Helpers.apiVersion7() + "delete-one-wocman/:id",
-        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify],
-        adminDeleteOneWocmanController.deleteWocman
-    );
-
-    app.get(
-        Helpers.apiVersion7() + "get-all-admin",
-        [authJwt.verifyToken, authJwt.isAdmin],
+        Helpers.apiVersion7() + "admin/admins",
+        [authJwt.verifyToken, authJwt.isAdmin, rootAction.isRootAction],
         adminAllAdminController.allAdmin
     );
 
     app.get(
-        Helpers.apiVersion7() + "get-one-admin/:id", 
-        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify],
+        Helpers.apiVersion7() + "admin/details/:id", 
+        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify, rootAction.isRootAction],
         adminOneAdminController.oneAdmin
     );
 
-    app.get(
-        Helpers.apiVersion7() + "delete-one-admin/:id", 
-        [authJwt.verifyToken, authJwt.isAdmin, isIdVerify.isIdVerify],
-        adminDeleteOneAdminController.deleteAdmin
+    app.post(
+        Helpers.apiVersion7() + "admin/delete",
+        [
+            authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction
+        ],
+        adminRootCloseController.adminclose
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "admin/root/enable/login", 
+        [authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction, verifyAdminSignUp.isEmailVerify],
+        adminRootController.islogin
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "admin/root/disable/login", 
+        [authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction, verifyAdminSignUp.isEmailVerify],
+        adminRootController.cancel_islogin
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "admin/root/enable/profile", 
+        [authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction, verifyAdminSignUp.isEmailVerify],
+        adminRootController.isprofile
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "admin/root/disable/profile", 
+        [authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction, verifyAdminSignUp.isEmailVerify],
+        adminRootController.cancel_isprofile
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "admin/root/enable/settings", 
+        [authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction,verifyAdminSignUp.isEmailVerify],
+        adminRootController.issettings
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "admin/root/disable/settings", 
+        [authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction, verifyAdminSignUp.isEmailVerify],
+        adminRootController.cancel_issettings
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "admin/root/enable/customer", 
+        [authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction, verifyAdminSignUp.isEmailVerify],
+        adminRootController.iscustomer
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "admin/root/disable/customer", 
+        [authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction, verifyAdminSignUp.isEmailVerify],
+        adminRootController.cancel_iscustomer
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "admin/root/enable/wocman", 
+        [authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction, verifyAdminSignUp.isEmailVerify],
+        adminRootController.iswocman
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "admin/root/disable/wocman", 
+        [authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction, verifyAdminSignUp.isEmailVerify],
+        adminRootController.cancel_iswocman
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "admin/root/enable/project", 
+        [authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction, verifyAdminSignUp.isEmailVerify],
+        adminRootController.isproject
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "admin/root/disable/project", 
+        [authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction, verifyAdminSignUp.isEmailVerify],
+        adminRootController.cancel_isproject
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "admin/root/enable/user", 
+        [authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction, verifyAdminSignUp.isEmailVerify],
+        adminRootController.isuser
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "admin/root/disable/user", 
+        [authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction, verifyAdminSignUp.isEmailVerify],
+        adminRootController.cancel_isuser
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "admin/root/enable/account", 
+        [authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction, verifyAdminSignUp.isEmailVerify],
+        adminRootController.isaccount
+    );
+
+    app.post(
+        Helpers.apiVersion7() + "admin/root/disable/account", 
+        [authJwt.verifyToken, authJwt.isAdmin, rootAdmin.isRootAdmin, rootAction.isRootAction, verifyAdminSignUp.isEmailVerify],
+        adminRootController.cancel_isaccount
     );
 };

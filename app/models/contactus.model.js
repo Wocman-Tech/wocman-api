@@ -18,6 +18,10 @@ module.exports = (sequelize, Sequelize) => {
         message: {
             type: Sequelize.STRING,
             allowNull: false
+        },
+        tracker: {
+            type: Sequelize.STRING,
+            allowNull: false
         }
     });
     return Contactus;

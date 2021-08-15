@@ -54,118 +54,99 @@ let MailGenerator = new Mailgen({
 const Op = db.Sequelize.Op;
 
 
-exports.wocmanStartResetPassword = (req, res, next) => {
-    var email_link =  req.body.link;
+exports.adminStartResetPassword = (req, res, next) => {
+    var email_link =  req.body.email;
     var password_link =  req.body.password;
-    if (typeof password_link === "undefined") {
-        return res.status(400).send(
-            {
-                statusCode: 400,
-                status: false,
-                message: "password field is undefined.",
-                data: [] 
-            }
-        );
-    }
-    var linkMin = 7;
-    if (password_link.length < linkMin ) {
-        return res.status(400).send(
-            {
-                statusCode: 400,
-                status: false,
-                message: "Invalid password. Minimum of "+ linkMin +" characters link is required." ,
-                data: []
-            }
-        );
-    }else{
-        var password = bcrypt.hashSync(password_link, 8);
-    }
+    var password_otplink =  req.body.otpToken;
+    
+    var password = bcrypt.hashSync(password_link, 8);
+    
     var SearchemailLink = {};
-    if (typeof email_link === "undefined") {
-        return res.status(400).send(
-            {
-                statusCode: 400,
-                status: false,
-                message: "link is undefined." ,
-                data: []
-            }
-        );
+   
+
+    if(email_link && email_link !== ''){
+        SearchemailLink = {'email': email_link, 'changepassword': password_otplink};
     }else{
+        SearchemailLink = {'email':  {$not: null}, 'changepassword': {$not: null}};
+    }
 
-        if(email_link && email_link !== ''){
-            SearchemailLink = {'changepassword': email_link};
-        }else{
-            SearchemailLink = {'changepassword': {$not: null}};
+    User.findOne({
+        where: SearchemailLink 
+    })
+    .then(users => {
+        if (!users) {
+            return res.status(404).send(
+            {
+                statusCode: 404,
+                status: false,
+                message: "Password reset link does not exist.",
+                data: []
+            });
         }
-
-        User.findOne({
-            where: SearchemailLink 
+        
+        users.update({
+            password: password,
+            changepassword: 1
         })
-        .then(users => {
-            if (!users) {
-                return res.status(404).send(
-                {
-                    statusCode: 404,
-                    status: false,
-                    message: "link does not exist.",
-                    data: []
-                });
+        .then(khj => {
+            var sentMail = false;
+
+            var authorities = [];
+
+            authorities.push("ROLE_" + "admin".toUpperCase());
+
+            var verification_link = config.website + "/login?admin=1";
+            let response = {
+                body: {
+                  name: users.username,
+                  intro: "Welcome to Wocman Technology! We're very excited to have you on board. <br/>Your password reset process was Completed. Click or Copy this link below to any browser to login: <br/><div style='font-weight:bolder;'>"+verification_link + "</div><br/>",
+                },
+            };
+
+            let mail = MailGenerator.generate(response);
+
+            let message = {
+                from: EMAIL,
+                to:  users.email,
+                subject: "Password Reset successful",
+                html: mail,
+            };
+
+            transporter.sendMail(message)
+            .then(() => {
+                var sentMail = true;
+            })
+            if (users.changepassword == 1) {
+                var changepassword = "Completed";
             }
-            users.update({
-                password: password,
-                changepassword: 1
-            })
-            .then(khj => {
-                var authorities = [];
+            if (users.changepassword.length == 6) {
+                var changepassword = "In progress";
+            }
+            if (users.changepassword == 0) {
+                var changepassword = "Not Started";
+            }
+            var unboard = Helpers.returnBoolean(users.unboard);
+            var isEmailVerified = Helpers.returnBoolean(users.verify_email);
+            var isProfileUpdated = Helpers.returnBoolean(users.profileupdate);
+            
+            if (isEmailVerified !== true && isEmailVerified !== false) {
+                isEmailVerified = false;
+            }
 
-                authorities.push("ROLE_" + "admin".toUpperCase());
-
-                var verification_link = MAIN_URL.slice(0, -1)+Helpers.apiVersion7()+"auth/admin-signin";
-                let response = {
-                    body: {
-                      name: users.username,
-                      intro: "Welcome to Wocman Technology! We're very excited to have you on board. Thank you for completing your signup. Click or Copy this link below to any browser to login: "+verification_link,
-                    },
-                };
-
-                let mail = MailGenerator.generate(response);
-
-                let message = {
-                    from: EMAIL,
-                    to:  users.email,
-                    subject: "Reset Password successful",
-                    html: mail,
-                };
-
-                transporter.sendMail(message)
-                .then(() => {
-                    var sentMail = true;
-                })
-                .catch(err => {
-                    var sentMail = false;
-                });
-                
-                res.status(200).send({
-                    statusCode: 200,
-                    status: true,
-                    message: "Password Reset successful",
-                    data: {
-                        username: users.username,
-                        email: users.email,
-                        password: users.password,
-                        changepassword: users.changepassword,
-                        roles: authorities,
-                        sentMail: sentMail
-                    }
-                });
-            })
-            .catch(err => {
-                res.status(500).send({
-                    statusCode: 500,
-                    status: false, 
-                    message: err.message,
-                    data: [] 
-                });
+            res.status(200).send({
+                statusCode: 200,
+                status: true,
+                message: "Password Reset successful",
+                data: {
+                    username: users.username,
+                    email: users.email,
+                    changepassword: changepassword,
+                    roles: authorities,
+                    sentMail: sentMail,
+                    isEmailVerified: isEmailVerified,
+                    isProfileUpdated: isProfileUpdated,
+                    unboard: unboard
+                }
             });
         })
         .catch(err => {
@@ -175,6 +156,14 @@ exports.wocmanStartResetPassword = (req, res, next) => {
                 message: err.message,
                 data: [] 
             });
-        }); 
-    }
+        });
+    })
+    .catch(err => {
+        res.status(500).send({
+            statusCode: 500,
+            status: false, 
+            message: err.message,
+            data: [] 
+        });
+    }); 
 };
