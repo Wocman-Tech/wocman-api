@@ -282,8 +282,7 @@ exports.chatSave = (req, res, next) => {
         const joiClean = Joi.object().keys({ 
             customerid: Joi.string().min(1),
             message: Joi.string().min(1).max(225),
-            message: Joi.string().min(1).max(225),
-
+            projectid: Joi.string().min(1).max(225),
         }); 
         const dataToValidate = { 
             customerid: customerid,
