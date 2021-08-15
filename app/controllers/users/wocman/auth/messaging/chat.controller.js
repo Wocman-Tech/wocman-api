@@ -303,7 +303,6 @@ exports.chatSave = (req, res, next) => {
                   return;
                 }
                 var gg = 0;
-                var projectid = 0;
                 Projects.findAll(
                 {
                     where: {
@@ -352,7 +351,7 @@ exports.chatSave = (req, res, next) => {
                             if(typeof file === "undefined"){
 
                             }else{
-                                
+
                                 var images = [];
                                 file.map((item) => {
                                     let myFile =  item.originalname.split(".")
