@@ -349,51 +349,56 @@ exports.chatSave = (req, res, next) => {
                             const file = req.files;//this are the files
 
 
-                            var images = [];
-                            file.map((item) => {
-                                let myFile =  item.originalname.split(".")
-                                const fileType = myFile[myFile.length - 1]
-                                const dsf = uuidv4();
+                            if(typeof file === "undefined"){
 
-                                var params = {
-                                    ACL: "public-read-write",
-                                    Bucket: config.awsS3BucketName,
-                                    Key: item.originalname,
-                                    Body:  item.buffer
-                                }
+                            }else{
+                                
+                                var images = [];
+                                file.map((item) => {
+                                    let myFile =  item.originalname.split(".")
+                                    const fileType = myFile[myFile.length - 1]
+                                    const dsf = uuidv4();
 
-                                s3.upload(params, (error, data, res) => {
-                                    if(error){
-                                        // res.status(500).send(error)
-                                        console.log(error);
-                                    }else{
-                                        var fileUrl = data.Location;
-                                        if (typeof fileUrl === 'undefined') {
-                                            //empty file
-                                        }else{
-                                            images.push({fileUrl});
-                                        }
+                                    var params = {
+                                        ACL: "public-read-write",
+                                        Bucket: config.awsS3BucketName,
+                                        Key: item.originalname,
+                                        Body:  item.buffer
                                     }
-                                    // save project
-                                    var all_image_url = '';
-                                    for (var i = 0; i < images.length; i++) {
-                                        if (i == 0) {
-                                            all_image_url =  images[i].fileUrl;
+
+                                    s3.upload(params, (error, data, res) => {
+                                        if(error){
+                                            // res.status(500).send(error)
+                                            console.log(error);
                                         }else{
-                                            all_image_url = all_image_url + Helpers.padTogether() +  images[i].fileUrl;
+                                            var fileUrl = data.Location;
+                                            if (typeof fileUrl === 'undefined') {
+                                                //empty file
+                                            }else{
+                                                images.push({fileUrl});
+                                            }
                                         }
-                                    }
-                                    // console.log(all_image_url);
-                                    WCChat.update(
-                                        {
-                                            messagelinks: all_image_url
-                                        },
-                                        {
-                                            where: {'tracker': chat_tracker}
+                                        // save project
+                                        var all_image_url = '';
+                                        for (var i = 0; i < images.length; i++) {
+                                            if (i == 0) {
+                                                all_image_url =  images[i].fileUrl;
+                                            }else{
+                                                all_image_url = all_image_url + Helpers.padTogether() +  images[i].fileUrl;
+                                            }
                                         }
-                                    );
+                                        // console.log(all_image_url);
+                                        WCChat.update(
+                                            {
+                                                messagelinks: all_image_url
+                                            },
+                                            {
+                                                where: {'tracker': chat_tracker}
+                                            }
+                                        );
+                                    });
                                 });
-                            });
+                            }
                         }
                         res.send({
                             statusCode: 200,
