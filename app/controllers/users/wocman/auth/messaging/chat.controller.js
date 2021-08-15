@@ -69,6 +69,7 @@ exports.chatLog = (req, res, next) => {
     var chatLimit =  req.body.chatLimit;
     var perPage =  req.body.perPage;
     var page =  req.body.page;
+    var projectid =  req.body.projectid;
     
     if (typeof customerid === "undefined") {
         return res.status(400).send(
@@ -80,6 +81,17 @@ exports.chatLog = (req, res, next) => {
             }
         );
     }else{
+
+        if (typeof projectid === "undefined") {
+            return res.status(400).send(
+                { 
+                    statusCode: 400,
+                    status: false,
+                    message: "projectid field  is undefined.",
+                    data: []
+                }
+            );
+        }
         //schema
         const joiClean = Joi.object().keys({ 
             customerid: Joi.string().min(1),
@@ -141,7 +153,8 @@ exports.chatLog = (req, res, next) => {
                                 },
                                 receiverid: {
                                     [Op.or]: [ parseInt(customerid, 10), parseInt(req.userId, 10)]
-                                }
+                                },
+                                projectid: projectid
                             },
                             offset: offsetd,
                             limit: chatLimit,
