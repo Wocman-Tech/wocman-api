@@ -79,10 +79,11 @@ exports.schedule = (req, res, next) => {
                 Searchuserid = {'userid': {$not: null}};
                 Searchwocmanid = {'wocmanid': {$not: null}};
             }
+            const promiseInvoices = [];
             Projects.findAll({
                 where: Searchwocmanid
             })
-            .then(projects => {
+            .then(async  projects => {
                 var send_row = [];
 
                 if (!projects) {
@@ -95,28 +96,49 @@ exports.schedule = (req, res, next) => {
                             unboard: unboard
                         }
                     });
-                }else{
-                    var todaysDate = new Date();
-                    for (let i = 0; i < projects.length; i++) {
-                        //check/mmatch todays date
-                        var rowDate =  new Date(projects[i].wocmanstartdatetime);
-                        if (rowDate.setHours(0, 0, 0, 0) == todaysDate.setHours(0, 0, 0, 0)) {
-                            send_row.push([
-                                projects[i]
-                            ]);
-                        }
-                    }
-                    res.status(200).send({
-                        statusCode: 200,
-                        status: true,
-                        message: "Found a wocmna user",
-                        data: {
-                            schedule: send_row,
-                            accessToken: req.token,
-                            unboard: unboard
-                        }
-                    });
                 }
+                var todaysDate = new Date();
+                for await (const project of projects){
+                    //check/mmatch todays date
+                    var rowDate =  new Date(project.datetimeset);
+                    if (rowDate.setHours(0, 0, 0, 0) == todaysDate.setHours(0, 0, 0, 0)) {
+                        // console.log("YES");
+
+                        // Make sure to wait on all your sequelize CRUD calls
+                        const prod = await Project.findByPk(project.projectid)
+
+                        // It will now wait for above Promise to be fulfilled and show the proper details
+                        console.log(prod)
+
+                        const cust = await User.findByPk(project.customerid)
+
+                        // It will now wait for above Promise to be fulfilled and show the proper details
+                        console.log(cust)
+
+                        let cartItem3 = {}
+                        const customer_name = cust.firstname +" "+ cust.lastname
+
+                        cartItem3.projectId = project.id
+                        cartItem3.project = project.description
+                        cartItem3.schedule = project.datetimeset
+                        cartItem3.projectType = prod.name
+                        cartItem3.customer = customer_name
+                       
+                        // Simple push will work in this loop, you don't need to return anything
+                        promiseInvoices.push(cartItem3)
+                    }
+                }
+               
+                res.status(200).send({
+                    statusCode: 200,
+                    status: true,
+                    message: "Found a wocmna user",
+                    data: {
+                        schedule: promiseInvoices,
+                        accessToken: req.token,
+                        unboard: unboard
+                    }
+                });
             })
             .catch(err => {
                 res.status(500).send({

@@ -92,7 +92,7 @@ exports.workDone = (req, res, next) => {
             res.status(200).send({
                 statusCode: 200,
                 status: true,
-                message: "Found a wocmna user",
+                message: "Found a wocman user",
                 data: {
                     workDone: workDone,
                     accessToken: req.token,

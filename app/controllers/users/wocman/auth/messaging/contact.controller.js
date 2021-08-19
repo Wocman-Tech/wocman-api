@@ -73,30 +73,50 @@ exports.wocmanChatContact = (req, res, next) => {
           return;
         }
         var unboard = Helpers.returnBoolean(user.unboard);
+        const customers = [];
         Projects.findAll({
             where: {wocmanid: req.userId}
-        }).then(projectBase => {
-            var customers = [];
+        }).then(async projectBase => {
             if (!projectBase) {
-              res.status(404).send({
-                statusCode: 404,
-                status: false,
-                message: "Project Not Found",
-                data: []
-              });
-              return;
+                    res.status(404).send({
+                    statusCode: 404,
+                    status: false,
+                    message: "Project Not Found",
+                    data: []
+                });
+                return;
             }
-            for (var i = 0; i < projectBase.length; i++) {
-                
-                if (parseInt(projectBase[i].wocmanaccept) > 1 && parseInt(projectBase[i].wocmanaccept) < 5) {
 
-                    customers.push({
-                        customerid: projectBase[i].customerid,
-                        projectid: projectBase[i].projectid,
-                        project: projectBase[i].description
-                    })
+            for await (const project of projectBase){
+
+                // Make sure to wait on all your sequelize CRUD calls
+                const prod = await Project.findByPk(project.projectid)
+
+                // It will now wait for above Promise to be fulfilled and show the proper details
+                console.log(prod)
+
+                const cust = await User.findByPk(project.customerid)
+
+                // It will now wait for above Promise to be fulfilled and show the proper details
+                console.log(cust)
+
+                let cartItem3 = {}
+                const customer_name = cust.firstname +" "+ cust.lastname
+
+                cartItem3.projectId = project.projectid
+                cartItem3.project = project.description
+                cartItem3.projectType = prod.name
+                cartItem3.customerName = customer_name
+                cartItem3.customerEmail = cust.email
+                cartItem3.customerPhone = cust.phone
+                cartItem3.customerUsername = cust.username
+               
+                // Simple push will work in this loop, you don't need to return anything
+                if (parseInt(project.wocmanaccept) > 1 && parseInt(project.wocmanaccept) < 5) {
+                    customers.push(cartItem3)
                 }
             }
+            
             res.status(200).send({
                 statusCode: 200,
                 status: true,

@@ -91,19 +91,20 @@ exports.walletDetails = (req, res, next) => {
                             unboard: unboard
                         }
                     });
-                }else{
-                    
-                    res.status(200).send({
-                        statusCode: 200,
-                        status: true,
-                        message: "Found a wocmna user",
-                        data: {
-                            wallet: wwallet,
-                            accessToken: req.token,
-                            nnboard: unboard
-                        }
-                    });
                 }
+                wwallet.name = users.firstname+ " "+users.lastname;
+                    
+                res.status(200).send({
+                    statusCode: 200,
+                    status: true,
+                    message: "Found a wocman user",
+                    data: {
+                        wallet: wwallet,
+                        accessToken: req.token,
+                        nnboard: unboard
+                    }
+                });
+                
             })
             .catch(err => {
                 res.status(500).send({

@@ -124,9 +124,10 @@ exports.walletDetails = (req, res, next) => {
                         res.status(200).send({
                             statusCode: 200,
                             status: true,
-                            message: "Found a wocmna user",
+                            message: "Found a wocman user",
                             data: {
                                 history: wwallet,
+                                name: users.firstname+ " " +users.lastname,
                                 accessToken: req.token,
                                 unboard: unboard
                             }

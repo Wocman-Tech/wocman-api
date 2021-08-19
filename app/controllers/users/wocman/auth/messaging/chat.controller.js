@@ -130,14 +130,34 @@ exports.chatLog = (req, res, next) => {
                     }
                 }).then(project => {
                     if (!project) {
-                      res.status(404).send({
-                        statusCode: 404,
-                        status: false,
-                        Project: "Project Not Found",
-                        data: []
-                      });
-                      return;
+                        res.status(404).send({
+                            statusCode: 404,
+                            status: false,
+                            Project: "Project Not Found",
+                            data: []
+                        });
+                        return;
                     }
+
+                    var wpCustomer = [];
+                    User.findByPk(customerid).then(customeruser => {
+                        if (customeruser) {
+                            wpCustomer.push(
+                                [
+                                    {
+                                        custmer_username: customeruser.username,
+                                        custmer_firstname: customeruser.firstname,
+                                        custmer_lastname: customeruser.lastname,
+                                        custmer_phone: customeruser.phone,
+                                        custmer_email: customeruser.email,
+                                        custmer_address: customeruser.address,
+                                        custmer_country: customeruser.country,
+                                        custmer_image: customeruser.image
+                                    }
+                                ]
+                            );
+                        }
+                    })
                     
                     for (var i = 0; i < project.length; i++) {
                         if (parseInt(project[i].wocmanaccept, 10) > 1 && parseInt(project[i].wocmanaccept, 10) < 5) {
@@ -177,7 +197,7 @@ exports.chatLog = (req, res, next) => {
                                 message: "Found relationships",
                                 data: {
                                     accessToken: req.token,
-                                    customerid: customerid,
+                                    customer: wpCustomer,
                                     chat: chats
                                 }
                             });

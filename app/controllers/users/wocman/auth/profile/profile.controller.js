@@ -368,7 +368,8 @@ exports.wocmanProfile = (req, res, next) => {
                                     bankName: wwallet.bankName,
                                     accountNumber: wwallet.accNumber,
                                     accountName: wwallet.accName,
-                                    froozen: froozen
+                                    froozen: froozen,
+                                    name: users.firstname+" "+users.lastname
                                 }
                             );
                         }
@@ -382,6 +383,7 @@ exports.wocmanProfile = (req, res, next) => {
                     var wpRejected = [];
                     var wpUnaccessed = [];
                     var project_images = [];
+                    var wpSchedules = [];
 
                     var wp_schare = 0;
                     var Searchshare = {}
@@ -397,13 +399,37 @@ exports.wocmanProfile = (req, res, next) => {
                         if (!hht7t) {}else{
                             wp_schare = hht7t.wocmanshare;
                         }
+                        const wpCustomer = []
                         Projects.findAll({
                             where: Searchwocmanid
                         })
-                        .then(projects => {
+                        .then(async projects => {
                             if (!projects) {}else{
                                 if (!Array.isArray(projects) || !projects.length) {
                                 }else{
+
+                                    for await (const project of projects){
+
+                                        // Make sure to wait on all your sequelize CRUD calls
+                                        const prod = await Project.findByPk(project.projectid)
+
+                                        // It will now wait for above Promise to be fulfilled and show the proper details
+                                        console.log(prod)
+
+                                        const cust = await User.findByPk(project.customerid)
+
+                                        // It will now wait for above Promise to be fulfilled and show the proper details
+                                        console.log(cust)
+
+                                        let cartItem3 = {}
+                                        const customer_name = cust.firstname +" "+ cust.lastname
+
+                                        cartItem3.projectType = prod.name
+                                        cartItem3.customer = customer_name
+                                       
+                                        // Simple push will work in this loop, you don't need to return anything
+                                        wpCustomer.push(cartItem3)
+                                    }
 
                                     for (let i = 0; i < projects.length; i++) {
 
@@ -429,12 +455,13 @@ exports.wocmanProfile = (req, res, next) => {
                                                 }
                                             }
                                         }
+                                        
+
                                         if (parseInt(projects[i].wocmanaccept, 10) == 0) {
                                             wpUnaccessed.push(
                                                 [{
-                                                    project_id: projects[i].id, 
-                                                    project_type_id: projects[i].projectid, 
-                                                    project_customer_id: projects[i].customerid, 
+                                                    project_id: projects[i].id,
+                                                    project_customer: wpCustomer, 
                                                     project_description: projects[i].description, 
                                                     project_country: projects[i].country, 
                                                     project_state: projects[i].State, 
@@ -457,8 +484,7 @@ exports.wocmanProfile = (req, res, next) => {
                                             wpRejected.push(
                                                 [{
                                                     project_id: projects[i].id, 
-                                                    project_type_id: projects[i].projectid, 
-                                                    project_customer_id: projects[i].customerid, 
+                                                    project_customer: wpCustomer,  
                                                     project_description: projects[i].description, 
                                                     project_country: projects[i].country, 
                                                     project_state: projects[i].State, 
@@ -481,8 +507,7 @@ exports.wocmanProfile = (req, res, next) => {
                                             wpAccepted.push(
                                                 [{
                                                     project_id: projects[i].id, 
-                                                    project_type_id: projects[i].projectid, 
-                                                    project_customer_id: projects[i].customerid, 
+                                                    project_customer: wpCustomer,
                                                     project_description: projects[i].description, 
                                                     project_country: projects[i].country, 
                                                     project_state: projects[i].State, 
@@ -499,14 +524,23 @@ exports.wocmanProfile = (req, res, next) => {
                                                     project_wocman_complete: projects[i].projectcomplete
                                                 }]
                                             );
+                                            wpSchedules.push(
+                                                [
+                                                    {
+                                                        project_id: projects[i].id, 
+                                                        project_type: wpCustomer,
+                                                        project_description: projects[i].description, 
+                                                        schedule: projects[i].datetimeset
+                                                    }
+                                                ]
+                                            );
                                         }
                                         if (parseInt(projects[i].wocmanaccept, 10) == 5) {
                                             
                                             wpVerified.push(
                                                 [{
                                                     project_id: projects[i].id, 
-                                                    project_type_id: projects[i].projectid, 
-                                                    project_customer_id: projects[i].customerid, 
+                                                    project_customer: wpCustomer, 
                                                     project_description: projects[i].description, 
                                                     project_country: projects[i].country, 
                                                     project_state: projects[i].State, 
@@ -529,8 +563,7 @@ exports.wocmanProfile = (req, res, next) => {
                                             wpCompleted.push(
                                                 [{
                                                     project_id: projects[i].id, 
-                                                    project_type_id: projects[i].projectid, 
-                                                    project_customer_id: projects[i].customerid, 
+                                                    project_customer: wpCustomer, 
                                                     project_description: projects[i].description, 
                                                     project_country: projects[i].country, 
                                                     project_state: projects[i].State, 
@@ -553,8 +586,7 @@ exports.wocmanProfile = (req, res, next) => {
                                             wpStarted.push(
                                                 [{
                                                     project_id: projects[i].id, 
-                                                    project_type_id: projects[i].projectid, 
-                                                    project_customer_id: projects[i].customerid, 
+                                                    project_customer: wpCustomer,
                                                     project_description: projects[i].description, 
                                                     project_country: projects[i].country, 
                                                     project_state: projects[i].State, 
@@ -610,6 +642,7 @@ exports.wocmanProfile = (req, res, next) => {
                                     profile_picture: profilePictures,
                                     certificates: certificates,
                                     projects: wprojects,
+                                    schedule: wpSchedules,
                                     wallet: wallet,
                                     notice: notice,
                                     skills: skills,

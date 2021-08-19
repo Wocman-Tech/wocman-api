@@ -105,6 +105,27 @@ exports.wocmanProjectProject = (req, res, next) => {
                         });
                     }
 
+                    var wpCustomer = [];
+                    var isCustomer = project.customerid;
+                    User.findByPk(isCustomer).then(customeruser => {
+                        if (customeruser) {
+                            wpCustomer.push(
+                                
+                                {
+                                    custmer_username: customeruser.username,
+                                    custmer_firstname: customeruser.firstname,
+                                    custmer_lastname: customeruser.lastname,
+                                    custmer_phone: customeruser.phone,
+                                    custmer_email: customeruser.email,
+                                    custmer_address: customeruser.address,
+                                    custmer_country: customeruser.country,
+                                    custmer_image: customeruser.image
+                                }
+                                
+                            );
+                        }
+                    })
+
                     Project.findByPk(project.projectid).then(projecttype => {
                         if (!projecttype) {
                           res.status(404).send({
@@ -118,7 +139,8 @@ exports.wocmanProjectProject = (req, res, next) => {
                         res.send({
                             accessToken: req.token,
                             project: project,
-                            project_type: projecttype
+                            project_type: projecttype.name,
+                            customer: wpCustomer
                         });
                     })
                     .catch(err => {

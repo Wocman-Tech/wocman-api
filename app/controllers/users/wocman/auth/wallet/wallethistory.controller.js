@@ -97,6 +97,7 @@ exports.walletDetailsHistory = (req, res, next) => {
                         message: "Found a wocmna user",
                         data: {
                             history: wwallet,
+                            name: users.firstname+ " " +users.lastname,
                             accessToken: req.token,
                             unboard: unboard
                         }

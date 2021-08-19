@@ -99,6 +99,7 @@ exports.walletDetails = (req, res, next) => {
                         message: "Found a wocmna user",
                         data: {
                             wallet: wwallet,
+                            name: users.firstname+ " " +users.lastname,
                             accessToken: req.token,
                             unboard: unboard
                         }
