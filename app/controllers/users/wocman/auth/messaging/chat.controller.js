@@ -183,12 +183,12 @@ exports.chatLog = (req, res, next) => {
                             ],
                         }).then(chats => {
                             if (!chats) {
-                              res.status(404).send({
-                                 statusCode: 404,
-                                status: false,
-                                message: "Chat Not Found",
-                                data: []
-                              });
+                                res.status(404).send({
+                                    statusCode: 404,
+                                    status: false,
+                                    message: "Chat Not Found",
+                                    data: []
+                                });
                               return;
                             }
                             res.send({
@@ -309,6 +309,7 @@ exports.chatSave = (req, res, next) => {
             projectid: projectid,
             message: message
         }
+        let now =  new Date();
         // const result = Joi.validate(dataToValidate, joiClean);
         const result = joiClean.validate(dataToValidate);
         if (result.error == null) {
@@ -347,6 +348,7 @@ exports.chatSave = (req, res, next) => {
                         senderid: parseInt(req.userId, 10),
                         receiverid: parseInt(customerid, 10),
                         message: message,
+                        chattime: now.getTime(),
                         messagetype: messageType,
                         messagelinks: '',
                         seen: seen,

@@ -109,7 +109,8 @@ exports.wocmanChatContact = (req, res, next) => {
                 cartItem3.customerName = customer_name
                 cartItem3.customerEmail = cust.email
                 cartItem3.customerPhone = cust.phone
-                cartItem3.customerUsername = cust.username
+                cartItem3.customerUsername = cust.username,
+                cartItem3.customerId = project.customerid
                
                 // Simple push will work in this loop, you don't need to return anything
                 if (parseInt(project.wocmanaccept) > 1 && parseInt(project.wocmanaccept) < 5) {

@@ -59,4 +59,10 @@ module.exports = function(app) {
         [authJwt.verifyToken, authJwt.isWocman], 
         walletHistory.walletDetailsHistory
     );
+
+    app.post(
+        Helpers.apiVersion7() + "wocman/wallet/chart",
+        [authJwt.verifyToken, authJwt.isWocman], 
+        walletHistory.mapChart
+    );
 };

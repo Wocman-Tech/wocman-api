@@ -9,6 +9,9 @@ module.exports = (sequelize, Sequelize) => {
         message: {
             type: Sequelize.STRING
         },
+        chattime: {
+            type: Sequelize.STRING
+        },
         messagetype: {
             type: Sequelize.STRING
         },

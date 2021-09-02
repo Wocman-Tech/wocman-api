@@ -92,7 +92,6 @@ exports.walletDetails = (req, res, next) => {
                         }
                     });
                 }
-                wwallet.name = users.firstname+ " "+users.lastname;
                     
                 res.status(200).send({
                     statusCode: 200,
@@ -100,6 +99,7 @@ exports.walletDetails = (req, res, next) => {
                     message: "Found a wocman user",
                     data: {
                         wallet: wwallet,
+                        name: users.firstname+ " "+users.lastname,
                         accessToken: req.token,
                         nnboard: unboard
                     }
