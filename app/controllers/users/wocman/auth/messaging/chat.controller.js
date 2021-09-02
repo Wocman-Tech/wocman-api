@@ -310,9 +310,9 @@ exports.chatSave = (req, res, next) => {
             message: message
         }
         const nowTime = new Date().toLocaleString('en-US', {
-          timeZone: 'Africa/Lagos'
+            timeZone: 'Africa/Lagos'
         });
-        var ggTime = nowTime.split("T");
+        // var ggTime = nowTime.split("T");
         // const result = Joi.validate(dataToValidate, joiClean);
         const result = joiClean.validate(dataToValidate);
         if (result.error == null) {
@@ -351,7 +351,8 @@ exports.chatSave = (req, res, next) => {
                         senderid: parseInt(req.userId, 10),
                         receiverid: parseInt(customerid, 10),
                         message: message,
-                        chattime: ggTime[1],
+                        // chattime: ggTime[1],
+                        chattime: nowTime,
                         messagetype: messageType,
                         messagelinks: '',
                         seen: seen,
