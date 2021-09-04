@@ -25,24 +25,24 @@ var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
  
 let options = {
-  provider: 'openstreetmap'
+    provider: 'openstreetmap'
 };
 
 let transporter = nodemailer.createTransport({
-  service: config.message_server,
-  secure: true,
-  auth: {
-    user: EMAIL,
-    pass: PASSWORD,
-  },
+    service: config.message_server,
+    secure: true,
+    auth: {
+        user: EMAIL,
+        pass: PASSWORD,
+    },
 });
 
 let MailGenerator = new Mailgen({
-  theme: "default",
-  product: {
-    name: config.name,
-    link: config.website,
-  },
+    theme: "default",
+    product: {
+        name: config.name,
+        link: config.website,
+    },
 });
 
 

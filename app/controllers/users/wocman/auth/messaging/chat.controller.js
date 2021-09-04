@@ -158,6 +158,18 @@ exports.chatLog = (req, res, next) => {
                             );
                         }
                     })
+                    var wpWocman = [];
+                    wpWocman.push(
+                        [
+                            {
+                                wocman_username: user.username,
+                                wocman_firstname: user.firstname,
+                                wocman_lastname: user.lastname,
+                                wocman_phone: user.phone,
+                                wocman_image: user.image
+                            }
+                        ]
+                    );
                     
                     for (var i = 0; i < project.length; i++) {
                         if (parseInt(project[i].wocmanaccept, 10) > 1 && parseInt(project[i].wocmanaccept, 10) < 5) {
@@ -198,6 +210,7 @@ exports.chatLog = (req, res, next) => {
                                 data: {
                                     accessToken: req.token,
                                     customer: wpCustomer,
+                                    wocman: wpWocman,
                                     chat: chats
                                 }
                             });
