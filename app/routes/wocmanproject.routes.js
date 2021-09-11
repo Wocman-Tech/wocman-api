@@ -33,8 +33,8 @@ module.exports = function(app) {
 
     //project routes
 
-    app.post(
-        Helpers.apiVersion7() + "wocman-project", 
+    app.get(
+        Helpers.apiVersion7() + "wocman/project/:projectid", 
         [authJwt.verifyToken, authJwt.isWocman], 
         projectController.wocmanProjectProject
     );

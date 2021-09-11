@@ -33,6 +33,8 @@ let options = {
   provider: 'openstreetmap'
 };
 
+const urlExistSync = require("url-exist-sync");
+
 let transporter = nodemailer.createTransport({
   service: config.message_server,
   secure: true,
@@ -54,8 +56,8 @@ let MailGenerator = new Mailgen({
 const Op = db.Sequelize.Op;
 exports.wocmanProjectProject = (req, res, next) => {
     // Username
-    var projectid =  req.body.projectid;
-    
+    // var projectid =  req.body.projectid;
+    var projectid =  req.params.projectid;    
     if (typeof projectid === "undefined") {
         return res.status(400).send(
             { 
@@ -65,6 +67,7 @@ exports.wocmanProjectProject = (req, res, next) => {
                 data: []
             }
         );
+
     }else{
         //schema
         const joiClean = Joi.object().keys({ 
@@ -112,6 +115,7 @@ exports.wocmanProjectProject = (req, res, next) => {
                             wpCustomer.push(
                                 
                                 {
+                                    custmer_id: customeruser.id,
                                     custmer_username: customeruser.username,
                                     custmer_firstname: customeruser.firstname,
                                     custmer_lastname: customeruser.lastname,
@@ -125,6 +129,24 @@ exports.wocmanProjectProject = (req, res, next) => {
                             );
                         }
                     })
+                    if (parseInt(project.wocmanaccept, 10) == 0) {
+                        var project_status = 'Unaccessed';
+                    }
+                    if (parseInt(project.wocmanaccept, 10) == 1) {
+                        var project_status = 'Rejected';
+                    }
+                    if (parseInt(project.wocmanaccept, 10) == 2) {
+                        var project_status = 'Accepted';
+                    }
+                    if (parseInt(project.wocmanaccept, 10) == 3) {
+                        var project_status = 'Started';
+                    }
+                    if (parseInt(project.wocmanaccept, 10) == 4) {
+                        var project_status = 'Completed';
+                    }
+                    if (parseInt(project.wocmanaccept, 10) == 5) {
+                        var project_status = 'Verified';
+                    }
 
                     Project.findByPk(project.projectid).then(projecttype => {
                         if (!projecttype) {
@@ -136,11 +158,41 @@ exports.wocmanProjectProject = (req, res, next) => {
                           });
                           return;
                         }
+                        var project_images = [];
+
+                        if (project.images == null) {
+                                            
+                        }else{
+                            if (project.images == 'null') {
+                               
+                            }else{
+                                var ppp = (project.images).split(Helpers.padTogether());
+                                for (let i = 0; i <  ppp.length; i++) {
+                                    var linkExist =  urlExistSync(project.images);
+
+                                    if (linkExist === true) {
+                                        var theimage = project.images;
+                                        project_images.push(
+                                            [
+                                               theimage 
+                                            ]
+                                        );
+                                    }  
+                                }
+                            }
+                        }
+                        
                         res.send({
-                            accessToken: req.token,
-                            project: project,
+                            project: project.project,
+                            project_id: project.id,
+                            project_description: project.description,
+                            project_location: project.address+" "+project.city,
+                            project_schedule: project.datetimeset,
                             project_type: projecttype.name,
-                            customer: wpCustomer
+                            project_images: project_images,
+                            project_status: project_status,
+                            customer: wpCustomer,
+                            accessToken: req.token
                         });
                     })
                     .catch(err => {
