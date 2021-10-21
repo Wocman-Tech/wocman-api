@@ -159,28 +159,32 @@ exports.wocmanProjectProject = (req, res, next) => {
                           return;
                         }
                         var project_images = [];
-
-                        if (project.images == null) {
-                                            
+                        if (typeof project == "undefined") {
                         }else{
-                            if (project.images == 'null') {
-                               
-                            }else{
-                                var ppp = (project.images).split(Helpers.padTogether());
-                                for (let i = 0; i <  ppp.length; i++) {
-                                    var linkExist =  urlExistSync(project.images);
 
-                                    if (linkExist === true) {
-                                        var theimage = project.images;
-                                        project_images.push(
-                                            [
-                                               theimage 
-                                            ]
-                                        );
-                                    }  
+                            if (project.images == null) {
+                                                
+                            }else{
+                                if (project.images == 'null') {
+                                   
+                                }else{
+                                    var ppp = (project.images).split(Helpers.padTogether());
+                                    for (let i = 0; i <  ppp.length; i++) {
+                                        var linkExist =  urlExistSync(project.images);
+
+                                        if (linkExist === true) {
+                                            var theimage = project.images;
+                                            project_images.push(
+                                                [
+                                                   theimage 
+                                                ]
+                                            );
+                                        }  
+                                    }
                                 }
                             }
                         }
+
                         
                         res.send({
                             project: project.project,

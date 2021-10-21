@@ -235,51 +235,54 @@ exports.wocmanProfile = (req, res, next) => {
             var otherImages = [];
             var currentImage = [];
 
-            
-            if (users.images == null) {
-                var otherImages = [];
+            if (typeof users == "undefined") {
             }else{
-                if (users.images == 'null') {
+
+                if (users.images == null) {
                     var otherImages = [];
                 }else{
-                    var pp = (users.images).split(Helpers.padTogether());
-                    for (let i = 0; i <  pp.length; i++) {
-                        if (pp[i] !== users.image) {
-                            if (pp[i] == 'null') {}else{
-                                var linkExist =  urlExistSync(pp[i]);
-                                if (linkExist === true) {
-                                    var theimaeg = pp[i];
-                                    otherImages.push(
-                                        [
-                                            theimaeg
-                                        ]
-                                    );
+                    if (users.images == 'null') {
+                        var otherImages = [];
+                    }else{
+                        var pp = (users.images).split(Helpers.padTogether());
+                        for (let i = 0; i <  pp.length; i++) {
+                            if (pp[i] !== users.image) {
+                                if (pp[i] == 'null') {}else{
+                                    var linkExist =  urlExistSync(pp[i]);
+                                    if (linkExist === true) {
+                                        var theimaeg = pp[i];
+                                        otherImages.push(
+                                            [
+                                                theimaeg
+                                            ]
+                                        );
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            if (users.image == null) {}else{
-                if (users.image == 'null') {}else{
-                    var linkExist =  urlExistSync(users.image);
-                    if (linkExist === true) {
-                        var theimaeg = users.image;
-                        currentImage.push(
-                            [
-                                theimaeg
-                            ]
-                        );
+                if (users.image == null) {}else{
+                    if (users.image == 'null') {}else{
+                        var linkExist =  urlExistSync(users.image);
+                        if (linkExist === true) {
+                            var theimaeg = users.image;
+                            currentImage.push(
+                                [
+                                    theimaeg
+                                ]
+                            );
+                        }
                     }
                 }
-            }
 
-            profilePictures.push(
-                {
-                    current: currentImage, 
-                    others: otherImages
-                }
-            );
+                profilePictures.push(
+                    {
+                        current: currentImage, 
+                        others: otherImages
+                    }
+                );
+            }
 
             var certificates = [];
 
@@ -433,176 +436,180 @@ exports.wocmanProfile = (req, res, next) => {
 
                                     for (let i = 0; i < projects.length; i++) {
 
-                                        var project_quoteamount = (wp_schare/100) * parseInt(projects[i].quoteamount, 10);
-                                        if (projects[i].images == null) {
-                                            
+                                        if (typeof projects[i] == "undefined") {
                                         }else{
-                                            if (projects[i].images == 'null') {
-                                               
-                                            }else{
-                                                var ppp = (projects[i].images).split(Helpers.padTogether());
-                                                for (let i = 0; i <  ppp.length; i++) {
-                                                    var linkExist =  urlExistSync(projects[i].images);
 
-                                                    if (linkExist === true) {
-                                                        var theimage = projects[i].images;
-                                                        project_images.push(
-                                                            [
-                                                               theimage 
-                                                            ]
-                                                        );
-                                                    }  
+                                            var project_quoteamount = (wp_schare/100) * parseInt(projects[i].quoteamount, 10);
+                                            if (projects[i].images == null) {
+                                                
+                                            }else{
+                                                if (projects[i].images == 'null') {
+                                                   
+                                                }else{
+                                                    var ppp = (projects[i].images).split(Helpers.padTogether());
+                                                    for (let i = 0; i <  ppp.length; i++) {
+                                                        var linkExist =  urlExistSync(projects[i].images);
+
+                                                        if (linkExist === true) {
+                                                            var theimage = projects[i].images;
+                                                            project_images.push(
+                                                                [
+                                                                   theimage 
+                                                                ]
+                                                            );
+                                                        }  
+                                                    }
                                                 }
                                             }
-                                        }
-                                        
+                                            
 
-                                        if (parseInt(projects[i].wocmanaccept, 10) == 0) {
-                                            wpUnaccessed.push(
-                                                [{
-                                                    project_id: projects[i].id,
-                                                    project_customer: wpCustomer, 
-                                                    project_description: projects[i].description, 
-                                                    project_country: projects[i].country, 
-                                                    project_state: projects[i].State, 
-                                                    project_city: projects[i].city, 
-                                                    project_address: projects[i].address, 
-                                                    project_date: projects[i].datetimeset, 
-                                                    project_reward: project_quoteamount, 
-                                                    project_images: project_images, 
-                                                    project_start: projects[i].wocmanstartdatetime, 
-                                                    project_stop: projects[i].wocmanstopdatetime, 
-                                                    project_customer_complete: projects[i].customeracceptcomplete, 
-                                                    project_rate: projects[i].customerratewocman, 
-                                                    project_rate: projects[i].customerratewocman, 
-                                                    project_wocman_complete: projects[i].projectcomplete
-                                                }]
-                                            );
-                                        }
-                                        if (parseInt(projects[i].wocmanaccept, 10) == 1) {
-                                            
-                                            wpRejected.push(
-                                                [{
-                                                    project_id: projects[i].id, 
-                                                    project_customer: wpCustomer,  
-                                                    project_description: projects[i].description, 
-                                                    project_country: projects[i].country, 
-                                                    project_state: projects[i].State, 
-                                                    project_city: projects[i].city, 
-                                                    project_address: projects[i].address, 
-                                                    project_date: projects[i].datetimeset, 
-                                                    project_reward: project_quoteamount, 
-                                                    project_images: project_images, 
-                                                    project_start: projects[i].wocmanstartdatetime, 
-                                                    project_stop: projects[i].wocmanstopdatetime, 
-                                                    project_customer_complete: projects[i].customeracceptcomplete, 
-                                                    project_rate: projects[i].customerratewocman, 
-                                                    project_rate: projects[i].customerratewocman, 
-                                                    project_wocman_complete: projects[i].projectcomplete
-                                                }]
-                                            );
-                                        }
-                                        if (parseInt(projects[i].wocmanaccept, 10) == 2) {
-                                            
-                                            wpAccepted.push(
-                                                [{
-                                                    project_id: projects[i].id, 
-                                                    project_customer: wpCustomer,
-                                                    project_description: projects[i].description, 
-                                                    project_country: projects[i].country, 
-                                                    project_state: projects[i].State, 
-                                                    project_city: projects[i].city, 
-                                                    project_address: projects[i].address, 
-                                                    project_date: projects[i].datetimeset, 
-                                                    project_reward: project_quoteamount, 
-                                                    project_images: project_images, 
-                                                    project_start: projects[i].wocmanstartdatetime, 
-                                                    project_stop: projects[i].wocmanstopdatetime, 
-                                                    project_customer_complete: projects[i].customeracceptcomplete, 
-                                                    project_rate: projects[i].customerratewocman, 
-                                                    project_rate: projects[i].customerratewocman, 
-                                                    project_wocman_complete: projects[i].projectcomplete
-                                                }]
-                                            );
-                                            wpSchedules.push(
-                                                [
-                                                    {
-                                                        project_id: projects[i].id, 
-                                                        project_type: wpCustomer,
+                                            if (parseInt(projects[i].wocmanaccept, 10) == 0) {
+                                                wpUnaccessed.push(
+                                                    [{
+                                                        project_id: projects[i].id,
+                                                        project_customer: wpCustomer, 
                                                         project_description: projects[i].description, 
-                                                        schedule: projects[i].datetimeset
-                                                    }
-                                                ]
-                                            );
-                                        }
-                                        if (parseInt(projects[i].wocmanaccept, 10) == 5) {
-                                            
-                                            wpVerified.push(
-                                                [{
-                                                    project_id: projects[i].id, 
-                                                    project_customer: wpCustomer, 
-                                                    project_description: projects[i].description, 
-                                                    project_country: projects[i].country, 
-                                                    project_state: projects[i].State, 
-                                                    project_city: projects[i].city, 
-                                                    project_address: projects[i].address, 
-                                                    project_date: projects[i].datetimeset, 
-                                                    project_reward: project_quoteamount, 
-                                                    project_images: project_images, 
-                                                    project_start: projects[i].wocmanstartdatetime, 
-                                                    project_stop: projects[i].wocmanstopdatetime, 
-                                                    project_customer_complete: projects[i].customeracceptcomplete, 
-                                                    project_rate: projects[i].customerratewocman, 
-                                                    project_rate: projects[i].customerratewocman, 
-                                                    project_wocman_complete: projects[i].projectcomplete
-                                                }]
-                                            );
-                                        }
-                                        if (parseInt(projects[i].wocmanaccept, 10) == 4) {
-                                            
-                                            wpCompleted.push(
-                                                [{
-                                                    project_id: projects[i].id, 
-                                                    project_customer: wpCustomer, 
-                                                    project_description: projects[i].description, 
-                                                    project_country: projects[i].country, 
-                                                    project_state: projects[i].State, 
-                                                    project_city: projects[i].city, 
-                                                    project_address: projects[i].address, 
-                                                    project_date: projects[i].datetimeset, 
-                                                    project_reward: project_quoteamount, 
-                                                    project_images: project_images, 
-                                                    project_start: projects[i].wocmanstartdatetime, 
-                                                    project_stop: projects[i].wocmanstopdatetime, 
-                                                    project_customer_complete: projects[i].customeracceptcomplete, 
-                                                    project_rate: projects[i].customerratewocman, 
-                                                    project_rate: projects[i].customerratewocman, 
-                                                    project_wocman_complete: projects[i].projectcomplete
-                                                }]
-                                            );
-                                        }
-                                        if (parseInt(projects[i].wocmanaccept, 10) == 3) {
-                                            
-                                            wpStarted.push(
-                                                [{
-                                                    project_id: projects[i].id, 
-                                                    project_customer: wpCustomer,
-                                                    project_description: projects[i].description, 
-                                                    project_country: projects[i].country, 
-                                                    project_state: projects[i].State, 
-                                                    project_city: projects[i].city, 
-                                                    project_address: projects[i].address, 
-                                                    project_date: projects[i].datetimeset, 
-                                                    project_reward: project_quoteamount, 
-                                                    project_images: project_images, 
-                                                    project_start: projects[i].wocmanstartdatetime, 
-                                                    project_stop: projects[i].wocmanstopdatetime, 
-                                                    project_customer_complete: projects[i].customeracceptcomplete, 
-                                                    project_rate: projects[i].customerratewocman, 
-                                                    project_rate: projects[i].customerratewocman, 
-                                                    project_wocman_complete: projects[i].projectcomplete
-                                                }]
-                                            );
+                                                        project_country: projects[i].country, 
+                                                        project_state: projects[i].State, 
+                                                        project_city: projects[i].city, 
+                                                        project_address: projects[i].address, 
+                                                        project_date: projects[i].datetimeset, 
+                                                        project_reward: project_quoteamount, 
+                                                        project_images: project_images, 
+                                                        project_start: projects[i].wocmanstartdatetime, 
+                                                        project_stop: projects[i].wocmanstopdatetime, 
+                                                        project_customer_complete: projects[i].customeracceptcomplete, 
+                                                        project_rate: projects[i].customerratewocman, 
+                                                        project_rate: projects[i].customerratewocman, 
+                                                        project_wocman_complete: projects[i].projectcomplete
+                                                    }]
+                                                );
+                                            }
+                                            if (parseInt(projects[i].wocmanaccept, 10) == 1) {
+                                                
+                                                wpRejected.push(
+                                                    [{
+                                                        project_id: projects[i].id, 
+                                                        project_customer: wpCustomer,  
+                                                        project_description: projects[i].description, 
+                                                        project_country: projects[i].country, 
+                                                        project_state: projects[i].State, 
+                                                        project_city: projects[i].city, 
+                                                        project_address: projects[i].address, 
+                                                        project_date: projects[i].datetimeset, 
+                                                        project_reward: project_quoteamount, 
+                                                        project_images: project_images, 
+                                                        project_start: projects[i].wocmanstartdatetime, 
+                                                        project_stop: projects[i].wocmanstopdatetime, 
+                                                        project_customer_complete: projects[i].customeracceptcomplete, 
+                                                        project_rate: projects[i].customerratewocman, 
+                                                        project_rate: projects[i].customerratewocman, 
+                                                        project_wocman_complete: projects[i].projectcomplete
+                                                    }]
+                                                );
+                                            }
+                                            if (parseInt(projects[i].wocmanaccept, 10) == 2) {
+                                                
+                                                wpAccepted.push(
+                                                    [{
+                                                        project_id: projects[i].id, 
+                                                        project_customer: wpCustomer,
+                                                        project_description: projects[i].description, 
+                                                        project_country: projects[i].country, 
+                                                        project_state: projects[i].State, 
+                                                        project_city: projects[i].city, 
+                                                        project_address: projects[i].address, 
+                                                        project_date: projects[i].datetimeset, 
+                                                        project_reward: project_quoteamount, 
+                                                        project_images: project_images, 
+                                                        project_start: projects[i].wocmanstartdatetime, 
+                                                        project_stop: projects[i].wocmanstopdatetime, 
+                                                        project_customer_complete: projects[i].customeracceptcomplete, 
+                                                        project_rate: projects[i].customerratewocman, 
+                                                        project_rate: projects[i].customerratewocman, 
+                                                        project_wocman_complete: projects[i].projectcomplete
+                                                    }]
+                                                );
+                                                wpSchedules.push(
+                                                    [
+                                                        {
+                                                            project_id: projects[i].id, 
+                                                            project_type: wpCustomer,
+                                                            project_description: projects[i].description, 
+                                                            schedule: projects[i].datetimeset
+                                                        }
+                                                    ]
+                                                );
+                                            }
+                                            if (parseInt(projects[i].wocmanaccept, 10) == 5) {
+                                                
+                                                wpVerified.push(
+                                                    [{
+                                                        project_id: projects[i].id, 
+                                                        project_customer: wpCustomer, 
+                                                        project_description: projects[i].description, 
+                                                        project_country: projects[i].country, 
+                                                        project_state: projects[i].State, 
+                                                        project_city: projects[i].city, 
+                                                        project_address: projects[i].address, 
+                                                        project_date: projects[i].datetimeset, 
+                                                        project_reward: project_quoteamount, 
+                                                        project_images: project_images, 
+                                                        project_start: projects[i].wocmanstartdatetime, 
+                                                        project_stop: projects[i].wocmanstopdatetime, 
+                                                        project_customer_complete: projects[i].customeracceptcomplete, 
+                                                        project_rate: projects[i].customerratewocman, 
+                                                        project_rate: projects[i].customerratewocman, 
+                                                        project_wocman_complete: projects[i].projectcomplete
+                                                    }]
+                                                );
+                                            }
+                                            if (parseInt(projects[i].wocmanaccept, 10) == 4) {
+                                                
+                                                wpCompleted.push(
+                                                    [{
+                                                        project_id: projects[i].id, 
+                                                        project_customer: wpCustomer, 
+                                                        project_description: projects[i].description, 
+                                                        project_country: projects[i].country, 
+                                                        project_state: projects[i].State, 
+                                                        project_city: projects[i].city, 
+                                                        project_address: projects[i].address, 
+                                                        project_date: projects[i].datetimeset, 
+                                                        project_reward: project_quoteamount, 
+                                                        project_images: project_images, 
+                                                        project_start: projects[i].wocmanstartdatetime, 
+                                                        project_stop: projects[i].wocmanstopdatetime, 
+                                                        project_customer_complete: projects[i].customeracceptcomplete, 
+                                                        project_rate: projects[i].customerratewocman, 
+                                                        project_rate: projects[i].customerratewocman, 
+                                                        project_wocman_complete: projects[i].projectcomplete
+                                                    }]
+                                                );
+                                            }
+                                            if (parseInt(projects[i].wocmanaccept, 10) == 3) {
+                                                
+                                                wpStarted.push(
+                                                    [{
+                                                        project_id: projects[i].id, 
+                                                        project_customer: wpCustomer,
+                                                        project_description: projects[i].description, 
+                                                        project_country: projects[i].country, 
+                                                        project_state: projects[i].State, 
+                                                        project_city: projects[i].city, 
+                                                        project_address: projects[i].address, 
+                                                        project_date: projects[i].datetimeset, 
+                                                        project_reward: project_quoteamount, 
+                                                        project_images: project_images, 
+                                                        project_start: projects[i].wocmanstartdatetime, 
+                                                        project_stop: projects[i].wocmanstopdatetime, 
+                                                        project_customer_complete: projects[i].customeracceptcomplete, 
+                                                        project_rate: projects[i].customerratewocman, 
+                                                        project_rate: projects[i].customerratewocman, 
+                                                        project_wocman_complete: projects[i].projectcomplete
+                                                    }]
+                                                );
+                                            }
                                         }
                                     }
                                     wprojects.push(
