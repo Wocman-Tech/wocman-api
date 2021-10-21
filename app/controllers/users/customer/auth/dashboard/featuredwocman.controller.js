@@ -240,13 +240,17 @@ exports.listProject = (req, res, next) => {
                 if (!Array.isArray(projects) || !projects.length) {
                 }else{
                     for (let i = 0; i < projects.length; i++) {
-                        if (parseInt(projects[i].wocmanid, 10) > 0 && parseInt(projects[i].projectcomplete, 10) != 1) {
-                            jobs.push({
-                                description: projects[i].description,
-                                wocmanid: projects[i].wocmanid,
-                                projectid: projects[i].projectid,
-                                images: projects[i].images
-                            })
+
+                        if (typeof projects[i] == "undefined") {
+                        }else{
+                            if (parseInt(projects[i].wocmanid, 10) > 0 && parseInt(projects[i].projectcomplete, 10) != 1) {
+                                jobs.push({
+                                    description: projects[i].description,
+                                    wocmanid: projects[i].wocmanid,
+                                    projectid: projects[i].projectid,
+                                    images: projects[i].images
+                                })
+                            }
                         }
                     }
                 }
