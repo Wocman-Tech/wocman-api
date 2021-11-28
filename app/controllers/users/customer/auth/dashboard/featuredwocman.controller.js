@@ -212,69 +212,7 @@ exports.uploadProject = (req, res, next) => {
         }
     }
 };
-exports.listProject = (req, res, next) => {
-    if (typeof req.userId == "undefined") {
-        return res.status(400).send(
-        {
-            statusCode: 400,
-            status: false,
-            message: "User was not found",
-            data: []
-        });
-    }else{
-        var customer_id =  req.userId;
 
-        let jobs =  [];
-
-        if(req.userId && req.userId !== ''){
-            Searchuserid = {'customerid': req.userId};
-        }else{
-            Searchuserid = {'customerid': {$not: null}};
-        }
-        
-        Projects.findAll({
-            where: Searchuserid
-        })
-        .then(projects => {
-            if (!projects) {}else{
-                if (!Array.isArray(projects) || !projects.length) {
-                }else{
-                    for (let i = 0; i < projects.length; i++) {
-
-                        if (typeof projects[i] == "undefined") {
-                        }else{
-                            if (parseInt(projects[i].wocmanid, 10) > 0 && parseInt(projects[i].projectcomplete, 10) != 1) {
-                                jobs.push({
-                                    description: projects[i].description,
-                                    wocmanid: projects[i].wocmanid,
-                                    projectid: projects[i].projectid,
-                                    images: projects[i].images
-                                })
-                            }
-                        }
-                    }
-                }
-            }
-            res.status(200).send({
-                statusCode: 200,
-                status: true,
-                message: "Jobs",
-                data: {
-                    accessToken: req.token,
-                    jobs: jobs
-                }
-            });
-        })
-        .catch(err => {
-            res.status(500).send({
-                statusCode: 500,
-                status: false, 
-                message: err.message,
-                data: [] 
-            });
-        });
-    }
-};
 exports.projectTypes = (req, res, next) => {
     if (typeof req.userId == "undefined") {
         return res.status(400).send(
@@ -329,14 +267,76 @@ exports.projectTypes = (req, res, next) => {
                     });
                 }
 
-                res.status(200).send({
-                    statusCode: 200,
-                    status: true,
-                    message: "jobType",
-                    data: {
-                        accessToken: req.token,
-                        jobType: projectNew
+                var customer_id =  req.userId;
+
+                let jobs =  [];
+                let jobtypes =  [];
+
+                if (!projectNew) {}else{
+                    if (!Array.isArray(projectNew) || !projectNew.length) {
+                    }else{
+                        for (let i = 0; i < projectNew.length; i++) {
+
+                            if (typeof projectNew[i] == "undefined") {
+                            }else{
+                                jobtypes.push({
+                                    jobTypeid: projectNew[i].id,
+                                    description: projectNew[i].description,
+                                    name: projectNew[i].name
+                                })
+                            }
+                        }
                     }
+                }
+
+                if(req.userId && req.userId !== ''){
+                    Searchuserid = {'customerid': req.userId};
+                }else{
+                    Searchuserid = {'customerid': {$not: null}};
+                }
+
+                
+                Projects.findAll({
+                    where: Searchuserid
+                })
+                .then(projects => {
+                    if (!projects) {}else{
+                        if (!Array.isArray(projects) || !projects.length) {
+                        }else{
+                            for (let i = 0; i < projects.length; i++) {
+
+                                if (typeof projects[i] == "undefined") {
+                                }else{
+                                    if (parseInt(projects[i].wocmanid, 10) > 0 && parseInt(projects[i].projectcomplete, 10) != 1) {
+                                        jobs.push({
+                                            description: projects[i].description,
+                                            wocmanid: projects[i].wocmanid,
+                                            images: projects[i].images,
+                                            jobTypeid: projects[i].projectid
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    res.status(200).send({
+                        statusCode: 200,
+                        status: true,
+                        message: "Jobs And Job Types",
+                        data: {
+                            accessToken: req.token,
+                            jobs: jobs,
+                            jobTypes: jobtypes
+                        }
+                    });
+                })
+                .catch(err => {
+                    res.status(500).send({
+                        statusCode: 500,
+                        status: false, 
+                        message: err.message,
+                        data: [] 
+                    });
                 });
             })
             .catch(err => {
@@ -347,170 +347,6 @@ exports.projectTypes = (req, res, next) => {
                     data: [] 
                 });
             });
-        })
-        .catch(err => {
-            res.status(500).send({
-                statusCode: 500,
-                status: false, 
-                message: err.message,
-                data: [] 
-            });
-        });
-
-    }
-};
-exports.wocmanDetails = (req, res, next) => {
-    if (typeof req.userId == "undefined") {
-        return res.status(400).send(
-        {
-            statusCode: 400,
-            status: false,
-            message: "User was not found",
-            data: []
-        });
-    }else{
-        var wocman_details = [];
-
-        User.findAll({
-            where: {'featured': '1'}
-        })
-        .then(userc => {
-
-            if (!(userc)) {
-                return res.status(404).send({
-                    statusCode: 404,
-                    status: false, 
-                    message: 'Could not Find Featured wocman',
-                    data: [] 
-                });
-            }
-
-            if (!Array.isArray(userc) || !userc.length) {
-                return res.status(404).send({
-                    statusCode: 404,
-                    status: false, 
-                    message: 'Could not Find Featured wocman',
-                    data: [] 
-                });
-            }else{
-                for (let i = 0; i < userc.length; i++) {
-
-                    var wocman_picture = '';
-                    if (userc[i].image == null) {}else{
-                        if (userc[i].image == 'null') {}else{
-                            var linkExist =  urlExistSync(userc[i].image);
-                            if (linkExist === true) {
-                                wocman_picture = userc[i].image;
-                            }
-                        }
-                    }
-
-
-                    var searchuserid = {'userid': userc[i].id};//wocmen
-                    UserRole.findOne({
-                        where: searchuserid
-                    })
-                    .then(dUserRole => {
-                        
-                        if (!dUserRole) {
-                            
-                        }
-                        let searchuserid1 = {'userid': userc[i].id};
-                        if (parseInt(dUserRole.roleid, 10) == 2) {
-
-                            var rateUser = 0;
-                            var rateUserCount = 0;
-                            var rateUserWocman  = 0;
-                            Wrate.findAll({
-                                where: searchuserid1
-                            })
-                            .then(wrate => {
-                                if (!wrate) {}else{
-                                    if (!Array.isArray(wrate) || !wrate.length) {
-                                    }else{
-                                        for (let i1 = 0; i1 < wrate.length; i1++) {
-                                            rateUserCount = rateUserCount + 1;
-                                            rateUser = rateUser + parseInt(wrate[i1].rateUser, 10);
-                                        }
-                                    }
-                                }
-                            });
-                            if (rateUser > 0 && rateUserCount > 0) {
-                                rateUserWocman = rateUser/rateUserCount;
-                            }else{
-                                rateUserWocman = 0;
-                            }
-
-
-                            var skills = "";
-                            Skills.findAll()
-                            .then(skillsg6 => {
-                                if (!skillsg6) {}else{
-                                    if (!Array.isArray(skillsg6) || !skillsg6.length) {
-                                    }else{
-                                        for (var i2 = 0; i2 < skillsg6.length; i2++) {
-
-                                            const skillname = skillsg6[i2].name;
-                                            var skillid = skillsg6[i2].id;
-                                            var category_id = skillsg6[i2].categoryid;
-                                            let searchuserid2 = {'userid': userc[i].id, 'skillid': skillid};
-
-                                            Wskills.findOne({
-                                                where: searchuserid2
-                                            })
-                                            .then(wskills => {
-                                                if (!wskills) {}else{
-                                                    if ('dataValues' in wskills) {
-                                                        var skillsId = wskills.id;
-                                                        var description = wskills.description;
-                                                        Category.findOne({
-                                                            where: {id: category_id}
-                                                        })
-                                                        .then(wcategory => {
-                                                            if (!wcategory) {}else{
-                                                                if ('dataValues' in wcategory) {
-                                                                    skills = skillname;
-                                                                }
-                                                            } 
-                                                        });
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    }
-                                }
-                            });
-
-                            wocman_details.push(
-                                {
-                                    name: userc[i].firstname + " " +userc[i].lastname,
-                                    picture: wocman_picture,
-                                    rate: rateUserWocman,
-                                    skill: skills
-                                }
-                            );
-                        }
-                        // console.log(wocman_details);
-                        res.status(200).send({
-                            statusCode: 200,
-                            status: true,
-                            message: "Featured wocman user",
-                            data: {
-                                featured: wocman_details,
-                                accessToken: req.token
-                            }
-                        });
-                    })
-                    .catch(err => {
-                        res.status(500).send({
-                            statusCode: 500,
-                            status: false, 
-                            message: err.message,
-                            data: [] 
-                        });
-                    });
-                }
-            }
         })
         .catch(err => {
             res.status(500).send({

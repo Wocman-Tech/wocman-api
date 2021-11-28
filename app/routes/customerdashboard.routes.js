@@ -27,19 +27,13 @@ module.exports = function(app) {
     });
 
     app.post(
-        Helpers.apiVersion7()+"customer/job/featured-wocman",
-        [authJwt.verifyToken, authJwt.isCustomer],
-        featuredWocman.wocmanDetails
-    );
-
-    app.post(
         Helpers.apiVersion7()+"customer/nav",
         [authJwt.verifyToken, authJwt.isCustomer],
         customerNav.customerNav
     );
 
     app.post(
-        Helpers.apiVersion7()+"customer/job/project-types",
+        Helpers.apiVersion7()+"customer/job/projects",
         [authJwt.verifyToken, authJwt.isCustomer],
         featuredWocman.projectTypes
     );
@@ -48,11 +42,5 @@ module.exports = function(app) {
         Helpers.apiVersion7()+"customer/job/upload-project",
         [authJwt.verifyToken, authJwt.isCustomer, uploadJob],
         featuredWocman.uploadProject
-    );
-
-    app.post(
-        Helpers.apiVersion7()+"customer/job/list-project",
-        [authJwt.verifyToken, authJwt.isCustomer],
-        featuredWocman.listProject
     );
 };
