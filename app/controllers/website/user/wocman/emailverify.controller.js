@@ -49,7 +49,6 @@ let MailGenerator = new Mailgen({
   },
 });
 
-
 const Op = db.Sequelize.Op;
 
 exports.checkVerifyEmailLinkWocman = (req, res) => {
@@ -113,12 +112,15 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
 
             User.update(
                 {
-                    verify_email: 1
+                    verify_email: 1,
+                    loginlogout:0,
+                    weblogintoken:token
                 },
                 {
                     where: {email : users.email}
                 }
             );
+            
             var isEmailVerified = true;
             var isProfileUpdated = Helpers.returnBoolean(users.profileupdate);
             var isCertificateUploaded = Helpers.returnBoolean(users.certificatesupdate);
