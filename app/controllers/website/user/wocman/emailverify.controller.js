@@ -85,6 +85,18 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
         var isEmailVerified1 = Helpers.returnBoolean(users.verify_email);
 
         if (isEmailVerified1 == true) {
+
+            User.update(
+                {
+                    verify_email: 1,
+                    loginlogout:0,
+                    weblogintoken:token
+                },
+                {
+                    where: {email : users.email}
+                }
+            );
+            
             return res.status(200).send(
             {
                 statusCode: 200,
@@ -120,7 +132,7 @@ exports.checkVerifyEmailLinkWocman = (req, res) => {
                     where: {email : users.email}
                 }
             );
-            
+
             var isEmailVerified = true;
             var isProfileUpdated = Helpers.returnBoolean(users.profileupdate);
             var isCertificateUploaded = Helpers.returnBoolean(users.certificatesupdate);
