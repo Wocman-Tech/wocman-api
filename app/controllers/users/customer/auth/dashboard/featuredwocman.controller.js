@@ -312,7 +312,8 @@ exports.projectTypes = (req, res, next) => {
                                             description: projects[i].description,
                                             wocmanid: projects[i].wocmanid,
                                             images: projects[i].images,
-                                            jobTypeid: projects[i].projectid
+                                            jobTypeid: projects[i].projectid,
+                                            jobid: projects[i].id
                                         })
                                     }
                                 }
