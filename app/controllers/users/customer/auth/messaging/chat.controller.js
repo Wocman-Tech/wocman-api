@@ -110,6 +110,7 @@ exports.chatLog = (req, res, next) => {
                     });
                     return;
                 }
+                var unboard = Helpers.returnBoolean(user.unboard);
                 var gg = 0;
 
                 Projects.findAll(
@@ -129,6 +130,38 @@ exports.chatLog = (req, res, next) => {
                         });
                         return;
                     }
+
+                    var wpWocman = [];
+                    User.findByPk(wocmanid).then(customeruser => {
+                        if (customeruser) {
+                            wpWocman.push(
+                                [
+                                    {
+                                        wocman_username: customeruser.username,
+                                        wocman_firstname: customeruser.firstname,
+                                        wocman_lastname: customeruser.lastname,
+                                        wocman_phone: customeruser.phone,
+                                        wocman_email: customeruser.email,
+                                        wocman_address: customeruser.address,
+                                        wocman_country: customeruser.country,
+                                        wocman_image: customeruser.image
+                                    }
+                                ]
+                            );
+                        }
+                    })
+                    var wpCustomer = [];
+                    wpCustomer.push(
+                        [
+                            {
+                                customer_username: user.username,
+                                customer_firstname: user.firstname,
+                                customer_lastname: user.lastname,
+                                customer_phone: user.phone,
+                                customer_image: user.image
+                            }
+                        ]
+                    );
 
                     WCChat.findAll({
                         where: {
@@ -161,8 +194,10 @@ exports.chatLog = (req, res, next) => {
                             message: "Found relationships",
                             data: {
                                 accessToken: req.token,
-                                wocmanid: wocmanid,
-                                chat: chats
+                                customer: wpCustomer,
+                                wocman: wpWocman,
+                                chat: chats,
+                                unboard: unboard
                             }
                         });
                     })
@@ -205,6 +240,7 @@ exports.chatLog = (req, res, next) => {
         }
     }
 };
+
 
 exports.chatSave = (req, res, next) => {
     // Username
@@ -260,7 +296,12 @@ exports.chatSave = (req, res, next) => {
             wocmanid: Joi.number().integer().min(1),
             projectid: Joi.number().integer().min(1),
             message: Joi.string().min(1).max(225),
-        }); 
+        });
+
+        const nowTime = new Date().toLocaleString('en-US', {
+            timeZone: 'Africa/Lagos'
+        });
+
         const dataToValidate = { 
             wocmanid: wocmanid,
             projectid: projectid,
@@ -303,6 +344,7 @@ exports.chatSave = (req, res, next) => {
                         senderid: parseInt(req.userId, 10),
                         receiverid: parseInt(wocmanid, 10),
                         message: message,
+                        chattime: nowTime,
                         messagetype: messageType,
                         messagelinks: '',
                         seen: seen,
@@ -323,52 +365,56 @@ exports.chatSave = (req, res, next) => {
                         if (messageType == 'media') {
                             const file = req.files;//this are the files
 
+                            if(typeof file === "undefined"){
 
-                            var images = [];
-                            file.map((item) => {
-                                let myFile =  item.originalname.split(".")
-                                const fileType = myFile[myFile.length - 1]
-                                const dsf = uuidv4();
+                            }else{
 
-                                var params = {
-                                    ACL: "public-read-write",
-                                    Bucket: config.awsS3BucketName,
-                                    Key: item.originalname,
-                                    Body:  item.buffer
-                                }
+                                var images = [];
+                                file.map((item) => {
+                                    let myFile =  item.originalname.split(".")
+                                    const fileType = myFile[myFile.length - 1]
+                                    const dsf = uuidv4();
 
-                                s3.upload(params, (error, data, res) => {
-                                    if(error){
-                                        // res.status(500).send(error)
-                                        console.log(error);
-                                    }else{
-                                        var fileUrl = data.Location;
-                                        if (typeof fileUrl === 'undefined') {
-                                            //empty file
-                                        }else{
-                                            images.push({fileUrl});
-                                        }
+                                    var params = {
+                                        ACL: "public-read-write",
+                                        Bucket: config.awsS3BucketName,
+                                        Key: item.originalname,
+                                        Body:  item.buffer
                                     }
-                                    // save project
-                                    var all_image_url = '';
-                                    for (var i = 0; i < images.length; i++) {
-                                        if (i == 0) {
-                                            all_image_url =  images[i].fileUrl;
+
+                                    s3.upload(params, (error, data, res) => {
+                                        if(error){
+                                            // res.status(500).send(error)
+                                            console.log(error);
                                         }else{
-                                            all_image_url = all_image_url + Helpers.padTogether() +  images[i].fileUrl;
+                                            var fileUrl = data.Location;
+                                            if (typeof fileUrl === 'undefined') {
+                                                //empty file
+                                            }else{
+                                                images.push({fileUrl});
+                                            }
                                         }
-                                    }
-                                    // console.log(all_image_url);
-                                    WCChat.update(
-                                        {
-                                            messagelinks: all_image_url
-                                        },
-                                        {
-                                            where: {'tracker': chat_tracker}
+                                        // save project
+                                        var all_image_url = '';
+                                        for (var i = 0; i < images.length; i++) {
+                                            if (i == 0) {
+                                                all_image_url =  images[i].fileUrl;
+                                            }else{
+                                                all_image_url = all_image_url + Helpers.padTogether() +  images[i].fileUrl;
+                                            }
                                         }
-                                    );
+                                        // console.log(all_image_url);
+                                        WCChat.update(
+                                            {
+                                                messagelinks: all_image_url
+                                            },
+                                            {
+                                                where: {'tracker': chat_tracker}
+                                            }
+                                        );
+                                    });
                                 });
-                            });
+                            }
                         }
                         
                         res.send({
