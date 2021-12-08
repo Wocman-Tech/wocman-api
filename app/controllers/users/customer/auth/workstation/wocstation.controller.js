@@ -154,7 +154,7 @@ exports.wocstation_details = (req, res, next) => {
                                 for await (const skill of skills){
 
 
-                                    const skill_now = await Skills.findByPk(skill.id)
+                                    const skill_now = await Skills.findOne({ where: {'id': skill.skillid} })
                                     
                                     const category = await Category.findByPk(skill_now.categoryid)
 
