@@ -16,6 +16,10 @@ const Wshear = db.wshear;
 const WAChat = db.waChat;
 const WCChat = db.wcChat;
 const WWallet = db.wWallet;
+const Skills = db.skills;
+const Wskills = db.wskills;
+const Category = db.category;
+const Wcategory = db.wcategory;
 
 const Helpers = require(pathRoot+"helpers/helper.js");
 const { verifySignUp } = require(pathRoot+"middleware");
@@ -86,7 +90,7 @@ exports.wocstation_details = (req, res, next) => {
                     });
                     return;
                 }
-                Projects.findByPk(projectid).then(project => {
+                Projects.findByPk(projectid).then(async project => {
                     if (!project) {
                         res.status(404).send({
                             statusCode: 404,
@@ -115,11 +119,108 @@ exports.wocstation_details = (req, res, next) => {
                             });
                             return;
                         }
-                        res.send({
-                            accessToken: req.token,
-                            project: project,
-                            project_type: projecttype
-                        });
+
+                        var wpWocman = [];
+
+                        var wpProjectr = [];
+                        if (parseInt(project.wocmanaccept, 10) == 1) {
+                            var wocmanAccept = true;
+                        }else{
+                            var wocmanAccept = false;
+                        }
+
+                        if (parseInt(project.customerstart, 10) == 1) {
+                            var customerstart = true;
+                        }else{
+                            var customerstart = false;
+                        }
+
+                        if (parseInt(project.customeracceptcomplete, 10) == 1) {
+                            var customeracceptcomplete = true;
+                        }else{
+                            var customeracceptcomplete = false;
+                        }
+
+                        if (parseInt(project.projectcomplete, 10) == 1) {
+                            var projectcomplete = true;
+                        }else{
+                            var projectcomplete = false;
+                        }
+                        User.findByPk(project.wocmanid).then(wocman_project_user => {
+
+                            // Make sure to wait on all your sequelize CRUD calls
+                            Wskills.findAll({ where:{'userid': project.wocmanid}}).then(async skills => {
+
+                                for await (const skill of skills){
+
+
+                                    const skill_now = await Skills.findByPk(skill.id)
+                                    
+                                    const category = await Category.findByPk(skill_now.categoryid)
+
+                                    let cartItem3 = {}
+
+                                    cartItem3.wocman_username = wocman_project_user.username,
+                                    cartItem3.wocman_name = wocman_project_user.firstname+ " " +wocman_project_user.lastname,
+                                    cartItem3.wocman_phone = wocman_project_user.phone,
+                                    cartItem3.wocman_email = wocman_project_user.email,
+                                    cartItem3.wocman_address = wocman_project_user.address,
+                                    cartItem3.wocman_country = wocman_project_user.country,
+                                    cartItem3.wocman_image = wocman_project_user.image,
+                                    cartItem3.wocman_skill_category = category.name,
+                                    cartItem3.wocman_skill_name = skill_now.name,
+                                    cartItem3.wocman_skill_description = skill_now.description
+                                   
+                                    wpWocman.push(cartItem3)
+                                }
+                                var wpCustomer = [];
+                                wpCustomer.push(
+                                    [
+                                        {
+                                            customer_username: user.username,
+                                            customer_firstname: user.firstname,
+                                            customer_lastname: user.lastname,
+                                            customer_phone: user.phone,
+                                            customer_image: user.image
+                                        }
+                                    ]
+                                );
+                                wpProjectr.push(
+                                    [
+                                        {
+                                            id: project.id,
+                                            project_type_name: projecttype.name,
+                                            project_type_description: projecttype.description,
+                                            project: project.project,
+                                            project_description: project.description,
+                                            project_address: project.address,
+                                            project_city: project.city,
+                                            project_date_schedule: project.datetimeset,
+                                            project_country: project.country,
+                                            project_state: project.state,
+                                            Project_Images: project.images,
+                                            project_quotation_amount: project.quoteamount,
+                                            project_isWocmanAccept: wocmanAccept,
+                                            project_wocmanStartDate: project.wocmanstartdatetime,
+                                            project_isCustomerAcceptStart: customerstart,
+                                            project_customerReports: project.projectreport,
+                                            project_wocmanStopDate: project.wocmanstopdatetime,
+                                            project_isCustomerAcceptComplete: customeracceptcomplete,
+                                            project_CustomerRateWocman: project.customerratewocman,
+                                            project_adminProjectComplete: projectcomplete,
+                                            Project_created_on: project.createdAt
+                                        }
+                                    ]
+                                );
+
+                                res.send({
+                                    accessToken: req.token,
+                                    project: wpProjectr,
+                                    Wocman: wpWocman,
+                                    Customer: wpCustomer
+                                });
+                            })
+                        })
                     })
                     .catch(err => {
                         res.status(500).send({
