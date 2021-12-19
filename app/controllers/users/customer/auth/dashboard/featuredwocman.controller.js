@@ -85,10 +85,12 @@ exports.uploadProject = (req, res, next) => {
         });
     }else{
 
+        var project_topic =  req.body.topic;
         var decription =  req.body.decription;
         var address =  req.body.address;
         var city =  req.body.city;
         var projecttypeid =  req.body.projecttypeid;
+        var project_topic = req.body.topic;
         // data cleaning
 
         //schema
@@ -96,11 +98,13 @@ exports.uploadProject = (req, res, next) => {
             decription: Joi.string(),
             address: Joi.string(),
             city: Joi.string(),
+            project_topic: Joi.string(),
         }); 
         const dataToValidate = {
           decription: decription,
           address: address,
-          city: city
+          city: city,
+          project_topic: project_topic
         }
         const result = joiClean.validate(dataToValidate);
         if (result.error == null) {
@@ -116,6 +120,7 @@ exports.uploadProject = (req, res, next) => {
                 {
                     where: {
                         [Op.and]:[
+                            {project: project_topic},
                             {description: decription},
                             {projectid: project_id},
                             {customerid: customer_id}
@@ -127,6 +132,7 @@ exports.uploadProject = (req, res, next) => {
 
                     //create one
                     Projects.create({
+                        project: project_topic,
                         description: decription,
                         address: address,
                         city: city,
@@ -232,7 +238,8 @@ exports.projectTypes = (req, res, next) => {
                 }else{
                     for (let i = 0; i < skills.length; i++) {
                         skill_names.push({
-                            name: skills[i].name
+                            name: skills[i].name,
+                            category: skills[i].categoryid
                         })
                     }
                 }
@@ -255,89 +262,93 @@ exports.projectTypes = (req, res, next) => {
                 });
             }
 
-            Project.findAll()
-            .then(projectNew => {
-                if (!projectNew) {
-                    return res.status(400).send(
-                    {
-                        statusCode: 400,
-                        status: false,
-                        message: "Projects Type was not found",
-                        data: []
-                    });
-                }
 
-                var customer_id =  req.userId;
 
-                let jobs =  [];
-                let jobtypes =  [];
+            let tradesmen = [];
+            let technicians = [];
+            let professionals = [];
 
-                if (!projectNew) {}else{
-                    if (!Array.isArray(projectNew) || !projectNew.length) {
-                    }else{
-                        for (let i = 0; i < projectNew.length; i++) {
 
-                            if (typeof projectNew[i] == "undefined") {
-                            }else{
-                                jobtypes.push({
-                                    jobTypeid: projectNew[i].id,
-                                    description: projectNew[i].description,
-                                    name: projectNew[i].name
-                                })
-                            }
+            for (var if2 = 0; if2 < skill_names.length; if2++) {
+                let skill2 = skill_names[if2]['name'];
+                let skill_category_id = parseInt(skill_names[if2]['category'], 10);
+                Project.findOne({
+                    where : {'name': skill2 }
+                })
+                .then(projectTypes => {
+                    if (projectTypes) {//already exist
+
+                        if (skill_category_id == 1) {
+                            tradesmen.push({
+                                project_type_id: projectTypes.id,
+                                project_type_name: projectTypes.name
+                            })
+                        }
+
+                        if (skill_category_id == 2) {
+                            technicians.push({
+                                project_type_id: projectTypes.id,
+                                project_type_name: projectTypes.name
+                            })
+                        }
+
+                        if (skill_category_id == 3) {
+                            professionals.push({
+                                project_type_id: projectTypes.id,
+                                project_type_name: projectTypes.name
+                            })
                         }
                     }
-                }
+                });
+            }
 
-                if(req.userId && req.userId !== ''){
-                    Searchuserid = {'customerid': req.userId};
-                }else{
-                    Searchuserid = {'customerid': {$not: null}};
-                }
+          
+            var customer_id =  req.userId;
 
-                
-                Projects.findAll({
-                    where: Searchuserid
-                })
-                .then(projects => {
-                    if (!projects) {}else{
-                        if (!Array.isArray(projects) || !projects.length) {
-                        }else{
-                            for (let i = 0; i < projects.length; i++) {
+            let jobs =  [];
+           
 
-                                if (typeof projects[i] == "undefined") {
-                                }else{
-                                    if (parseInt(projects[i].wocmanid, 10) > 0 && parseInt(projects[i].projectcomplete, 10) != 1) {
-                                        jobs.push({
-                                            description: projects[i].description,
-                                            wocmanid: projects[i].wocmanid,
-                                            images: projects[i].images,
-                                            jobTypeid: projects[i].projectid,
-                                            jobid: projects[i].id
-                                        })
-                                    }
+            if(req.userId && req.userId !== ''){
+                Searchuserid = {'customerid': req.userId};
+            }else{
+                Searchuserid = {'customerid': {$not: null}};
+            }
+
+            Projects.findAll({
+                where: Searchuserid
+            })
+            .then(projects => {
+                if (!projects) {}else{
+                    if (!Array.isArray(projects) || !projects.length) {
+                    }else{
+                        for (let i = 0; i < projects.length; i++) {
+
+                            if (typeof projects[i] == "undefined") {
+                            }else{
+                                if (parseInt(projects[i].wocmanid, 10) > 0 && parseInt(projects[i].projectcomplete, 10) != 1) {
+                                    jobs.push({
+                                        description: projects[i].description,
+                                        wocmanid: projects[i].wocmanid,
+                                        images: projects[i].images,
+                                        jobTypeid: projects[i].projectid,
+                                        jobid: projects[i].id
+                                    })
                                 }
                             }
                         }
                     }
-                    res.status(200).send({
-                        statusCode: 200,
-                        status: true,
-                        message: "Jobs And Job Types",
-                        data: {
-                            accessToken: req.token,
-                            jobs: jobs,
-                            jobTypes: jobtypes
-                        }
-                    });
-                })
-                .catch(err => {
-                    res.status(500).send({
-                        statusCode: 500,
-                        status: false, 
-                        message: err.message,
-                        data: [] 
-                    });
+                }
+                res.status(200).send({
+                    statusCode: 200,
+                    status: true,
+                    message: "Jobs And Job Types",
+                    data: {
+                        accessToken: req.token,
+                        jobs: jobs,
+                        tradesmen_jobTypes: tradesmen,
+                        technicians_jobTypes: technicians,
+                        professionals_jobTypes: professionals
+                    }
                 });
             })
             .catch(err => {

@@ -111,132 +111,80 @@ exports.customerNav = (req, res, next) => {
             User.findAll({
                 where: {'featured': '1'}
             })
-            .then(userc => {
+            .then(async userc => {
 
-                for (let i = 0; i < userc.length; i++) {
+                var wocman_picture = '';
 
-                    var wocman_picture = '';
-                    if (userc[i].image == null) {}else{
-                        if (userc[i].image == 'null') {}else{
-                            var linkExist =  urlExistSync(userc[i].image);
+                var rateUser = 0;
+                var rateUserCount = 0;
+                var rateUserWocman  = 0;
+                var skillname = '';
+
+                for await (const each_userc of userc){
+
+                    let cartItem3 = {}
+
+                    if (each_userc.image == null) {}else{
+                        if (each_userc.image == 'null') {}else{
+                            var linkExist =  urlExistSync(each_userc.image);
                             if (linkExist === true) {
-                                wocman_picture = userc[i].image;
+                                wocman_picture = each_userc.image;
                             }
                         }
                     }
 
+                    const user_role = await UserRole.findOne({ where: {'userid': each_userc.id} });
+                    if (parseInt(user_role.roleid, 10) == 2) {
 
-                    var searchuserid = {'userid': userc[i].id};//wocmen
-                    UserRole.findOne({
-                        where: searchuserid
-                    })
-                    .then(dUserRole => {
-                        
-                        if (!dUserRole) {
-                            
+                        const user_rate = await Wrate.findAll({ where: {'userid': each_userc.id} });
+                        for await (const each_rate of user_rate){
+                            rateUserCount = rateUserCount + 1;
+                            rateUser = rateUser + parseInt(each_rate.rateUser, 10);
                         }
-                        let searchuserid1 = {'userid': userc[i].id};
-                        if (parseInt(dUserRole.roleid, 10) == 2) {
+                    }
 
-                            var rateUser = 0;
-                            var rateUserCount = 0;
-                            var rateUserWocman  = 0;
-                            Wrate.findAll({
-                                where: searchuserid1
-                            })
-                            .then(wrate => {
-                                if (!wrate) {}else{
-                                    if (!Array.isArray(wrate) || !wrate.length) {
-                                    }else{
-                                        for (let i1 = 0; i1 < wrate.length; i1++) {
-                                            rateUserCount = rateUserCount + 1;
-                                            rateUser = rateUser + parseInt(wrate[i1].rateUser, 10);
-                                        }
-                                    }
-                                }
-                            });
-                            if (rateUser > 0 && rateUserCount > 0) {
-                                rateUserWocman = rateUser/rateUserCount;
-                            }else{
-                                rateUserWocman = 0;
-                            }
+                    if (rateUser > 0 && rateUserCount > 0) {
+                        rateUserWocman = rateUser/rateUserCount;
+                    }else{
+                        rateUserWocman = 0;
+                    }
 
+                    const user_skill = await Wskills.findAll({ where: {'userid': each_userc.id} });
+                    for await (const each_skill of user_skill){
+                        const skill = await Skills.findAll({ where: {'id': each_skill.skillid} });
+                        skillname = skill.name;
+                    }
 
-                            var skills = "";
-                            Skills.findAll()
-                            .then(skillsg6 => {
-                                if (!skillsg6) {}else{
-                                    if (!Array.isArray(skillsg6) || !skillsg6.length) {
-                                    }else{
-                                        for (var i2 = 0; i2 < skillsg6.length; i2++) {
+                    cartItem3.name = each_userc.firstname+' '+each_userc.lastname,
+                    cartItem3.picture = wocman_picture,
+                    cartItem3.rate = rateUserWocman,
+                    cartItem3.skill = skillname
 
-                                            const skillname = skillsg6[i2].name;
-                                            var skillid = skillsg6[i2].id;
-                                            var category_id = skillsg6[i2].categoryid;
-                                            let searchuserid2 = {'userid': userc[i].id, 'skillid': skillid};
-
-                                            Wskills.findOne({
-                                                where: searchuserid2
-                                            })
-                                            .then(wskills => {
-                                                if (!wskills) {}else{
-                                                    if ('dataValues' in wskills) {
-                                                        var skillsId = wskills.id;
-                                                        var description = wskills.description;
-                                                        Category.findOne({
-                                                            where: {id: category_id}
-                                                        })
-                                                        .then(wcategory => {
-                                                            if (!wcategory) {}else{
-                                                                if ('dataValues' in wcategory) {
-                                                                    skills = skillname;
-                                                                }
-                                                            } 
-                                                        });
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    }
-                                }
-                            });
-
-                            wocman_details.push(
-                                {
-                                    name: userc[i].firstname + " " +userc[i].lastname,
-                                    picture: wocman_picture,
-                                    rate: rateUserWocman,
-                                    skill: skills
-                                }
-                            );
-                        }
-                    });
+                    wocman_details.push(cartItem3);
                 }
-            });
-
-            var details = [];
-            details.push(
-                {
-                    username: users.username,
-                    email: users.email,
-                    firstname: users.firstname,
-                    lastname: users.lastname,
-                    profile_picture: currentImage,
-                    isEmailVerified: isEmailVerified,
-                    isProfileUpdated: isProfileUpdated,
-                    unboard: unboard
-                }
-            );
-            // console.log(wocman_details);
-            res.status(200).send({
-                statusCode: 200,
-                status: true,
-                message: "Customer Details",
-                data: {
-                    customer: details,
-                    featured_wocman: wocman_details,
-                    accessToken: req.token
-                }
+                var details = [];
+                details.push(
+                    {
+                        username: users.username,
+                        email: users.email,
+                        firstname: users.firstname,
+                        lastname: users.lastname,
+                        profile_picture: currentImage,
+                        isEmailVerified: isEmailVerified,
+                        isProfileUpdated: isProfileUpdated,
+                        unboard: unboard
+                    }
+                );
+                res.status(200).send({
+                    statusCode: 200,
+                    status: true,
+                    message: "Customer Details",
+                    data: {
+                        customer: details,
+                        featured_wocman: wocman_details,
+                        accessToken: req.token
+                    }
+                });
             });
         })
         .catch(err => {

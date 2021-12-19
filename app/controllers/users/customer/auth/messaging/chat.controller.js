@@ -95,6 +95,7 @@ exports.chatLog = (req, res, next) => {
             perPage: perPage,
             page: page
         }
+        
         var offsetd = parseInt(perPage, 10) * (parseInt(page, 10)-1);
         var chatLimit = parseInt(chatLimit, 10);
         // const result = Joi.validate(dataToValidate, joiClean);
