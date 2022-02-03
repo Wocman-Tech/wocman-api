@@ -217,7 +217,7 @@ exports.checkCompleteProfile = (req, res, next) => {
                 {where: {id: users.id} }
             );
             res.send({
-                statusCode: 200,
+                statusCode: 201,
                 status: true,
                 message: "Profile complete successful",
                 data: {

@@ -372,7 +372,7 @@ exports.chatSave = (req, res, next) => {
                         }
                         
                         res.send({
-                            statusCode: 200,
+                            statusCode: 201,
                             status: true, 
                             message: 'message Sent',
                             data: {

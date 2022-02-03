@@ -42,7 +42,7 @@ module.exports = function(app) {
 
     //wocstation routes
 
-    app.post(
+    app.get(
         Helpers.apiVersion7() + "customer/wocstation", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocstationController.wocstation_details
@@ -53,25 +53,25 @@ module.exports = function(app) {
         scheduleController.book_appointment
     );
 
-    app.post(
-        Helpers.apiVersion7() + "customer/wocstation/activities/start_project", 
+    app.patch(
+        Helpers.apiVersion7() + "customer/wocstation/activities/start_project/:projectid", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         activitiesController.startProject
     );
 
-    app.post(
-        Helpers.apiVersion7() + "customer/wocstation/activities/complete_project", 
+    app.patch(
+        Helpers.apiVersion7() + "customer/wocstation/activities/complete_project/:projectid", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         activitiesController.completeProject
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/wocstation/activities/rate_project", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         activitiesController.rateProject
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/wocstation/activities/report_project", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         activitiesController.reportProject

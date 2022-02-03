@@ -26,19 +26,19 @@ module.exports = function(app) {
         next();
     });
 
-    app.post(
+    app.get(
         Helpers.apiVersion7()+"customer/job/featured-wocman",
         [authJwt.verifyToken, authJwt.isCustomer],
         featuredWocman.wocmanDetails
     );
 
-    app.post(
+    app.get(
         Helpers.apiVersion7()+"customer/nav",
         [authJwt.verifyToken, authJwt.isCustomer],
         customerNav.customerNav
     );
 
-    app.post(
+    app.get(
         Helpers.apiVersion7()+"customer/job/project-types",
         [authJwt.verifyToken, authJwt.isCustomer],
         featuredWocman.projectTypes
@@ -50,7 +50,7 @@ module.exports = function(app) {
         featuredWocman.uploadProject
     );
 
-    app.post(
+    app.get(
         Helpers.apiVersion7()+"customer/job/list-project",
         [authJwt.verifyToken, authJwt.isCustomer],
         featuredWocman.listProject

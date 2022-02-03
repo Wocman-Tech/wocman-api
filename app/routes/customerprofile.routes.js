@@ -40,13 +40,13 @@ module.exports = function(app) {
         completeController.checkCompleteProfile
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7()+"customer/profile/update",
         [authJwt.verifyToken, authJwt.isCustomer],
         updateprofileController.ProfileUpdate
     );
 
-    app.post(
+    app.get(
         Helpers.apiVersion7() + "customer/profile/rating", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         ratingController.rating
@@ -58,25 +58,25 @@ module.exports = function(app) {
         profilepictureController.uploadProfilePicture
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/profile/reuse/picture", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         reusepictureController.ReuseProfilePicture
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/profile/remove/picture", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         removepictureController.removeProfilePicture
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/logout", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         logoutController.customerLogout
     );
 
-    app.post(
+    app.delete(
         Helpers.apiVersion7() + "customer/close/account", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         closeaccountController.customeraccount

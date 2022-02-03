@@ -8,7 +8,7 @@ const Cert = db.cert;
 const Helpers = require("../helpers/helper.js");
 const Joi = require('joi');
 
-verifyToken = (req, res, next) => {
+const verifyToken = (req, res, next) => {
     let token = req.headers.authorization;
     // console.log(token);
 
@@ -84,7 +84,7 @@ verifyToken = (req, res, next) => {
     });
 };
 
-isAdmin = (req, res, next) => {
+const isAdmin = (req, res, next) => {
 
     User.findByPk(req.userId).then(users => {
         if (!users) {
@@ -165,7 +165,7 @@ isAdmin = (req, res, next) => {
     });
 };
 
-isWocman = (req, res, next) => {
+const isWocman = (req, res, next) => {
     User.findByPk(req.userId).then(users => {
         if (!users) {
             res.status(403).send({
@@ -255,7 +255,7 @@ isWocman = (req, res, next) => {
     });
 };
 
-isCustomer = (req, res, next) => {
+const isCustomer = (req, res, next) => {
     User.findByPk(req.userId).then(users => {
         if (!users) {
             res.status(403).send({
