@@ -5,24 +5,24 @@ const { workstation }  = require("./env.config");
 
 if (workstation.toLowerCase() === "web") {
     module.exports = {
-        secret: "",
-        resolve: "",
+        secret: "wocman-technology-api-justice-auth-0-security",
+        resolve: "https://wocman-node-api-8080.herokuapp.com",
         port: '/',
         version: "/api/v1/",
         coreRootFolder: "",
         coreImageFloder: "app/uploads/",
         split: "/XX98XX",
-        email: "",
-        message_server: "Yahoo",
-        password: "",
+        email: "",//create your account with the transport for mailing, put your email here
+        message_server: "gmail",
+        password: "",//put your transport password here
         name: "Wocman Technology",
-        website: "",
-        otpId: "",
-        googleAppClientID: "",
-        googleAppClientSecret: "",
-        awsS3AccessKeyId: "",
-        awsS3SecretAccessKey: "",
-        awsS3BucketName: ""
+        website: "https://wocman.netlify.app",
+        otpId: "8C5YFUT5NWJo8TD7tVQ20o4QF",
+        googleAppClientID: "832018209601-v1h3d5qgu10p3m4pv6l1jvgq9gcrl9v1.apps.googleusercontent.com",
+        googleAppClientSecret: "o1pyycovPehN0loXowHRh0aR",
+        awsS3AccessKeyId: "AKIAUPJAS3S6WTQ37DUN",
+        awsS3SecretAccessKey: "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",
+        awsS3BucketName: "wocmantechnologyuploads"
     }
 }
 
