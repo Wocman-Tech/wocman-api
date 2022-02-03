@@ -22,29 +22,32 @@ if (workstation.toLowerCase() === "web") {
         googleAppClientSecret: "o1pyycovPehN0loXowHRh0aR",
         awsS3AccessKeyId: "AKIAUPJAS3S6WTQ37DUN",
         awsS3SecretAccessKey: "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",
-        awsS3BucketName: "wocmantechnologyuploads"
+        awsS3BucketName: "wocmantechnologyuploads",
+        companyPassword: 'rathH-5Rhsa-sa755bB0o!d'
     }
 }
 
 if(workstation.toLowerCase() === "localhost"){
     module.exports = {
-        secret: "",
-        resolve: "",
-        port: '',
+        secret: "wocman-technology-api-justice-auth-0-security",
+        resolve: "http://localhost",
+        port: ':8080/',
         version: "/api/v1/",
         coreRootFolder: "",
         coreImageFloder: "app/uploads/",
         split: "/XX98XX",
-        email: "",
+        email: "ugboguj@yahoo.com",
         message_server: "Yahoo",
-        password: "",
+        password: "rrilmtbqmsduewpy",
         name: "Wocman Technology",
-        website: "",
-        otpId: "",
-        googleAppClientID: "",
-        googleAppClientSecret: "",
-        awsS3AccessKeyId: "",
-        awsS3SecretAccessKey: "",
-        awsS3BucketName: ""
+        website: "https://wocman.netlify.app",
+        otpId: "8C5YFUT5NWJo8TD7tVQ20o4QF",
+        googleAppClientID: "195099622008-8thdppg008minmb2vlmq4q3nd6obbfjv.apps.googleusercontent.com",
+        googleAppClientSecret: "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",
+        awsS3AccessKeyId: "AKIAUPJAS3S6WTQ37DUN",
+        awsS3SecretAccessKey: "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",
+        awsS3BucketName: "wocmantechnologyuploads",
+        companyPassword: 'rathH-5Rhsa-sa755bB0o!d'
     }
 }
+

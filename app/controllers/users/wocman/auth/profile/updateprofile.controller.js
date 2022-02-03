@@ -114,30 +114,32 @@ exports.wocmanProfileUpdate = (req, res, next) => {
             });
         }
 
-        if(req.body.country && req.body.country !== ''){
-            var country = req.body.country;
-        }else{
-            return res.status(400).send(
-            {
-                statusCode: 400,
-                status: false,
-                message: "Enter Your country name",
-                data: [] 
-            });
-        }
-        if(req.body.state && req.body.state !== ''){
-            var state = req.body.state;
-        }else{
-            return res.status(400).send(
-            {
-                statusCode: 400,
-                status: false,
-                message: "Enter Your State name",
-                data: []
-            });
-        }
+        // if(req.body.country && req.body.country !== ''){
+        //     var country = req.body.country;
+        // }else{
+        //     return res.status(400).send(
+        //     {
+        //         statusCode: 400,
+        //         status: false,
+        //         message: "Enter Your country name",
+        //         data: [] 
+        //     });
+        // }
+        // if(req.body.state && req.body.state !== ''){
+        //     var state = req.body.state;
+        // }else{
+        //     return res.status(400).send(
+        //     {
+        //         statusCode: 400,
+        //         status: false,
+        //         message: "Enter Your State name",
+        //         data: []
+        //     });
+        // }
 
         var province = req.body.address;
+        var state = req.body.address
+        var country = req.body.address;
        
 
         if(req.body.username && req.body.username !== ''){

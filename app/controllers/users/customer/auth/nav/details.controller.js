@@ -105,21 +105,86 @@ exports.customerNav = (req, res, next) => {
             var unboard = Helpers.returnBoolean(users.unboard);
 
             var authorities = 'customer';
-            res.status(200).send({
-                statusCode: 200,
-                status: true,
-                message: "Found a customer user",
-                data: {
-                    username: users.username,
-                    email: users.email,
-                    firstname: users.firstname,
-                    lastname: users.lastname,
-                    profile_picture: currentImage,
-                    accessToken: req.token,
-                    isEmailVerified: isEmailVerified,
-                    isProfileUpdated: isProfileUpdated,
-                    unboard: unboard
+
+            var wocman_details = [];
+
+            User.findAll({
+                where: {'featured': '1'}
+            })
+            .then(async userc => {
+
+                var wocman_picture = '';
+
+                var rateUser = 0;
+                var rateUserCount = 0;
+                var rateUserWocman  = 0;
+                var skillname = '';
+
+                for await (const each_userc of userc){
+
+                    let cartItem3 = {}
+
+                    if (each_userc.image == null) {}else{
+                        if (each_userc.image == 'null') {}else{
+                            var linkExist =  urlExistSync(each_userc.image);
+                            if (linkExist === true) {
+                                wocman_picture = each_userc.image;
+                            }
+                        }
+                    }
+
+                    const user_role = await UserRole.findOne({ where: {'userid': each_userc.id} });
+                    if (parseInt(user_role.roleid, 10) == 2) {
+
+                        const user_rate = await Wrate.findAll({ where: {'userid': each_userc.id} });
+                        for await (const each_rate of user_rate){
+                            rateUserCount = rateUserCount + 1;
+                            rateUser = rateUser + parseInt(each_rate.rateUser, 10);
+                        }
+                    }
+
+                    if (rateUser > 0 && rateUserCount > 0) {
+                        rateUserWocman = rateUser/rateUserCount;
+                    }else{
+                        rateUserWocman = 0;
+                    }
+
+                    const user_skill = await Wskills.findAll({ where: {'userid': each_userc.id} });
+                    for await (const each_skill of user_skill){
+                        const skill = await Skills.findAll({ where: {'id': each_skill.skillid} });
+                        skillname = skill.name;
+                    }
+
+                    cartItem3.name = each_userc.firstname+' '+each_userc.lastname,
+                    cartItem3.picture = wocman_picture,
+                    cartItem3.rate = rateUserWocman,
+                    cartItem3.skill = skillname
+
+                    wocman_details.push(cartItem3);
                 }
+                var details = [];
+                details.push(
+                    {
+                        username: users.username,
+                        email: users.email,
+                        firstname: users.firstname,
+                        lastname: users.lastname,
+                        profile_picture: currentImage,
+                        isEmailVerified: isEmailVerified,
+                        isProfileUpdated: isProfileUpdated,
+                        unboard: unboard
+                    }
+                );
+                res.status(200).send({
+                    statusCode: 200,
+                    status: true,
+                    message: "Customer Details",
+                    data: {
+                        customer: details,
+                        featured_wocman: wocman_details,
+                        accessToken: req.token
+                    }
+                });
             });
         })
         .catch(err => {

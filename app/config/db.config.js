@@ -19,10 +19,10 @@ if (workstation.toLowerCase() == "web") {
 
 if(workstation.toLowerCase() == "localhost"){
     module.exports = {
-        HOST: "",
-        USER: "",
+        HOST: "localhost",
+        USER: "root",
         PASSWORD: "",
-        DB: "",
+        DB: "express_api_1",
         dialect: "mysql",
         pool: {
             max: 5,
