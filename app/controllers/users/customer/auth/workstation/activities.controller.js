@@ -55,7 +55,7 @@ const Op = db.Sequelize.Op;
 
 exports.startProject = (req, res, next) => {
     // Username
-    var projectid =  req.body.projectid;
+    var projectid =  req.params.projectid;
     
     if (typeof projectid === "undefined") {
         return res.status(400).send(
@@ -157,7 +157,7 @@ exports.startProject = (req, res, next) => {
 };
 exports.completeProject = (req, res, next) => {
     // Username
-    var projectid =  req.body.projectid;
+    var projectid =  req.params.projectid;
     
     if (typeof projectid === "undefined") {
         return res.status(400).send(

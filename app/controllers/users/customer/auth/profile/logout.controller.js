@@ -73,7 +73,7 @@ exports.customerLogout = (req, res, next) => {
         res.status(200).send({
             statusCode: 200,
             status: true,
-            message: "Logded Out",
+            message: "Logged Out",
             data: {
                 accessToken: null 
             }

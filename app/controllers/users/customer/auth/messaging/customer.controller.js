@@ -54,7 +54,7 @@ let MailGenerator = new Mailgen({
 const Op = db.Sequelize.Op;
 exports.wocmanContactCustomer = (req, res, next) => {
     // Username
-    var wocmanid =  req.body.wocmanid;
+    var wocmanid =  req.params.wocmanid;
     
     if (typeof wocmanid === "undefined") {
         return res.status(400).send(

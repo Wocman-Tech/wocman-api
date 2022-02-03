@@ -182,8 +182,8 @@ exports.uploadProject = (req, res, next) => {
                         });
                     
                         // return
-                        res.status(200).send({
-                            statusCode: 200,
+                        res.status(201).send({
+                            statusCode: 201,
                             status: true,
                             message: "Project Created",
                             data: {

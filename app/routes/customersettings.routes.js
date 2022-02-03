@@ -38,120 +38,120 @@ module.exports = function(app) {
         wocmanSettings.createsettings
     );
 
-    app.post(
+    app.get(
         Helpers.apiVersion7() + "customer/settings/get",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmanSettings.settings
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/activate/sms",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmansmsSettings.smsNotice
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/cancel/sms",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmansmsSettings.nsmsNotice
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/activate/email",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmanemailSettings.emailNotice
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/cancel/email",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmanemailSettings.nemailNotice
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/activate/service",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmanserviceSettings.serviceNotice
     );
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/cancel/service",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmanserviceSettings.nserviceNotice
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/activate/technical",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmantechnicalSettings.technicalNotice
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/cancel/technical",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmantechnicalSettings.ntechnicalNotice
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/activate/2fa",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocman2FASettings.w2fsettings
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/cancel/2fa",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocman2FASettings.nw2fsettings
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/activate/ipa",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmanIPASettings.wipsettings
     );
     
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/cancel/ipa",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmanIPASettings.nwipsettings
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/edit/password",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmanUPDPSDSettings.wocmanChangePassword
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/get/wallet",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmanWalletSettings.wwDetails
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/edit/bankdetails",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmanWalletSettings.wchangeBankDetails
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/weekly/paymentschedule",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmanPSSettings.wpssettings
     );
     
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/monthly/paymentschedule",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmanPSSettings.nwpssettings
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/blacklist/device",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmanDeviceSettings.blacklistsettings
     );
 
-    app.post(
+    app.patch(
         Helpers.apiVersion7() + "customer/settings/allow/device",
         [authJwt.verifyToken, authJwt.isCustomer], 
         wocmanDeviceSettings.allowsettings

@@ -26,17 +26,17 @@ module.exports = function(app) {
         next();
     });
     //chat end points
-    app.post(
+    app.get(
         Helpers.apiVersion7() + "customer/chat/contacts", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         contactController.wocmanChatContact
     );
-    app.post(
-        Helpers.apiVersion7() + "customer/chat/contact/details", 
+    app.get(
+        Helpers.apiVersion7() + "customer/chat/contact/details/:wocmanid", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         customerController.wocmanContactCustomer
     );
-    app.post(
+    app.get(
         Helpers.apiVersion7() + "customer/chat/log", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         chatController.chatLog
