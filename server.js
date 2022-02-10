@@ -20,14 +20,16 @@ const cookieSession = require('cookie-session');
 
 const { resolve, port, website }  = require("./app/config/auth.config");
 
-var corsOptions = {
-    // origin: [resolve+port, "http://localhost:3000", "http://localhost:8081", website ],
-    // default: resolve+port
-    origin:  "*",
-    default: "*"
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods',
+      'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers',
+      'Authorization, Origin, Content-Type, Accept');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+});
 
 // parse requests of content-type - application/json
 app.use(bodyParser.json());
