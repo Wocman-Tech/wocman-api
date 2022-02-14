@@ -1,24 +1,44 @@
-module.exports = (sequelize, Sequelize) => {
-    const WocmanNotice = sequelize.define("wnotice", {
+const {
+    Model,
+} = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+    class WocmanNotice extends Model {
+        /**
+         * Helper method for defining associations.
+         * This method is not a part of Sequelize lifecycle.
+         * The `models/index` file will call this method automatically.
+         */
+        static associate(models) {
+            // define association here
+        }
+    }
+
+    WocmanNotice.init({
         userid: {
-            type: Sequelize.INTEGER
+            type: DataTypes.INTEGER
         },
         notice: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         type: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         link: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         date: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         seen: {
-            type: Sequelize.INTEGER
+            type: DataTypes.INTEGER
         }
+    }, {
+        sequelize,
+        modelName: 'WocmanNotice',
+        tableName: 'wnotices',
     });
+
     return WocmanNotice;
 };
 

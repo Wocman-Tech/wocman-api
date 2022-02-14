@@ -186,7 +186,6 @@ module.exports = function(app) {
             verifyWocmanSignIn.isEmailVerify, 
             verifyWocmanSignIn.isPasswordVerify, 
             verifyWocmanSignIn.checkRole,
-            verifyWocmanUser.isWocman,
             isDeviceVC.isDevice,
             isOtpVC.is2FA
         ],

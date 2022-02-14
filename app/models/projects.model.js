@@ -1,98 +1,118 @@
-module.exports = (sequelize, Sequelize) => {
-    const Projects = sequelize.define("projects", {
+const {
+    Model,
+} = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+    class Projects extends Model {
+        /**
+         * Helper method for defining associations.
+         * This method is not a part of Sequelize lifecycle.
+         * The `models/index` file will call this method automatically.
+         */
+        static associate(models) {
+            // define association here
+        }
+    }
+
+    Projects.init({
         projectid: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         },
         customerid: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         },
         project: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         },
         description: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         },
         address: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         },
         city: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         },
         images: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         },
         datetimeset: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         country: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 'nigeria',
             allowNull: false
         },
         state: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         wocmanid: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         quoteamount: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         wocmanaccept: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: false
         },
         customerstart: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         wocmanstartdatetime: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         wocmanstopdatetime: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         customeracceptcomplete: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         projectreport: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         customerratewocman: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         projectcomplete: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: true
         }
+    }, {
+        sequelize,
+        modelName: 'Projects',
+        tableName: 'projects',
     });
+
     return Projects;
 };

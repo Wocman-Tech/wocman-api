@@ -1,22 +1,42 @@
-module.exports = (sequelize, Sequelize) => {
-    const Cert = sequelize.define("wcerts", {
+const {
+    Model,
+} = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+    class Cert extends Model {
+        /**
+         * Helper method for defining associations.
+         * This method is not a part of Sequelize lifecycle.
+         * The `models/index` file will call this method automatically.
+         */
+        static associate(models) {
+            // define association here
+        }
+    }
+
+    Cert.init({
         userid: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
         },
         name: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
         },
         picture: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
         },
         status: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: false
         },
         issue_date: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
         }
-    });
+    }, {
+        sequelize,
+        modelName: 'Cert',
+        tableName: 'wcerts',
+    });   
+
     return Cert;
 };

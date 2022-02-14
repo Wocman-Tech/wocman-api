@@ -1,28 +1,48 @@
-module.exports = (sequelize, Sequelize) => {
-    const Contactus = sequelize.define("contactus", {
+const {
+    Model,
+} = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+    class Contactus extends Model {
+        /**
+         * Helper method for defining associations.
+         * This method is not a part of Sequelize lifecycle.
+         * The `models/index` file will call this method automatically.
+         */
+        static associate(models) {
+            // define association here
+        }
+    }
+
+    Contactus.init({
         name: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         },
         email: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         },
         phone: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
         },
         enquiry: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         },
         message: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         },
         tracker: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         }
+    }, {
+        sequelize,
+        modelName: 'Contactus',
+        tableName: 'contactus',
     });
+
     return Contactus;
 };

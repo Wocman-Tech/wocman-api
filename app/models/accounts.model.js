@@ -1,35 +1,54 @@
-module.exports = (sequelize, Sequelize) => {
-    const WocmanAccount = sequelize.define("waccount", {
-      	accountid: {
-            type: Sequelize.INTEGER
+const {
+    Model,
+} = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+    class WocmanAccount extends Model {
+        /**
+         * Helper method for defining associations.
+         * This method is not a part of Sequelize lifecycle.
+         * The `models/index` file will call this method automatically.
+         */
+        static associate(models) {
+            // define association here
+        }
+    }
+    WocmanAccount.init({
+        accountid: {
+            type: DataTypes.INTEGER
         },
         projectid: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         customerid: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         customerpaid: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         customervetadminid: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         wocmanid: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         wocmanreceived: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         wocmanvetadminid: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         closeAccount: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         closeaccountvetadminid: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         }
+    }, {
+        sequelize,
+        modelName: 'WocmanAccount',
+        tableName: 'waccounts',
     });
+
     return WocmanAccount;
 };

@@ -3,10 +3,10 @@ const { resolve, port, website, googleAppClientID }  = require(baseUrl + "config
 
 const db = require(baseUrl+"models");
 const {OAuth2Client} = require("google-auth-library");
-const User = db.user;
-const UserRole = db.userRole;
-const Role = db.role;
-const Cert = db.cert;
+const User = db.User;
+const UserRole = db.UserRole;
+const Role = db.Role;
+const Cert = db.Cert;
 const Helpers = require(baseUrl+"helpers/helper.js");
 const Joi = require('joi');
 

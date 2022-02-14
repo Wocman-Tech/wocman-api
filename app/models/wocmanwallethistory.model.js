@@ -1,30 +1,50 @@
-module.exports = (sequelize, Sequelize) => {
-    const WocmanWalletHistory = sequelize.define("wwallethistory", {
-      	walletid: {
-            type: Sequelize.STRING
+const {
+    Model,
+} = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+    class WocmanWalletHistory extends Model {
+        /**
+         * Helper method for defining associations.
+         * This method is not a part of Sequelize lifecycle.
+         * The `models/index` file will call this method automatically.
+         */
+        static associate(models) {
+            // define association here
+        }
+    }
+
+    WocmanWalletHistory.init({
+        walletid: {
+            type: DataTypes.STRING
         },
         userid: {
-            type: Sequelize.INTEGER
+            type: DataTypes.INTEGER
         },
         transactiontype: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         amount: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         transactionmode: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         transactiondescription: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         transactiondate: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         transactionstatus: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         }
+    }, {
+        sequelize,
+        modelName: 'WocmanWalletHistory',
+        tableName: 'wwallethistories',
     });
+
     return WocmanWalletHistory;
 };
 

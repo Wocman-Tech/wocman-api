@@ -2,18 +2,14 @@ const pathRoot = '../../../../../';
 const db = require(pathRoot+"models");
 const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
-const User = db.user;
-const Role = db.role;
-const UserRole = db.userRole;
-const Nletter = db.nletter;
-const Contactus = db.contactus;
-const Cert = db.cert;
-const Skills = db.skills;
-const Wskills = db.wskills;
-const Competency = db.competency;
-const Wcompetency = db.wcompetency;
-const Category = db.category;
-const Wcategory = db.wcategory;
+const User = db.User;
+const Cert = db.Cert;
+const Skills = db.Skills;
+const Wskills = db.Wskills;
+const Competency = db.Competency;
+const Wcompetency = db.Wcompetency;
+const Category = db.Category;
+const Wcategory = db.Wcategory;
 
 const urlExistSync = require("url-exist-sync");
 

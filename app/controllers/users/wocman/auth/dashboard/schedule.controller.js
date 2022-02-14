@@ -3,12 +3,12 @@ const db = require(pathRoot+"models");
 const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
 
-const User = db.user;
-const Role = db.role;
-const UserRole = db.userRole;
+const User = db.User;
+const Role = db.Role;
+const UserRole = db.UserRole;
 
-const Projects = db.projects;
-const Project = db.projecttype;
+const Projects = db.Projects;
+const Project = db.Projecttype;
 
 
 const Helpers = require(pathRoot+"helpers/helper.js");

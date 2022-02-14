@@ -1,11 +1,31 @@
-module.exports = (sequelize, Sequelize) => {
-    const images = sequelize.define("imagestore", {
-    	image: {
-      		type: Sequelize.STRING
-    	},
-        tracker: {
-            type: Sequelize.STRING
-        }
-  	});
-  	return images;
+const {
+	Model,
+} = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+	class Image extends Model {
+		/**
+		 * Helper method for defining associations.
+		 * This method is not a part of Sequelize lifecycle.
+		 * The `models/index` file will call this method automatically.
+		 */
+		static associate(models) {
+			// define association here
+		}
+	}
+
+	Image.init({
+		image: {
+			type: DataTypes.STRING
+		},
+		tracker: {
+			type: DataTypes.STRING
+		}
+	}, {
+		sequelize,
+		modelName: 'Image',
+		tableName: 'imagestores',
+	});
+
+	return Image;
 };

@@ -1,14 +1,14 @@
 
 const baseUrl = "../../../../";
 
-const db = require(baseUrl+"models");
+const db = require('../../../../models');
 const fs = require('fs');
-const User = db.user;
-const UserRole = db.userRole;
-const Role = db.role;
-const Cert = db.cert;
-const Wsetting = db.wsetting;
-const IpBlacklist = db.ipblacklist;
+const User = db.User;
+const UserRole = db.UserRole;
+const Role = db.Role;
+const Cert = db.Cert;
+const Wsetting = db.Wsetting;
+const IpBlacklist = db.Ipblacklist;
 const config = require(baseUrl+"config/auth.config");
 
 

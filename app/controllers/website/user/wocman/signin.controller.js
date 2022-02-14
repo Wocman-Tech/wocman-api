@@ -1,95 +1,98 @@
 const pathRoot = '../../../../';
-const db = require(pathRoot+"models");
-const config = require(pathRoot+"config/auth.config");
+const { QueryTypes } = require('sequelize')
+const db = require('../../../../models');
+const config = require(pathRoot + "config/auth.config");
 const fs = require('fs');
-const User = db.user;
-const Role = db.role;
-const UserRole = db.userRole;
-const Nletter = db.nletter;
-const Contactus = db.contactus;
-const Cert = db.cert;
+const User = db.User;
+const Role = db.Role;
+const UserRole = db.UserRole;
+const Nletter = db.Nletter;
+const Contactus = db.Contactus;
+const Cert = db.Cert;
 
 
-const Projects = db.projects;
-const Project = db.projecttype;
-const Wshear = db.wshear;
-const WAChat = db.waChat;
-const WCChat = db.wcChat;
-const WWallet = db.wWallet;
-const Wsetting = db.wsetting;
+const Projects = db.Projects;
+const Project = db.Projecttype;
+const Wshear = db.Wshear;
+const WAChat = db.WaChat;
+const WCChat = db.WcChat;
+const WWallet = db.WWallet;
+const Wsetting = db.Wsetting;
+
+const { sequelize } = db;
 
 
-const Helpers = require(pathRoot+"helpers/helper.js");
-const { verifySignUp } = require(pathRoot+"middleware");
-const { EMAIL, PASSWORD, MAIN_URL } = require(pathRoot+"helpers/helper.js");
+const Helpers = require(pathRoot + "helpers/helper.js");
+const { verifySignUp } = require(pathRoot + "middleware");
+const { EMAIL, PASSWORD, MAIN_URL } = require(pathRoot + "helpers/helper.js");
 
-const {v4 : uuidv4} = require('uuid');
-const Joi = require('joi'); 
+const { v4: uuidv4 } = require('uuid');
+const Joi = require('joi');
 let nodeGeocoder = require('node-geocoder');
 const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
- 
+
 let options = {
-  provider: 'openstreetmap'
+    provider: 'openstreetmap'
 };
 
 let transporter = nodemailer.createTransport({
-  service: config.message_server,
-  secure: true,
-  auth: {
-    user: EMAIL,
-    pass: PASSWORD,
-  },
+    service: config.message_server,
+    secure: true,
+    auth: {
+        user: EMAIL,
+        pass: PASSWORD,
+    },
 });
 
 let MailGenerator = new Mailgen({
-  theme: "default",
-  product: {
-    name: config.name,
-    link: config.website,
-  },
+    theme: "default",
+    product: {
+        name: config.name,
+        link: config.website,
+    },
 });
 const Op = db.Sequelize.Op;
 
 exports.signInWocman = (req, res, next) => {
     var searchemail = {};
     var searchPassword = {};
-    if(req.body.password && req.body.password !== ''){
-        searchPassword = {'password': req.body.password};
-    }else{
-        searchPassword = {'password': {$not: null}};
+    if (req.body.password && req.body.password !== '') {
+        searchPassword = { 'password': req.body.password };
+    } else {
+        searchPassword = { 'password': { $not: null } };
     }
-    if(req.body.email && req.body.email !== ''){
-        searchemail = {'email': req.body.email}
-    }else{
-        searchemail = {'email': {$not: null}};
+    if (req.body.email && req.body.email !== '') {
+        searchemail = { 'email': req.body.email }
+    } else {
+        searchemail = { 'email': { $not: null } };
     }
 
-    User.findOne({
-        where: searchemail
+    const sql = `
+        SELECT 
+            users.*,
+            roles.name as role
+        FROM users
+        LEFT JOIN userroles ON userroles.userid = users.id
+        LEFT JOIN roles ON roles.id = userroles.roleid
+        WHERE users.email = '${searchemail.email}'
+    `;
+
+    sequelize.query(sql, {
+        type: QueryTypes.SELECT,
     })
-    .then(user => {
-        if (!user) {
-            return res.status(404).send({
-                statusCode: 404,
-                status: false,
-                message: "User Not found.",
-                date: []
-            });
-        }else{
-            // console.log(user.signuptype);
-            if (user.signuptype !== 'wocman') {
-                return res.status(401).send({
-                    statusCode: 401,
+        .then(userDetail => {
+            let [user] = userDetail;
+            if (!user) {
+                return res.status(404).send({
+                    statusCode: 404,
                     status: false,
-                    accessToken: null,
-                    message: "Use the google sign up",
-                    data: []
+                    message: "User Not found.",
+                    date: []
                 });
-            }else{
-
+            } else {
                 var passwordIsValid = bcrypt.compareSync(
                     req.body.password,
                     user.password
@@ -102,8 +105,7 @@ exports.signInWocman = (req, res, next) => {
                         message: "Invalid Password!",
                         data: []
                     });
-                }else{
-
+                } else {
                     var token = jwt.sign({ id: user.id }, config.secret, {
                         expiresIn: 86400 // 24 hours
                     });
@@ -116,10 +118,17 @@ exports.signInWocman = (req, res, next) => {
 
 
                     //making sure a user was signed in appropriately
-                    user.update({
-                        loginlogout:0,
-                        weblogintoken:token
-                    });
+                    User.update(
+                        {
+                            loginlogout: 0,
+                            weblogintoken: token
+                        },
+                        {
+                            where: {
+                                id: user.id,
+                            },
+                        },
+                    );
                     if (isEmailVerified !== true && isEmailVerified !== false) {
                         isEmailVerified = false;
                     }
@@ -140,7 +149,7 @@ exports.signInWocman = (req, res, next) => {
                             province: user.province,
                             phone: user.phone,
                             image: user.image,
-                            role: 'wocman',
+                            role: user.role,
                             accessToken: token,
                             isEmailVerified: isEmailVerified,
                             isProfileUpdated: isProfileUpdated,
@@ -151,14 +160,13 @@ exports.signInWocman = (req, res, next) => {
                     });
                 }
             }
-        }
-    })
-    .catch(err => {
-        res.status(500).send({
-            statusCode: 500,
-            status: false, 
-            message: err.message,
-            data: [] 
+        })
+        .catch(err => {
+            res.status(500).send({
+                statusCode: 500,
+                status: false,
+                message: err.message,
+                data: []
+            });
         });
-    });
 };

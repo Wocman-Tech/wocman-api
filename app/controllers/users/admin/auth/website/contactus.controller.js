@@ -11,23 +11,9 @@ const s3 = new AWS.S3({
     accessKeyId: config.awsS3AccessKeyId,
     secretAccessKey: config.awsS3SecretAccessKey
 })
-const ImageStore = db.imageStore;
+const ImageStore = db.ImageStore;
+const Contactus = db.Contactus;
 
-
-const User = db.user;
-const Role = db.role;
-const UserRole = db.userRole;
-const Nletter = db.nletter;
-const Contactus = db.contactus;
-const Cert = db.cert;
-
-
-const Projects = db.projects;
-const Project = db.projecttype;
-const Wshear = db.wshear;
-const WAChat = db.waChat;
-const WCChat = db.wcChat;
-const WWallet = db.wWallet;
 
 const Helpers = require(pathRoot+"helpers/helper.js");
 const { verifySignUp } = require(pathRoot+"middleware");

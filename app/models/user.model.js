@@ -1,119 +1,139 @@
-module.exports = (sequelize, Sequelize) => {
-    const User = sequelize.define("users", {
+const {
+    Model,
+} = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+    class User extends Model {
+        /**
+         * Helper method for defining associations.
+         * This method is not a part of Sequelize lifecycle.
+         * The `models/index` file will call this method automatically.
+         */
+        static associate(models) {
+            // define association here
+        }
+    }
+
+    User.init({
         email: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         },
         password: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         },
         verify_email: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: false
         },
         username: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         firstname: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         lastname: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         unboard: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         address: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         country: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         state: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         province: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         phone: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         image: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         images: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         changepassword: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         loginlogout: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         weblogintoken: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         weblogin2fa: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         webloginipa: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         signuptype: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: null,
             allowNull: true
         },
         certificatesupdate: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0
         },
         profileupdate: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0
         },
         featured: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0
         },
         isSkilled: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0
         }
+    }, {
+        sequelize,
+        modelName: 'User',
+        tableName: 'users',
     });
+
     return User;
 };

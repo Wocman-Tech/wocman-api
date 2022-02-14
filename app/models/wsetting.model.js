@@ -1,43 +1,63 @@
-module.exports = (sequelize, Sequelize) => {
-    const Wsetting = sequelize.define("wsettings", {
+const {
+    Model,
+} = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+    class Wsetting extends Model {
+        /**
+         * Helper method for defining associations.
+         * This method is not a part of Sequelize lifecycle.
+         * The `models/index` file will call this method automatically.
+         */
+        static associate(models) {
+            // define association here
+        }
+    }
+
+    Wsetting.init({
         userid: {
-            type: Sequelize.STRING
+            type: DataTypes.STRING
         },
         smsnotice: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: true
         },
         emailnotice: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: true
         },
         servicenotice: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: true
         },
         technicalnotice: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: true
         },
         security2fa: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: true
         },
         securityipa: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: true
         },
         paymentschedule: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: true
         }
+    }, {
+        sequelize,
+        modelName: 'Wsetting',
+        tableName: 'wsettings',
     });
+
     return Wsetting;
 };

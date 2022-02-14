@@ -10,23 +10,12 @@ const s3 = new AWS.S3({
     accessKeyId: config.awsS3AccessKeyId,
     secretAccessKey: config.awsS3SecretAccessKey
 })
-const User = db.user;
-const Role = db.role;
-const UserRole = db.userRole;
-const Nletter = db.nletter;
-const Contactus = db.contactus;
-const Cert = db.cert;
-const Skills = db.skills;
-const Wskills = db.wskills;
-const Wcategory = db.wcategory;
-const Category = db.category;
+const User = db.User;
+const Skills = db.Skills;
+const Wskills = db.Wskills;
+const Wcategory = db.Wcategory;
+const Category = db.Category;
 
-const Projects = db.projects;
-const Project = db.projecttype;
-const Wshear = db.wshear;
-const WAChat = db.waChat;
-const WCChat = db.wcChat;
-const WWallet = db.wWallet;
 
 const Helpers = require(pathRoot+"helpers/helper.js");
 const { verifySignUp } = require(pathRoot+"middleware");

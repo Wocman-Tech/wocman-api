@@ -4,22 +4,22 @@ const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
 const passport = require('passport');
 const cookieSession = require('cookie-session');
-const User = db.user;
-const Role = db.role;
-const UserRole = db.userRole;
-const Nletter = db.nletter;
-const Contactus = db.contactus;
-const Cert = db.cert;
+const User = db.User;
+const UserRole = db.UserRole;
+const Role = db.Role;
+const Cert = db.Cert;
+const Nletter = db.Nletter;
+const Contactus = db.Contactus;
 
 
-const Projects = db.projects;
-const Project = db.projecttype;
-const Wshear = db.wshear;
-const WAChat = db.waChat;
-const WCChat = db.wcChat;
-const WWallet = db.wWallet;
-const Wsetting = db.wsetting;
-const IpBlacklist = db.ipblacklist;
+const Projects = db.Projects;
+const Project = db.Projecttype;
+const Wshear = db.Wshear;
+const WAChat = db.WaChat;
+const WCChat = db.WcChat;
+const WWallet = db.WWallet;
+const Wsetting = db.Wsetting;
+const IpBlacklist = db.Ipblacklist;
 
 const Helpers = require(pathRoot+"helpers/helper.js");
 const { verifySignUp } = require(pathRoot+"middleware");

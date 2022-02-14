@@ -2,20 +2,9 @@ const pathRoot = '../../../../../';
 const db = require(pathRoot+"models");
 const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
-const User = db.user;
-const Role = db.role;
-const UserRole = db.userRole;
-const Nletter = db.nletter;
-const Contactus = db.contactus;
-const Cert = db.cert;
 
-
-const Projects = db.projects;
-const Project = db.projecttype;
-const Wshear = db.wshear;
-const WAChat = db.waChat;
-const WCChat = db.wcChat;
-const WWallet = db.wWallet;
+const User = db.User;
+const UserRole = db.UserRole;
 
 const Helpers = require(pathRoot+"helpers/helper.js");
 const { verifySignUp } = require(pathRoot+"middleware");

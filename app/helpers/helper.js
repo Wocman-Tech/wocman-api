@@ -1,10 +1,10 @@
 const db = require("../models");
 const config = require("../config/auth.config");
-const User = db.user;
-const Role = db.role;
-const UserRole = db.userRole;
-const Wsetting = db.wsetting;
-const Cert = db.cert;
+const User = db.User;
+const UserRole = db.UserRole;
+const Role = db.Role;
+const Cert = db.Cert;
+const Wsetting = db.Wsetting;
 const {v4 : uuidv4} = require('uuid');
 const joi = require('joi');
 

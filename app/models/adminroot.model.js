@@ -1,54 +1,74 @@
-module.exports = (sequelize, Sequelize) => {
-    const rootAdmin = sequelize.define("rootadmin", {
+const {
+    Model,
+} = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+    class RootAdmin extends Model {
+        /**
+         * Helper method for defining associations.
+         * This method is not a part of Sequelize lifecycle.
+         * The `models/index` file will call this method automatically.
+         */
+        static associate(models) {
+            // define association here
+        }
+    }
+
+    RootAdmin.init({
         email: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         },
         islogin: {
-        	type: Sequelize.STRING,
+        	type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: false
         },
         isprofile: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: false
         },
         issettings: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: false
         },
         iscustomer: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: false
         },
         iswocman: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: false
         },
         isproject: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: false
         },
         isuser: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: false
         },
         isaccount: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: false
         },
         isroot: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             defaultValue: 0,
             allowNull: false
         }
+    }, {
+        sequelize,
+        modelName: 'RootAdmin',
+        tableName: 'rootadmins',
     });
-    return rootAdmin;
+   
+    return RootAdmin;
 };

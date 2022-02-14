@@ -1,13 +1,33 @@
-module.exports = (sequelize, Sequelize) => {
-    const ProjectType = sequelize.define("projecttype", {
+const {
+    Model,
+} = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+    class ProjectType extends Model {
+        /**
+         * Helper method for defining associations.
+         * This method is not a part of Sequelize lifecycle.
+         * The `models/index` file will call this method automatically.
+         */
+        static associate(models) {
+            // define association here
+        }
+    }
+
+    ProjectType.init({
         name: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         },
         description: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: false
         }
+    }, {
+        sequelize,
+        modelName: 'ProjectType',
+        tableName: 'projecttype',
     });
+
     return ProjectType;
 };

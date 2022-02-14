@@ -1,7 +1,6 @@
 const baseUrl = "../../../../";
 const db = require(baseUrl+"models");
-const User = db.user;
-const UserRole = db.userRole;
+const { User, UserRole } = require('../../../../models');
 const Role = db.role;
 const Cert = db.cert;
 const Helpers = require(baseUrl+"helpers/helper.js");
@@ -19,7 +18,7 @@ const schemaJoiPassword = Joi.object({
         .required()
 
 });
-isEmailVerify = (req, res, next) => {
+const isEmailVerify = (req, res, next) => {
     if (typeof req.body.email === "undefined") {
         return res.status(400).send(
             {
@@ -46,7 +45,7 @@ isEmailVerify = (req, res, next) => {
         }
     }
 };
-isPasswordVerify = (req, res, next) => {
+const isPasswordVerify = (req, res, next) => {
     if (typeof req.body.password === "undefined") {
         return res.status(400).send(
             {
@@ -73,7 +72,7 @@ isPasswordVerify = (req, res, next) => {
         }
     }
 };
-checkRolesExisted = (req, res, next) => {
+const checkRolesExisted = (req, res, next) => {
 
    if (typeof req.body.email === "undefined") {
         return res.status(400).send(
@@ -126,6 +125,7 @@ checkRolesExisted = (req, res, next) => {
                 next();
             })
             .catch(err => {
+            console.log("🚀 ~ file: signIn.js ~ line 130 ~ checkRolesExisted ~ err", err)
                 res.status(500).send({
                     statusCode: 500,
                     status: false, 

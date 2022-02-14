@@ -1,10 +1,10 @@
 
 const baseUrl = "../../../../";
 const db = require(baseUrl+"models");
-const User = db.user;
-const UserRole = db.userRole;
-const Role = db.role;
-const Cert = db.cert;
+const User = db.User;
+const UserRole = db.UserRole;
+const Role = db.Role;
+const Cert = db.Cert;
 const Helpers = require(baseUrl+"helpers/helper.js");
 const Joi = require('joi');
 

@@ -1,19 +1,39 @@
-module.exports = (sequelize, Sequelize) => {
-    const Ipblacklist = sequelize.define("wipblacklists", {
+const {
+    Model,
+} = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+    class Ipblacklist extends Model {
+        /**
+         * Helper method for defining associations.
+         * This method is not a part of Sequelize lifecycle.
+         * The `models/index` file will call this method automatically.
+         */
+        static associate(models) {
+            // define association here
+        }
+    }
+
+    Ipblacklist.init({
         ip: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
         },
         userid: {
-            type: Sequelize.INTEGER,
+            type: DataTypes.INTEGER,
         },
         ipmode: {
-            type: Sequelize.INTEGER,
+            type: DataTypes.INTEGER,
             defaultValue: 0
         },
         ipotp: {
-            type: Sequelize.INTEGER,
+            type: DataTypes.INTEGER,
             defaultValue: 0
         }
+    }, {
+        sequelize,
+        modelName: 'Ipblacklist',
+        tableName: 'wipblacklists',
     });
+
     return Ipblacklist;
 };

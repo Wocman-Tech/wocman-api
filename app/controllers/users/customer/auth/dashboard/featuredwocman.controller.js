@@ -12,28 +12,11 @@ const s3 = new AWS.S3({
     secretAccessKey: config.awsS3SecretAccessKey
 })
 
-const User = db.user;
-const Role = db.role;
-const UserRole = db.userRole;
-const Nletter = db.nletter;
-const Contactus = db.contactus;
-const Cert = db.cert;
-const Skills = db.skills;
-const Wskills = db.wskills;
-const Competency = db.competency;
-const Wcompetency = db.wcompetency;
-const Category = db.category;
-const Wcategory = db.wcategory;
-const Wrate = db.wrate;
+const Skills = db.Skills;
 
-const Projects = db.projects;
-const Project = db.projecttype;
-const Wshear = db.wshear;
-const WAChat = db.waChat;
-const WCChat = db.wcChat;
-const WWallet = db.wWallet;
-const wWalletH = db.wWalletH;
-const WNotice = db.wNotice;
+const Projects = db.Projects;
+const Project = db.Projecttype;
+
 
 const urlExistSync = require("url-exist-sync");
 
