@@ -2,6 +2,7 @@ const { authJwt } = require("../middleware");
 
 const featuredWocman = require("../controllers/users/customer/auth/dashboard/featuredwocman.controller");
 const customerNav = require("../controllers/users/customer/auth/nav/details.controller");
+const jobControllers = require("../controllers/users/customer/auth/job/job.controller")
 
 
 const Helpers = require("../helpers/helper.js");
@@ -30,6 +31,12 @@ module.exports = function(app) {
         Helpers.apiVersion7()+"customer/nav",
         [authJwt.verifyToken, authJwt.isCustomer],
         customerNav.customerNav
+    );
+
+    app.get(
+        Helpers.apiVersion7()+"customer/job",
+        [authJwt.verifyToken],
+        jobControllers.jobController
     );
 
     app.get(

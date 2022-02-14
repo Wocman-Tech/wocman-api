@@ -3,7 +3,7 @@ const {
 } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-    class ProjectType extends Model {
+    class Wrate extends Model {
         /**
          * Helper method for defining associations.
          * This method is not a part of Sequelize lifecycle.
@@ -14,23 +14,8 @@ module.exports = (sequelize, DataTypes) => {
         }
     }
 
-    ProjectType.init({
-        name: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        description: {
-            type: DataTypes.STRING,
-            allowNull: false
-        }
-    }, {
-        sequelize,
-        modelName: 'ProjectType',
-        tableName: 'projecttypes',
-    });
-
-    const WocmanRate = sequelize.define("wrate", {
-      	userid: {
+    Wrate.init({
+        userid: {
             type: DataTypes.INTEGER
         },
         jobid: {
@@ -39,8 +24,13 @@ module.exports = (sequelize, DataTypes) => {
         rateUser: {
             type: DataTypes.INTEGER
         }
+    }, {
+        sequelize,
+        modelName: 'Wrate',
+        tableName: 'wrates',
     });
-    return WocmanRate;
+
+    return Wrate;
 };
 
 /*  jobid : gotten projects table

@@ -3,7 +3,7 @@ const {
 } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-    class WocmanWalletHistory extends Model {
+    class WWalletH extends Model {
         /**
          * Helper method for defining associations.
          * This method is not a part of Sequelize lifecycle.
@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     }
 
-    WocmanWalletHistory.init({
+    WWalletH.init({
         walletid: {
             type: DataTypes.STRING
         },
@@ -41,11 +41,11 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         sequelize,
-        modelName: 'WocmanWalletHistory',
+        modelName: 'WWalletH',
         tableName: 'wwallethistories',
     });
 
-    return WocmanWalletHistory;
+    return WWalletH;
 };
 
 /*  walletid : gotten from the wocmanwallet table

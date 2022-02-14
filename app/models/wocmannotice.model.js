@@ -3,7 +3,7 @@ const {
 } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-    class WocmanNotice extends Model {
+    class WNotice extends Model {
         /**
          * Helper method for defining associations.
          * This method is not a part of Sequelize lifecycle.
@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     }
 
-    WocmanNotice.init({
+    WNotice.init({
         userid: {
             type: DataTypes.INTEGER
         },
@@ -35,11 +35,11 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         sequelize,
-        modelName: 'WocmanNotice',
+        modelName: 'WNotice',
         tableName: 'wnotices',
     });
 
-    return WocmanNotice;
+    return WNotice;
 };
 
 /*  

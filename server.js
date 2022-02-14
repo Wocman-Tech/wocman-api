@@ -49,13 +49,13 @@ app.use(passport.session());
 
 // database
 const db = require("./app/models");
-const Role = db.role;
-const WCchat = db.wcChat;
-const Skills = db.skills;
-const Competency = db.competency;
-const Category = db.category;
+const Role = db.Role;
+const WCchat = db.WcChat;
+const Skills = db.Skills;
+const Competency = db.Competency;
+const Category = db.Category;
 
-db.sequelize.sync();
+// db.sequelize.sync();
 // force: true will drop the table if it already exists
 // db.sequelize.sync({force: true}).then(() => {
 //   console.log('Drop and Resync Database with { force: true }');
@@ -93,31 +93,31 @@ function initial1() {
 
     Skills.create({
         id: 1,
-        categoryid: '1',
+        categoryid: 1,
         name: "Barbing Services"
     });
  
     Skills.create({
         id: 2,
-        categoryid: '1',
+        categoryid: 1,
         name: "Plumbering Services"
     });
  
     Skills.create({
         id: 3,
-        categoryid: '2',
+        categoryid: 2,
         name: "Electrical Installations and Maintenance"
     });
 
     Skills.create({
         id: 4,
-        categoryid: '3',
+        categoryid: 3,
         name: "Mechanical Installations and Maintenance"
     });
 
     Skills.create({
         id: 5,
-        categoryid: '2',
+        categoryid: 2,
         name: "Computer, accessories Installations and Maintenance"
     });
 }

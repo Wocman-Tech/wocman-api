@@ -6,19 +6,9 @@ const User = db.User;
 const UserRole = db.UserRole;
 const Skills = db.Skills;
 const Wskills = db.Wskills;
+const Wrate = db.Wrate;
 
 const urlExistSync = require("url-exist-sync");
-
-
-const Projects = db.projects;
-const Project = db.projecttype;
-const Wshear = db.wshear;
-const WAChat = db.waChat;
-const WCChat = db.wcChat;
-const WWallet = db.wWallet;
-const wWalletH = db.wWalletH;
-const Wrate = db.wrate;
-const WNotice = db.wNotice;
 
 const Helpers = require(pathRoot+"helpers/helper.js");
 const { verifySignUp } = require(pathRoot+"middleware");
@@ -129,6 +119,7 @@ exports.customerNav = (req, res, next) => {
                     if (parseInt(user_role.roleid, 10) == 2) {
 
                         const user_rate = await Wrate.findAll({ where: {'userid': each_userc.id} });
+                        console.log("🚀 ~ file: details.controller.js ~ line 123 ~ forawait ~ user_rate", user_rate)
                         for await (const each_rate of user_rate){
                             rateUserCount = rateUserCount + 1;
                             rateUser = rateUser + parseInt(each_rate.rateUser, 10);

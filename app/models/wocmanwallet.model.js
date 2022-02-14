@@ -3,7 +3,7 @@ const {
 } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-    class WocmanWallet extends Model {
+    class WWallet extends Model {
         /**
          * Helper method for defining associations.
          * This method is not a part of Sequelize lifecycle.
@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     }
 
-    WocmanWallet.init({
+    WWallet.init({
         userid: {
             type: DataTypes.INTEGER
         },
@@ -48,11 +48,11 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         sequelize,
-        modelName: 'WocmanWallet',
+        modelName: 'WWallet',
         tableName: 'wwallet',
     });
 
-    return WocmanWallet;
+    return WWallet;
 };
 
 /*  walletid : generated unique value

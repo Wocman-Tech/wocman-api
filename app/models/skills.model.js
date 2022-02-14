@@ -11,6 +11,11 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
+            Skills.belongsTo(models.Category, {
+                foreignKey: 'categoryid',
+                onUpdate: 'CASCADE',
+                onDelete: 'CASCADE',
+            });
         }
     }
 
@@ -20,8 +25,11 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         categoryid: {
-        	type: DataTypes.STRING,
-            allowNull: false
+        	type: DataTypes.INTEGER,
+            references: {
+                model: 'categories',
+                key: 'id',
+            },
         }
     }, {
         sequelize,

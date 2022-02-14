@@ -5,7 +5,7 @@ const fs = require('fs');
 
 const User = db.User;
 const WWalletH = db.WWalletH;
-const WAccount = db.Waccounts;
+const WAccount = db.WocmanAccount;
 
 const Helpers = require(pathRoot+"helpers/helper.js");
 const { verifySignUp } = require(pathRoot+"middleware");

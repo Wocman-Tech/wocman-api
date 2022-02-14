@@ -17,12 +17,9 @@ const urlExistSync = require("url-exist-sync");
 const Projects = db.projects;
 const Project = db.projecttype;
 const Wshear = db.wshear;
-const WAChat = db.waChat;
-const WCChat = db.wcChat;
-const WWallet = db.wWallet;
-const wWalletH = db.wWalletH;
-const Wrate = db.wrate;
-const WNotice = db.wNotice;
+const WWallet = db.WWallet;
+const Wrate = db.Wrate;
+const WNotice = db.WNotice;
 
 const Helpers = require(pathRoot+"helpers/helper.js");
 const { verifySignUp } = require(pathRoot+"middleware");

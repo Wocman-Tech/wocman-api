@@ -12,7 +12,7 @@ const s3 = new AWS.S3({
     accessKeyId: config.awsS3AccessKeyId,
     secretAccessKey: config.awsS3SecretAccessKey
 })
-const ImageStore = db.imageStore;
+const ImageStore = db.ImageStore;
 
 const Nletter = db.Nletter;
 
