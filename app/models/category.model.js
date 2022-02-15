@@ -14,7 +14,12 @@ module.exports = (sequelize, DataTypes) => {
             Category.hasMany(models.Skills, {
                 foreignKey: 'categoryid',
                 as: 'skills'
-              });
+            });
+
+            Category.hasMany(models.Projecttype, {
+                foreignKey: 'category_id',
+                as: 'sub_category'
+            });
         }
     }
 
@@ -27,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
         sequelize,
         modelName: 'Category',
         tableName: 'categories',
-    });   
+    });
 
     return Category;
 };

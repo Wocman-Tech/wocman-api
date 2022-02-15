@@ -10,7 +10,6 @@ const Joi = require('joi');
 
 const verifyToken = (req, res, next) => {
     let token = req.headers.authorization;
-    // console.log(token);
 
     if (!token) {
         return res.status(403).send({

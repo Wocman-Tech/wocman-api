@@ -1,11 +1,11 @@
-const { Category, Skills } = require('../../models');
+const { Category, Projecttype } = require('../../models');
 
 const jobCategory = async () => {
     const categories = await Category.findAll({
         include: [
             {
-                model: Skills,
-                as: 'skills',
+                model: Projecttype,
+                as: 'sub_category',
                 attributes: {
                     exclude: ['createdAt', 'updatedAt'],
                 },

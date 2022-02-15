@@ -76,7 +76,7 @@ exports.signUpWocman = (req, res, next) => {
     .then(dfg43 => {
         if (dfg43) {
             return res.status(404).send(
-            { 
+            {
                 statusCode: 404,
                 status: false,
                 message: "User already exist with this credentials",
@@ -84,23 +84,21 @@ exports.signUpWocman = (req, res, next) => {
             });
         }
         User.create({
-            username: 'Wocman',
+            username: req.body.username,
             email: req.body.email,
             password: bcrypt.hashSync(req.body.password, 8),
             verify_email: otp,
-            signuptype: 'wocman'
+            signuptype: req.body.role
         })
         .then(user => {
-            UserRole.findOne({
-                where: {userid: user.id}
+            Role.findOne({
+                where: {name: req.body.role}
             })
-            .then(userrole => {
-              if (!userrole) {
+            .then(role => {
                 UserRole.create({
                     userid: user.id,
-                    roleid: 2
+                    roleid: role.id
                 });
-              }
             });
             Wsetting.findOne({
                 where: {userid: user.id}
@@ -143,7 +141,7 @@ exports.signUpWocman = (req, res, next) => {
                 data: {
                     link: verification_link, 
                     email : user.email, 
-                    role: 'wocman',
+                    role: req.body.role,
                     sentMail: sentMail
                 }
             });

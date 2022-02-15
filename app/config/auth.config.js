@@ -12,9 +12,9 @@ if (workstation.toLowerCase() === "web") {
         coreRootFolder: "",
         coreImageFloder: "app/uploads/",
         split: "/XX98XX",
-        email: "",//create your account with the transport for mailing, put your email here
-        message_server: "gmail",
-        password: "",//put your transport password here
+        email: "ugboguj@yahoo.com",//create your account with the transport for mailing, put your email here
+        message_server: "Yahoo",
+        password: "rrilmtbqmsduewpy",//put your transport password here
         name: "Wocman Technology",
         website: "https://wocman.netlify.app",
         otpId: "8C5YFUT5NWJo8TD7tVQ20o4QF",
@@ -50,4 +50,3 @@ if(workstation.toLowerCase() === "localhost"){
         companyPassword: 'rathH-5Rhsa-sa755bB0o!d'
     }
 }
-

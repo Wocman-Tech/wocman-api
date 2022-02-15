@@ -48,7 +48,7 @@ const schemaJoiOtp = Joi.object({
     otp: Joi.string().min(5).required()
 });
 
-isEmailVerify = (req, res, next) => {
+const isEmailVerify = (req, res, next) => {
     if (typeof req.body.email === "undefined") {
         return res.status(400).send(
             {
@@ -75,7 +75,7 @@ isEmailVerify = (req, res, next) => {
         }
     }
 };
-isUsernameVerify = (req, res, next) => {
+const isUsernameVerify = (req, res, next) => {
     if (typeof req.body.username === "undefined") {
         return res.status(400).send(
             {
@@ -102,7 +102,7 @@ isUsernameVerify = (req, res, next) => {
         }
     }
 };
-isPasswordVerify = (req, res, next) => {
+const isPasswordVerify = (req, res, next) => {
     if (typeof req.body.password === "undefined") {
         return res.status(400).send(
             {
@@ -129,7 +129,7 @@ isPasswordVerify = (req, res, next) => {
         }
     }
 };
-isPasswordConfirmed = (req, res, next) => {
+const isPasswordConfirmed = (req, res, next) => {
     if (typeof req.body.repeat_password === "undefined") {
         return res.status(400).send(
             {
@@ -156,7 +156,7 @@ isPasswordConfirmed = (req, res, next) => {
         }
     }
 };
-isOtp = (req, res, next) => {
+const isOtp = (req, res, next) => {
     var otpToken = req.body.otpToken;
     if (typeof otpToken === "undefined" || otpToken.length != 6) {
         return res.status(400).send(
@@ -184,7 +184,7 @@ isOtp = (req, res, next) => {
         }
     }
 }
-isLinkVerify = (req, res, next) => {
+const isLinkVerify = (req, res, next) => {
 
     if (typeof req.body.emailLink === "undefined") {
         return res.status(400).send(
@@ -209,7 +209,7 @@ isLinkVerify = (req, res, next) => {
         }
     }
 };
-isToken = (req, res, next) => {
+const isToken = (req, res, next) => {
     if (typeof req.body.tokenId === "undefined") {
         return res.status(400).send(
             {
@@ -249,7 +249,7 @@ isToken = (req, res, next) => {
         });
     }
 };
-checkDuplicateUsernameOrEmail = (req, res, next) => {
+const checkDuplicateUsernameOrEmail = (req, res, next) => {
     // Email
     User.findOne({
         where: {
@@ -277,7 +277,7 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
     });
    
 };
-isLink  = (req, res, next) => {
+const isLink  = (req, res, next) => {
     if (typeof req.body.verifylink === "undefined") {
         return res.status(400).send(
             {

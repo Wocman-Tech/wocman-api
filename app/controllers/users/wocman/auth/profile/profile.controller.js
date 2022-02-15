@@ -14,9 +14,9 @@ const Wcategory = db.Wcategory;
 const urlExistSync = require("url-exist-sync");
 
 
-const Projects = db.projects;
-const Project = db.projecttype;
-const Wshear = db.wshear;
+const Projects = db.Projects;
+const Project = db.Projecttype;
+const Wshear = db.Wshear;
 const WWallet = db.WWallet;
 const Wrate = db.Wrate;
 const WNotice = db.WNotice;
@@ -388,7 +388,6 @@ exports.wocmanProfile = (req, res, next) => {
                     if (parseInt(users.verify_email, 10) == 1) {
                         verified = true;
                     }
-
                     Wshear.findByPk(1)
                     .then(springShareDE => {
                         let hht7t = springShareDE;
