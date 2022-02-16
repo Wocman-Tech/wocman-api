@@ -11,6 +11,7 @@ const removepictureController = require("../controllers/users/customer/auth/prof
 const updateprofileController = require("../controllers/users/customer/auth/profile/updateprofile.controller");
 const ratingController = require("../controllers/users/customer/auth/profile/rating.controller");
 const completeController = require("../controllers/users/customer/auth/profile/complete.controller");
+const userProfileController = require("../controllers/users/customer/auth/profile/user.profile.controller");
 
 const Helpers = require("../helpers/helper.js");
 
@@ -33,8 +34,13 @@ module.exports = function(app) {
         next();
     });
     //auth
-    
-    app.post(
+    app.get(
+        Helpers.apiVersion7()+"customer/profile",
+        [authJwt.verifyToken, authJwt.isCustomer],
+        userProfileController.profileController
+    );
+
+    app.patch(
         Helpers.apiVersion7()+"customer/profile/complete",
         [authJwt.verifyToken, authJwt.isCustomer],
         completeController.checkCompleteProfile
