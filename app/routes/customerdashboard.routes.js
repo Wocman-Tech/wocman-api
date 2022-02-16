@@ -34,15 +34,9 @@ module.exports = function(app) {
     );
 
     app.get(
-        Helpers.apiVersion7()+"customer/job",
+        Helpers.apiVersion7()+"customer/job/projects",
         [authJwt.verifyToken],
         jobControllers.jobController
-    );
-
-    app.get(
-        Helpers.apiVersion7()+"customer/job/projects",
-        [authJwt.verifyToken, authJwt.isCustomer],
-        featuredWocman.projectTypes
     );
 
     app.post(

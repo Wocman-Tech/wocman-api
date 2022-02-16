@@ -62,61 +62,17 @@ exports.wocmanChangePassword = (req, res, next) => {
         }
 
 
-        var psd = req.body.password;
-        var opsd = req.body.oldpassword;
-        var cpsd = req.body.confirmpassword;
-        if(psd && psd !== '' && psd.length > 7){
-            var password = psd;
-        }else{
-            return res.status(400).send(
-            {
-                statusCode: 400,
-                status: false,
-                message: "Enter a valid password field. min of 8 characters",
-                data: []
-            });
-        }
+        const password = req.body.password;
+        const oldpassword = req.body.oldpassword;
+        const confirmpassword = req.body.confirmpassword;
 
-        if(opsd && opsd !== '' && opsd.length > 7){
-            var oldpassword = opsd;
-        }else{
-            return res.status(400).send(
-            {
-                statusCode: 400,
-                status: false,
-                message: "Enter a valid oldpassword  field",
-                data: []
-            });
-        }
-
-        if(cpsd && cpsd !== '' && cpsd.length > 7){
-            var confirmpassword = cpsd;
-        }else{
-            return res.status(400).send(
-            {
-                statusCode: 400,
-                status: false,
-                message: "Enter a valid confirmpassword  field",
-                data: []
-            });
-        }
-
-
-
-        //schema
-        // const joiCleanSchema = Joi.object({
-        //     password: Joi.string().pattern(new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")).required(),
-        //     oldpassword: Joi.string().pattern(new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")).required(),
-        //     confirmpassword: Joi.ref('password')
-        // });
-        //schema
         const joiCleanSchema = Joi.object({
-            password: Joi.string().alphanum().min(8).max(30).required(),
-            oldpassword: Joi.string().alphanum().min(8).max(30).required(),
-            confirmpassword: Joi.ref('password')
+            password: Joi.string().min(7),
+            oldpassword: Joi.string(),
+            confirmpassword: Joi.string().min(7)
         });
 
-        var joyresult = joiCleanSchema.validate({ password: psd, oldpassword: opsd, confirmpassword: cpsd});
+        var joyresult = joiCleanSchema.validate({ password, oldpassword, confirmpassword });
         var { value, error } = joyresult;
         if (!(typeof error === 'undefined')) {
             var msg = Helpers.getJsondata(error, 'details')[0];
@@ -124,7 +80,7 @@ exports.wocmanChangePassword = (req, res, next) => {
             return res.status(422).json({
                 statusCode: 422,
                 status: false,
-                message: 'Minimun of 8 alphanumeric characters and maximun of 30 alphanumeric characters  is required in password field',
+                message: msgs,
                 data: []
             })
         }else{
@@ -155,7 +111,7 @@ exports.wocmanChangePassword = (req, res, next) => {
                     statusCode: 401,
                     status: false,
                     accessToken: null,
-                    message: "oldpassword field is not defied or incorrect",
+                    message: "oldpassword incorrect",
                     data: []
                 });
             }
