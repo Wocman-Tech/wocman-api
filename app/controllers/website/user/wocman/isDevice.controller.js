@@ -126,18 +126,6 @@ exports.isDevice = (req, res, next) => {
                     if (parseInt(usersettings.securityipa, 10) == 0) {
                         next();
                     }else{
-                        var joyresult = schemaJoiIP.validate({ ipaddress: ip });
-                        var { value, error } = joyresult;
-                        if (!(typeof error === 'undefined')) {
-                            var msg = Helpers.getJsondata(error, 'details')[0];
-                            var msgs = Helpers.getJsondata(msg, 'message');
-                            return res.status(422).json({
-                                statusCode: 422,
-                                status: false,
-                                message: msgs,
-                                data: []
-                            })
-                        }else{
                             IpBlacklist.findOne({
                                 where: {ip: ip, userid: user.id}
                             }).then(findip => {
@@ -218,7 +206,7 @@ exports.isDevice = (req, res, next) => {
                                 });
                             });
                         }
-                    }
+
                 })
                 .catch(err => {
                     return res.status(500).send({
@@ -319,19 +307,6 @@ exports.resendIsDevice = (req, res) => {
                             data: []
                         })
                     }else{
-
-                        var joyresult = schemaJoiIP.validate({ ipaddress: ip });
-                        var { value, error } = joyresult;
-                        if (!(typeof error === 'undefined')) {
-                            var msg = Helpers.getJsondata(error, 'details')[0];
-                            var msgs = Helpers.getJsondata(msg, 'message');
-                            return res.status(422).json({
-                                statusCode: 422,
-                                status: false,
-                                message: msgs,
-                                data: []
-                            })
-                        }else{
                             IpBlacklist.findOne({
                                 where: {ip: ip, userid: user.id}
                             }).then(findip => {
@@ -412,7 +387,7 @@ exports.resendIsDevice = (req, res) => {
                                 });
                             });
                         }
-                    }
+
                 })
                 .catch(err => {
                     return res.status(500).send({
@@ -450,7 +425,6 @@ exports.activateIsDevice = (req, res) => {
          req.connection.remoteAddress || 
          req.socket.remoteAddress || 
          req.connection.socket.remoteAddress
-
     if (typeof ip === "undefined") {
         return res.status(400).send(
             {
@@ -461,19 +435,6 @@ exports.activateIsDevice = (req, res) => {
             }
         );
     }else{
-
-        var joyresult = schemaJoiIP.validate({ ipaddress: ip });
-        var { value, error } = joyresult;
-        if (!(typeof error === 'undefined')) {
-            var msg = Helpers.getJsondata(error, 'details')[0];
-            var msgs = Helpers.getJsondata(msg, 'message');
-            return res.status(422).json({
-                statusCode: 422,
-                status: false,
-                message: msgs,
-                data: []
-            })
-        }else{
 
             var searchemail = {};
 
@@ -609,5 +570,4 @@ exports.activateIsDevice = (req, res) => {
                 });
             });   
         }
-    }
 };

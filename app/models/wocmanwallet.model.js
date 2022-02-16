@@ -49,7 +49,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         sequelize,
         modelName: 'WWallet',
-        tableName: 'wwallet',
+        tableName: 'wwallets',
     });
 
     return WWallet;

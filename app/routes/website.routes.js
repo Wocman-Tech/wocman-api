@@ -227,7 +227,6 @@ module.exports = function(app) {
         Helpers.apiVersion7()+"auth/wocman-signin-activate-otp",
         [
             verifyWocmanSignIn.isEmailVerify,
-            verifyWocmanSignIn.isPasswordVerify, 
             verifyWocmanSignIn.checkRole,
             verifyWocmanUser.isWocman
         ],
