@@ -23,7 +23,8 @@ var storage = multer.memoryStorage({
         cb(null, '');
     }
 });
-const uploadJob = multer({storage: storage}).array('avatar')
+const uploadJob = multer({storage: storage}).array('avatar');
+const uploadSingle = multer({storage: storage}).single('avatar');
 
 module.exports = function(app) {
     app.use(function(req, res, next) {
@@ -60,7 +61,7 @@ module.exports = function(app) {
     
     app.post(
         Helpers.apiVersion7() + "customer/profile/picture", 
-        [authJwt.verifyToken, authJwt.isCustomer, uploadJob], 
+        [authJwt.verifyToken, authJwt.isCustomer, uploadSingle], 
         profilepictureController.uploadProfilePicture
     );
 

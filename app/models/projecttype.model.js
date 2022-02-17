@@ -16,6 +16,11 @@ module.exports = (sequelize, DataTypes) => {
                 onUpdate: 'CASCADE',
                 onDelete: 'CASCADE',
             });
+
+            Projecttype.hasMany(models.Projects, {
+                foreignKey: 'projectid',
+                as: 'project_subcategory'
+            });
         }
     }
 

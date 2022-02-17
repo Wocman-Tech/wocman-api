@@ -73,21 +73,22 @@ exports.uploadProject = (req, res, next) => {
         var address =  req.body.address;
         var city =  req.body.city;
         var projecttypeid =  req.body.projecttypeid;
-        var project_topic = req.body.topic;
         // data cleaning
 
         //schema
         const joiClean = Joi.object().keys({ 
-            decription: Joi.string(),
-            address: Joi.string(),
-            city: Joi.string(),
-            project_topic: Joi.string(),
+            decription: Joi.string().required(),
+            address: Joi.string().required(),
+            city: Joi.string().required(),
+            project_topic: Joi.string().required(),
+            projecttypeid: Joi.number().required()
         }); 
         const dataToValidate = {
           decription: decription,
-          address: address,
-          city: city,
-          project_topic: project_topic
+          address,
+          city,
+          project_topic,
+          projecttypeid,
         }
         const result = joiClean.validate(dataToValidate);
         if (result.error == null) {

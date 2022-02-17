@@ -1,7 +1,8 @@
-const { Category, Projecttype } = require('../../models');
+const { User, Projecttype, Projects, sequelize } = require('../../models');
+const { QueryTypes } = require('sequelize')
 
 const jobCategory = async () => {
-    const categories = await Category.findAll({
+    const categories = await Projects.findAll({
         include: [
             {
                 model: Projecttype,
@@ -15,8 +16,48 @@ const jobCategory = async () => {
     return categories;
 };
 
+const getCustomerJobs = async (customerid) => {
+    const projects = await Projects.findAll({
+        where: {
+            customerid
+        },
+        include: [
+            {
+                model: Projecttype,
+                as: 'project_subcategory',
+                attributes: {
+                    exclude: ['createdAt', 'updatedAt'],
+                },
+            },
+            {
+                model: User,
+                as: 'customer',
+                attributes: ['id', 'firstname', 'lastname', 'email', 'username'],
+            },
+            {
+                model: User,
+                as: 'wocman',
+                attributes: ['id', 'firstname', 'lastname', 'email', 'username'],
+            },
+        ],
+    });
+
+    const data = JSON.parse(JSON.stringify(projects))
+    
+    return data.map((el) => {
+        const imagesArray = {
+          images: el.images.split('/XX98XX')
+        }
+        return {
+          ...el,
+          ...imagesArray,
+        }
+      });
+};
+
 const jobServices = {
-    jobCategory
+    jobCategory,
+    getCustomerJobs
 };
 
 module.exports = jobServices;

@@ -65,7 +65,7 @@ exports.uploadProfilePicture =  (req, res, next) => {
         return res.status(400).send({
             statusCode: 400,
             status: false,
-            message: "avatar filed was undefined",
+            message: "avatar field was undefined",
             data: []
         });
     }

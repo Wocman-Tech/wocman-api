@@ -34,9 +34,15 @@ module.exports = function(app) {
     );
 
     app.get(
+        Helpers.apiVersion7()+"customer/jobs",
+        [authJwt.verifyToken, authJwt.isCustomer],
+        jobControllers.customerJobs
+    );
+
+    app.get(
         Helpers.apiVersion7()+"customer/job/projects",
         [authJwt.verifyToken],
-        jobControllers.jobController
+        jobControllers.jobCategory
     );
 
     app.post(

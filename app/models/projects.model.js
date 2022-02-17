@@ -11,17 +11,41 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
+            Projects.belongsTo(models.User, {
+                foreignKey: 'customerid',
+                onUpdate: 'CASCADE',
+                onDelete: 'CASCADE',
+                as: 'customer'
+            });
+
+            Projects.belongsTo(models.User, {
+                foreignKey: 'wocmanid',
+                as: 'wocman'
+            });
+
+            Projects.belongsTo(models.Projecttype, {
+                foreignKey: 'projectid',
+                as: 'project_subcategory'
+            });
         }
     }
 
     Projects.init({
         projectid: {
-            type: DataTypes.STRING,
-            allowNull: false
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: 'projecttypes',
+                key: 'id',
+            },
         },
         customerid: {
-            type: DataTypes.STRING,
-            allowNull: false
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: 'users',
+                key: 'id',
+            },
         },
         project: {
             type: DataTypes.STRING,
@@ -59,9 +83,13 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true
         },
         wocmanid: {
-            type: DataTypes.STRING,
+            type: DataTypes.INTEGER,
             defaultValue: null,
-            allowNull: true
+            allowNull: true,
+            references: {
+                model: 'users',
+                key: 'id',
+            },
         },
         quoteamount: {
             type: DataTypes.STRING,
