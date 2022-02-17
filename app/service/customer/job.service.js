@@ -1,8 +1,7 @@
-const { User, Projecttype, Projects, sequelize } = require('../../models');
-const { QueryTypes } = require('sequelize')
+const { Category, User, Projecttype, Projects } = require('../../models');
 
 const jobCategory = async () => {
-    const categories = await Projects.findAll({
+    const categories = await Category.findAll({
         include: [
             {
                 model: Projecttype,
