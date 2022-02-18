@@ -1,24 +1,17 @@
 require("dotenv/config");
 const express = require("express");
-const bodyParser = require("body-parser");
 const cors = require("cors");
 
-const multer = require("multer");
-
-const path = require("path");
-
 const app = express();
-
-let randomColor = require('randomcolor');
-
-const uuid = require('uuid');
-const fs = require('fs');
-var http = require('http').Server(app);
 
 const passport = require('passport');
 const cookieSession = require('cookie-session');
 
 const { resolve, port, website }  = require("./app/config/auth.config");
+
+// parse requests of content-type - application/x-www-form-urlencoded
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use(cors());
 app.use((req, res, next) => {
@@ -31,11 +24,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// parse requests of content-type - application/json
-app.use(bodyParser.json());
-
-// parse requests of content-type - application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
 
 // session variables
 app.use(cookieSession({
@@ -55,7 +43,7 @@ const Skills = db.Skills;
 const Competency = db.Competency;
 const Category = db.Category;
 
-db.sequelize.sync();
+//db.sequelize.sync();
 // force: true will drop the table if it already exists
 // db.sequelize.sync({force: true}).then(() => {
 //   console.log('Drop and Resync Database with { force: true }');

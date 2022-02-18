@@ -39,7 +39,7 @@ let MailGenerator = new Mailgen({
     },
 });
 
-getRoleById = (role_id) => {
+const getRoleById = (role_id) => {
     Role.findOne({
       where: role_id
     })
@@ -51,7 +51,7 @@ getRoleById = (role_id) => {
     });
 };
 
-getUserRoleById = (user_id) => {
+const getUserRoleById = (user_id) => {
     UserRole.findOne({
       where:  user_id
     })
@@ -63,7 +63,7 @@ getUserRoleById = (user_id) => {
     });
 };
 
-getRoleByName = (role_name) => {
+const getRoleByName = (role_name) => {
     Role.findOne({
       where: role_id 
     })
@@ -75,7 +75,7 @@ getRoleByName = (role_name) => {
     });
 };
 
-getUserByEmail = (email) => {
+const getUserByEmail = (email) => {
     User.findOne({
       where: email 
     })
@@ -86,7 +86,7 @@ getUserByEmail = (email) => {
         return users.id;
     });
 };
-getUserByUsername = (username) => {
+const getUserByUsername = (username) => {
     User.findOne({
       where: username 
     })
@@ -98,7 +98,7 @@ getUserByUsername = (username) => {
     });
 };
 
-kfgetEmailLink = (premirelink) => {
+const kfgetEmailLink = (premirelink) => {
     User.findOne({
       where: premirelink 
     })
@@ -111,20 +111,20 @@ kfgetEmailLink = (premirelink) => {
     });
 };
 
-apiVersion7 = () => { 
+const apiVersion7 = () => { 
   return config.version; 
 };
-coreProjectPath = () => {
+const coreProjectPath = () => {
     return config.coreRootFolder;
 }
-pathToImages = () => {
+const pathToImages = () => {
     return config.coreImageFloder;
 }
-padTogether = () => {
+const padTogether = () => {
     return config.split;
 }
 
-checkImageLink = (image_url, good, bad) => {
+const checkImageLink = (image_url, good, bad) => {
     var img = new Image();
     img.onload = good;
     img.onerror = bad;
@@ -133,7 +133,7 @@ checkImageLink = (image_url, good, bad) => {
     // http.send();
     // return http.status != 404;
 }
-filterFile = (req, file, cb) => {
+const filterFile = (req, file, cb) => {
     if (typeof req === "undefined") {
 
     }else{
@@ -150,13 +150,13 @@ filterFile = (req, file, cb) => {
     }
 };
 
-getJsondata = (stringValue, key) => {
+const getJsondata = (stringValue, key) => {
     var string = JSON.stringify(stringValue);
     var objectValue = JSON.parse(string);
     return objectValue[key];
 }
 
-returnBoolean = (value) => {
+const returnBoolean = (value) => {
 	if(value === 1){
 		return true;
 	}
@@ -178,7 +178,7 @@ returnBoolean = (value) => {
 	return value;
 }
 
-notice_pusher = (userId, noticeBody, noticeType) => {
+const notice_pusher = (userId, noticeBody, noticeType) => {
     User.findByPk(userId)
     .then(users => {
         if (!users) {

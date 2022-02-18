@@ -19,14 +19,6 @@ var storage = multer.memoryStorage({
 const uploadJob = multer({storage: storage}).array('avatar')
 
 module.exports = function(app) {
-    app.use(function(req, res, next) {
-        res.header(
-            "Access-Control-Allow-Headers",
-            "x-access-token, Origin, Content-Type, Accept"
-        );
-        next();
-    });
-
     app.get(
         Helpers.apiVersion7()+"customer/nav",
         [authJwt.verifyToken, authJwt.isCustomer],
@@ -47,7 +39,7 @@ module.exports = function(app) {
 
     app.post(
         Helpers.apiVersion7()+"customer/job/upload-project",
-        [authJwt.verifyToken, authJwt.isCustomer, uploadJob],
+        authJwt.verifyToken, authJwt.isCustomer, uploadJob,
         featuredWocman.uploadProject
     );
 };
