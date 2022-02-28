@@ -7,7 +7,8 @@ const getProjectStatusCount = async () => {
             count(case when status = 'pending' then status end) as pending_job,
             count(case when status = 'approved' then status end) as approved_job,
             count(case when status = 'in-progress' then status end) as progess_job,
-            count(case when status = 'completed' then status end) as completed_job
+            count(case when status = 'completed' then status end) as completed_job,
+            count(case when createdAt BETWEEN DATE_SUB(CURDATE(), INTERVAL 1 WEEK) AND CURDATE() then createdAt end) as recent_job
         FROM projects     
     `;
     return sequelize.query(sql, {
