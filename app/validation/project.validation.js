@@ -11,3 +11,21 @@ exports.createProject = async (body) => {
     const result = schema.validate(body);
     return result;
 };
+
+exports.approveStatusValidation = async (query) => {
+    const schema = Joi.object({
+        status: Joi.string().trim().valid('approved'),
+    });
+    const result = schema.validate(query);
+    return result;
+};
+
+exports.getProjectsValidation = async (query) => {
+    const schema = Joi.object({
+        page: Joi.number().positive(),
+        limit: Joi.number().positive(),
+        status: Joi.string().trim().valid('approved', 'pending', 'in-progress', 'completed'),
+    });
+    const result = schema.validate(query);
+    return result;
+};

@@ -9,7 +9,7 @@ const jobCategory = async (req, res, next) => {
             status: true,
             message,
             data: jobServices,
-        });;
+        });
     } catch (error) {
         return res.status(500).send({
             statusCode: 500,
@@ -29,7 +29,7 @@ const customerJobs = async (req, res, next) => {
             status: true,
             message,
             data: jobs,
-        });;
+        });
     } catch (error) {
         return res.status(500).send({
             statusCode: 500,

@@ -1,22 +1,15 @@
 const baseUrl = "../../";
 const jwt = require("jsonwebtoken");
 const config = require(baseUrl+"config/auth.config.js");
-const db = require(baseUrl+"models");
-const User = db.User;
-const UserRole = db.UserRole;
-const Role = db.Role;
-const Cert = db.Cert;
-const Helpers = require(baseUrl+"helpers/helper.js");
-const Joi = require('joi');
-const Rootadmin = db.Rootadmin;
+const { User, UserRole, RootAdmin, Wsetting } = require('../../models');
 
 var bcrypt = require("bcryptjs");
 
 const otp = Math.floor(100000 + Math.random() * 900000);
 
-isInitiateAdmin = (req, res, next) => {
+const isInitiateAdmin = (req, res, next) => {
 
-    Rootadmin.findOne({
+    RootAdmin.findOne({
         where: {'isroot': 1}
     })
     .then(adminroot => {

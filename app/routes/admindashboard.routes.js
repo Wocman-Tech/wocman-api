@@ -4,23 +4,25 @@ const { isIdVerify, verifyAdminUser, rootAdmin, rootAction, initiateAdmin } = re
 
 const adminNavAndUserController = require("../controllers/users/admin/auth/dashboard/navanduser.controller");
 const adminAccountAndProjectController = require("../controllers/users/admin/auth/dashboard/accountandproject.controller");
+const dashboardController = require('../controllers/admin/dashboard.controller');
 
 const Helpers = require("../helpers/helper.js");
-
-const path = require("path");
-const multer = require("multer");
 
 const  { verifyAdminSignUp } = require("../middleware/website/user/admin");
 
 
 module.exports = function(app) {
-    app.use(function(req, res, next) {
-        res.header(
-            "Access-Control-Allow-Headers",
-            "x-access-token, Origin, Content-Type, Accept"
-        );
-        next();
-    });
+    app.get(
+        Helpers.apiVersion7() + "admin/dashboard/projects", 
+        [authJwt.verifyToken, authJwt.isAdmin],
+        dashboardController.getProjects
+    );
+
+    app.patch(
+        Helpers.apiVersion7() + "admin/dashboard/projects/approve/:id", 
+        [authJwt.verifyToken, authJwt.isAdmin],
+        dashboardController.approveProject
+    );
 
     app.post(
         Helpers.apiVersion7() + "admin/nav", 
