@@ -4,6 +4,7 @@ const { isIdVerify, verifyAdminUser, rootAdmin, rootAction, initiateAdmin } = re
 const adminAllWocmanController = require("../controllers/users/admin/auth/wocman/allwocman.controller");
 const adminOneWocmanController = require("../controllers/users/admin/auth/wocman/onewocman.controller");
 const adminDeleteOneWocmanController = require("../controllers/users/admin/auth/wocman/deletewocman.controller");
+const wocmanController = require('../controllers/admin/wocman.controller')
 
 
 const Helpers = require("../helpers/helper.js");
@@ -15,13 +16,17 @@ const  { verifyAdminSignUp } = require("../middleware/website/user/admin");
 
 
 module.exports = function(app) {
-    app.use(function(req, res, next) {
-        res.header(
-            "Access-Control-Allow-Headers",
-            "x-access-token, Origin, Content-Type, Accept"
-        );
-        next();
-    });
+    app.get(
+        Helpers.apiVersion7() + "admin/wocman",
+        [authJwt.verifyToken, authJwt.isAdmin],
+        wocmanController.getAllWocman
+    );
+
+    app.get(
+        Helpers.apiVersion7() + "admin/wocman/:id",
+        [authJwt.verifyToken, authJwt.isAdmin],
+        wocmanController.getWocman
+    );
 
     app.get(
         Helpers.apiVersion7() + "get-all-wocman",

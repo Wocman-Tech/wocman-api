@@ -18,6 +18,18 @@ module.exports = function(app) {
         dashboardController.getProjects
     );
 
+    app.get(
+        Helpers.apiVersion7() + "admin/dashboard/projects/:id", 
+        [authJwt.verifyToken, authJwt.isAdmin],
+        dashboardController.getSingleProject
+    );
+
+    app.get(
+        Helpers.apiVersion7() + "admin/dashboard/projects/metrics", 
+        [authJwt.verifyToken, authJwt.isAdmin],
+        dashboardController.getProjectMetrics
+    );
+
     app.patch(
         Helpers.apiVersion7() + "admin/dashboard/projects/approve/:id", 
         [authJwt.verifyToken, authJwt.isAdmin],

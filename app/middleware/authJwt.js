@@ -56,14 +56,6 @@ const verifyToken = (req, res, next) => {
                 });
                 return;
             }
-            if (users.weblogintoken !== token) {
-                return res.status(403).send({
-                    statusCode: 403,
-                    status: false,
-                    message: "Token is blacklisted",
-                    data: []
-                });
-            }
             req.userId = decoded.id;
             req.token = token;
             next();

@@ -26,7 +26,7 @@ const getProjects = async (req, res, next) => {
             data: jobs,
         });
     } catch (error) {
-        logger.error('dashboardControllers::getProjects', error);
+        logger.error('Controller::Admin::dashboardControllers::getProjects', error);
         next(error);
     }
 };
@@ -54,14 +54,49 @@ const approveProject = async (req, res, next) => {
             data: {},
         });
     } catch (error) {
-        logger.error('dashboardControllers::approveProjects', error);
+        logger.error('Controller::Admin::dashboardControllers::approveProjects', error);
+        next(error);
+    }
+};
+
+const getProjectMetrics = async (req, res, next) => {
+    try {
+        const [metrics] = await DashboardServices.getProjectStatusCount();
+
+        const message = 'Project metrics fetched successfully';
+        return res.status(200).json({
+            statusCode: 200,
+            status: true,
+            message,
+            data: metrics,
+        });
+    } catch (error) {
+        logger.error('Controller::Admin::dashboardControllers::approveProjects', error);
+        next(error);
+    }
+};
+
+const getSingleProject = async (req, res, next) => {
+    try {
+        const jobs = await DashboardServices.getSingleProject(req.params);
+        const message = 'Project fetched successfully';
+        return res.status(200).json({
+            statusCode: 200,
+            status: true,
+            message,
+            data: jobs,
+        });
+    } catch (error) {
+        logger.error('Controller::Admin::dashboardControllers::getSingleProject', error);
         next(error);
     }
 };
 
 const dashboardControllers = {
     getProjects,
-    approveProject
+    approveProject,
+    getProjectMetrics,
+    getSingleProject
 };
 
 module.exports = dashboardControllers;
