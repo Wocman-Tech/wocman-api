@@ -19,15 +19,15 @@ module.exports = function(app) {
     );
 
     app.get(
-        Helpers.apiVersion7() + "admin/dashboard/projects/:id", 
-        [authJwt.verifyToken, authJwt.isAdmin],
-        dashboardController.getSingleProject
-    );
-
-    app.get(
         Helpers.apiVersion7() + "admin/dashboard/projects/metrics", 
         [authJwt.verifyToken, authJwt.isAdmin],
         dashboardController.getProjectMetrics
+    );
+
+    app.get(
+        Helpers.apiVersion7() + "admin/dashboard/projects/:id", 
+        [authJwt.verifyToken, authJwt.isAdmin],
+        dashboardController.getSingleProject
     );
 
     app.patch(
