@@ -1,5 +1,5 @@
 const { QueryTypes, fn } = require('sequelize');
-const { User, Projecttype, Projects, sequelize } = require('../../models');
+const { User, Projecttype, Projects, Payment, sequelize } = require('../../models');
 
 const getProjectStatusCount = async () => {
     const sql = `
@@ -21,7 +21,7 @@ const getProjects = async (query) => {
     const fetch = (parseInt(query.limit, 10) * parseInt(query.page, 10)) - parseInt(query.limit, 10);
     let filter = {};
     const data = query;
-    const {limit, page, ...newData} = data;
+    const { limit, page, ...newData } = data;
 
     filter = {
         ...newData
@@ -101,19 +101,32 @@ const getSingleProject = async (params) => {
 
     const result = JSON.parse(JSON.stringify(projects))
 
-    
-        const imagesArray = {
-            images: (result.images.length === 0) ? [] : result.images.split('/XX98XX') 
-        }
-        return {
-            ...result,
-            ...imagesArray,
-        }
+
+    const imagesArray = {
+        images: (result.images.length === 0) ? [] : result.images.split('/XX98XX')
+    }
+    return {
+        ...result,
+        ...imagesArray,
+    }
 };
 
 const approveJob = async (params, query) => {
     const { status } = query;
-
+    const payment = await Payment.findOne({
+        where: {
+            project_id: params.id,
+            status: 'success'
+        },
+    });
+    if (!payment) {
+        throw {
+            statusCode: 400,
+            status: false,
+            message: "Project has not been paid for",
+            data: []
+        };
+    }
     await Projects.update(
         {
             status,
@@ -127,11 +140,32 @@ const approveJob = async (params, query) => {
     );
 };
 
+const addPayment = async (body) => {
+    const { reference, transaction_id, status, amount, project_id } = body;
+    const project = await Projects.findByPk(project_id)
+    if (!project) {
+        throw {
+            statusCode: 400,
+            status: false,
+            message: "Project was not found",
+            data: []
+        };
+    }
+    await Payment.create({
+        reference,
+        transaction_id,
+        status,
+        amount,
+        project_id
+    })
+};
+
 const dashboardServices = {
     getProjects,
     approveJob,
     getProjectStatusCount,
-    getSingleProject
+    getSingleProject,
+    addPayment,
 };
 
 module.exports = dashboardServices;

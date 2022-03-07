@@ -137,7 +137,19 @@ module.exports = (sequelize, DataTypes) => {
         isSkilled: {
             type: DataTypes.STRING,
             defaultValue: 0
-        }
+        },
+        status: {
+            type: DataTypes.STRING,
+            defaultValue: 'active'
+        },
+        createdAt: {
+            allowNull: false,
+            type: DataTypes.DATE,
+          },
+          updatedAt: {
+            allowNull: false,
+            type: DataTypes.DATE,
+          },
     }, {
         sequelize,
         modelName: 'User',

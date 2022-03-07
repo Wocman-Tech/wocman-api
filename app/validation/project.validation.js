@@ -29,3 +29,15 @@ exports.getProjectsValidation = async (query) => {
     const result = schema.validate(query);
     return result;
 };
+
+exports.createPayment = async (body) => {
+    const schema = Joi.object({
+        reference: Joi.string().required(),
+        amount: Joi.number().required(),
+        transaction_id: Joi.string().required(),
+        status: Joi.string().required(),
+        project_id: Joi.number().required()
+    });
+    const result = schema.validate(body);
+    return result;
+};

@@ -1,4 +1,4 @@
-const { QueryTypes } = require('sequelize');
+const { QueryTypes, fn } = require('sequelize');
 const { User, sequelize } = require('../../models');
 
 const getAllWocman = async (query) => {
@@ -74,14 +74,34 @@ const getWocman = async (params) => {
             'country',
             'state',
             'phone',
-            'image'
+            'image',
+            'status'
         ],
     });
-}
+};
+
+const suspendOrActivateWocman = async (params, query) => {
+    const { status } = query;
+    const renameStatus = status === 'suspend' ? 'suspended' : status;
+console.log('hoho');
+    await User.update(
+        {
+            status: renameStatus,
+            updatedAt: fn('now'),
+        },
+        {
+            where: {
+                id: params.id
+            },
+        },
+    );
+    console.log('gogo');
+};
 
 const wocmanServices = {
     getAllWocman,
-    getWocman
+    getWocman,
+    suspendOrActivateWocman
 };
 
 module.exports = wocmanServices;

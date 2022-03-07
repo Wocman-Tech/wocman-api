@@ -9,3 +9,11 @@ exports.getWocmanQueryValidation = async (query) => {
     const result = schema.validate(query);
     return result;
 };
+
+exports.suspendOrActivateWocmanValidation = async (query) => {
+    const schema = Joi.object({
+        status: Joi.string().trim().valid('active', 'suspend').required(),
+    });
+    const result = schema.validate(query);
+    return result;
+};

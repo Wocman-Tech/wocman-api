@@ -22,6 +22,12 @@ module.exports = function(app) {
         wocmanController.getAllWocman
     );
 
+    app.patch(
+        Helpers.apiVersion7() + "admin/wocman/change-status/:id",
+        [authJwt.verifyToken, authJwt.isAdmin],
+        wocmanController.suspendOrActivateWocman
+    );
+
     app.get(
         Helpers.apiVersion7() + "admin/wocman/:id",
         [authJwt.verifyToken, authJwt.isAdmin],

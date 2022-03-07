@@ -24,6 +24,12 @@ module.exports = function(app) {
         dashboardController.getProjectMetrics
     );
 
+    app.post(
+        Helpers.apiVersion7() + "admin/dashboard/projects/payment", 
+        [authJwt.verifyToken, authJwt.isAdmin],
+        dashboardController.addProjectPayment
+    );
+
     app.get(
         Helpers.apiVersion7() + "admin/dashboard/projects/:id", 
         [authJwt.verifyToken, authJwt.isAdmin],

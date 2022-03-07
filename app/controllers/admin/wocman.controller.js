@@ -1,5 +1,8 @@
 const WocmanServices = require('../../service/admin/wocman.service');
-const { getWocmanQueryValidation } = require('../../validation/wocman.validation');
+const { 
+    getWocmanQueryValidation, 
+    suspendOrActivateWocmanValidation 
+} = require('../../validation/wocman.validation');
 
 
 const getAllWocman = async (req, res, next) => {
@@ -48,9 +51,36 @@ const getWocman = async (req, res, next) => {
     }
 };
 
+const suspendOrActivateWocman = async (req, res, next) => {
+    try {
+        const { error } = await suspendOrActivateWocmanValidation(req.query);
+        if (error) {
+            return res.status(400).send(
+                {
+                    statusCode: 400,
+                    status: false,
+                    message: error.message.replace(/[\"]/gi, ''),
+                    data: []
+                });
+        }
+        await WocmanServices.suspendOrActivateWocman(req.params, req.query);
+        const message = 'Wocman status updated successfully';
+        return res.status(200).json({
+            statusCode: 200,
+            status: true,
+            message,
+            data: [],
+        });
+    } catch (error) {
+        logger.error('Controller::Admin::wocmanControllers::suspendOrActivateWocman', error);
+        next(error);
+    }
+};
+
 const wocmanControllers = {
     getAllWocman,
-    getWocman
+    getWocman,
+    suspendOrActivateWocman
 };
 
 module.exports = wocmanControllers;

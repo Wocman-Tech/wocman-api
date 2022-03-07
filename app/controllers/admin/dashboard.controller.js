@@ -1,5 +1,6 @@
 const DashboardServices = require('../../service/admin/dashboard.service');
 const { approveStatusValidation, getProjectsValidation } = require('../../validation/project.validation');
+const validator = require('../../validation/project.validation')
 
 const getProjects = async (req, res, next) => {
     try {
@@ -92,11 +93,38 @@ const getSingleProject = async (req, res, next) => {
     }
 };
 
+const addProjectPayment = async (req, res, next) => {
+    try {
+        const { error } = await validator.createPayment(req.body);
+        if (error) {
+            return res.status(400).send(
+                {
+                    statusCode: 400,
+                    status: false,
+                    message: error.message.replace(/[\"]/gi, ''),
+                    data: []
+                });
+        }
+        const payment = await DashboardServices.addPayment(req.body);
+        const message = 'Payment added successfully';
+        return res.status(201).json({
+            statusCode: 201,
+            status: true,
+            message,
+            data: payment,
+        });
+    } catch (error) {
+        logger.error('Controller::Admin::dashboardControllers::addProjectPayment', error);
+        next(error);
+    }
+};
+
 const dashboardControllers = {
     getProjects,
     approveProject,
     getProjectMetrics,
-    getSingleProject
+    getSingleProject,
+    addProjectPayment
 };
 
 module.exports = dashboardControllers;
