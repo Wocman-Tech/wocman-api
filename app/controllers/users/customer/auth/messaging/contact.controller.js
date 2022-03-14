@@ -2,7 +2,6 @@ const pathRoot = '../../../../../';
 
 const db = require(pathRoot+"models");
 const config = require(pathRoot+"config/auth.config");
-const fs = require('fs');
 const User = db.User;
 const Projects = db.Projects;
 const Project = db.Projecttype;
@@ -11,11 +10,6 @@ const {v4 : uuidv4} = require('uuid');
 const Helpers = require(pathRoot+"helpers/helper.js");
 const { verifySignUp } = require(pathRoot+"middleware");
 
-let nodeGeocoder = require('node-geocoder');
- 
-let options = {
-  provider: 'openstreetmap'
-};
 
 
 const nodemailer = require("nodemailer");
