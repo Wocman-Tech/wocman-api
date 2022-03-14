@@ -34,8 +34,6 @@ const getProjects = async (req, res, next) => {
 
 const approveProject = async (req, res, next) => {
     try {
-        await DashboardServices.approveJob(req.params, req.query);
-
         const { error } = await approveStatusValidation(req.query);
         if (error) {
             return res.status(400).send(
@@ -46,6 +44,8 @@ const approveProject = async (req, res, next) => {
                     data: []
                 });
         };
+            
+        await DashboardServices.approveJob(req.params, req.query);
 
         const message = 'Project approved successfully';
         return res.status(200).json({
@@ -119,12 +119,41 @@ const addProjectPayment = async (req, res, next) => {
     }
 };
 
+const addProjectAmount = async (req, res, next) => {
+    try {
+        const { error } = await validator.addProjectAmountValidation(req.body);
+        if (error) {
+            return res.status(400).send(
+                {
+                    statusCode: 400,
+                    status: false,
+                    message: error.message.replace(/[\"]/gi, ''),
+                    data: []
+                });
+        };
+
+        await DashboardServices.addProjectAmount(req.params, req.body);
+
+        const message = 'Project amount added successfully';
+        return res.status(200).json({
+            statusCode: 200,
+            status: true,
+            message,
+            data: {},
+        });
+    } catch (error) {
+        logger.error('Controller::Admin::dashboardControllers::addProjectAmount', error);
+        next(error);
+    }
+};
+
 const dashboardControllers = {
     getProjects,
     approveProject,
     getProjectMetrics,
     getSingleProject,
-    addProjectPayment
+    addProjectPayment,
+    addProjectAmount
 };
 
 module.exports = dashboardControllers;

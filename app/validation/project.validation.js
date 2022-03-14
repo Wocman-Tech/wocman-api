@@ -41,3 +41,11 @@ exports.createPayment = async (body) => {
     const result = schema.validate(body);
     return result;
 };
+
+exports.addProjectAmountValidation = async (body) => {
+    const schema = Joi.object({
+        amount: Joi.number().required(),
+    });
+    const result = schema.validate(body);
+    return result;
+};

@@ -24,6 +24,12 @@ module.exports = function(app) {
         dashboardController.getProjectMetrics
     );
 
+    app.patch(
+        Helpers.apiVersion7() + "admin/dashboard/projects/amount/:id", 
+        [authJwt.verifyToken, authJwt.isAdmin],
+        dashboardController.addProjectAmount
+    );
+
     app.post(
         Helpers.apiVersion7() + "admin/dashboard/projects/payment", 
         [authJwt.verifyToken, authJwt.isAdmin],
@@ -32,7 +38,7 @@ module.exports = function(app) {
 
     app.get(
         Helpers.apiVersion7() + "admin/dashboard/projects/:id", 
-        [authJwt.verifyToken, authJwt.isAdmin],
+        [authJwt.verifyToken],
         dashboardController.getSingleProject
     );
 

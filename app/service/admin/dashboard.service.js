@@ -160,12 +160,29 @@ const addPayment = async (body) => {
     })
 };
 
+const addProjectAmount = async (params, body) => {
+    const { amount  } = body;
+    
+    await Projects.update(
+        {
+            quoteamount: amount,
+            updatedAt: fn('now'),
+        },
+        {
+            where: {
+                id: params.id
+            },
+        },
+    );
+};
+
 const dashboardServices = {
     getProjects,
     approveJob,
     getProjectStatusCount,
     getSingleProject,
     addPayment,
+    addProjectAmount
 };
 
 module.exports = dashboardServices;
