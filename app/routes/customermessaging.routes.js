@@ -43,7 +43,7 @@ module.exports = function(app) {
     );
     app.post(
         Helpers.apiVersion7() + "customer/chat/send",
-        [authJwt.verifyToken, authJwt.isCustomer, uploadChat], 
+        [authJwt.verifyToken, uploadChat], 
         chatController.chatSave
     );
 };
