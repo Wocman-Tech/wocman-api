@@ -4,7 +4,7 @@ exports.getWocmanQueryValidation = async (query) => {
     const schema = Joi.object({
         page: Joi.number().positive(),
         limit: Joi.number().positive(),
-        search: Joi.string().trim(),
+        search: Joi.string().trim().allow(null, ''),
     });
     const result = schema.validate(query);
     return result;
