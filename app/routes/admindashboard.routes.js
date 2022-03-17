@@ -32,7 +32,7 @@ module.exports = function(app) {
 
     app.post(
         Helpers.apiVersion7() + "admin/dashboard/projects/payment", 
-        [authJwt.verifyToken, authJwt.isAdmin],
+        [authJwt.verifyToken, authJwt.isCustomer],
         dashboardController.addProjectPayment
     );
 
