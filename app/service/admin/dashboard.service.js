@@ -57,7 +57,7 @@ const getProjects = async (query) => {
 
     const rows = result.rows.map((el) => {
         const imagesArray = {
-            images: el.images.split('/XX98XX')
+            images: (el.images.length === 0) ? [] : el.images.split('/XX98XX')
         }
         return {
             ...el,

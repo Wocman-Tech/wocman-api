@@ -14,6 +14,8 @@ const Helpers = require("../helpers/helper.js");
 
 const path = require("path");
 const multer = require("multer");
+const { getApprovedProjects, acceptJob } = require("../controllers/users/wocman/auth/dashboard/jobs.controller");
+const { getSingleProject } = require("../controllers/admin/dashboard.controller");
 
 var storage = multer.memoryStorage({
     destination: function (req, file, cb) {
@@ -34,9 +36,21 @@ module.exports = function(app) {
     //project routes
 
     app.get(
-        Helpers.apiVersion7() + "wocman/project/:projectid", 
+        Helpers.apiVersion7() + "wocman/project/approved", 
         [authJwt.verifyToken, authJwt.isWocman], 
-        projectController.wocmanProjectProject
+        getApprovedProjects
+    );
+
+    app.patch(
+        Helpers.apiVersion7() + "wocman/project/accept/:id", 
+        [authJwt.verifyToken, authJwt.isWocman], 
+        acceptJob
+    );
+
+    app.get(
+        Helpers.apiVersion7() + "wocman/project/:id", 
+        [authJwt.verifyToken, authJwt.isWocman], 
+        getSingleProject
     );
 
     app.post(

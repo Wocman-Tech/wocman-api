@@ -12,9 +12,9 @@ exports.createProject = async (body) => {
     return result;
 };
 
-exports.approveStatusValidation = async (query) => {
+exports.approveStatusValidation = async (query, string) => {
     const schema = Joi.object({
-        status: Joi.string().trim().valid('approved'),
+        status: Joi.string().trim().valid(string).required(),
     });
     const result = schema.validate(query);
     return result;

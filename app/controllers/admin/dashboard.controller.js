@@ -1,6 +1,7 @@
 const DashboardServices = require('../../service/admin/dashboard.service');
-const { approveStatusValidation, getProjectsValidation } = require('../../validation/project.validation');
-const validator = require('../../validation/project.validation')
+const { 
+    approveStatusValidation, getProjectsValidation, createPayment, addProjectAmountValidation
+} = require('../../validation/project.validation');
 
 const getProjects = async (req, res, next) => {
     try {
@@ -34,7 +35,7 @@ const getProjects = async (req, res, next) => {
 
 const approveProject = async (req, res, next) => {
     try {
-        const { error } = await approveStatusValidation(req.query);
+        const { error } = await approveStatusValidation(req.query, 'approved');
         if (error) {
             return res.status(400).send(
                 {
@@ -95,7 +96,7 @@ const getSingleProject = async (req, res, next) => {
 
 const addProjectPayment = async (req, res, next) => {
     try {
-        const { error } = await validator.createPayment(req.body);
+        const { error } = await createPayment(req.body);
         if (error) {
             return res.status(400).send(
                 {
@@ -121,7 +122,7 @@ const addProjectPayment = async (req, res, next) => {
 
 const addProjectAmount = async (req, res, next) => {
     try {
-        const { error } = await validator.addProjectAmountValidation(req.body);
+        const { error } = await addProjectAmountValidation(req.body);
         if (error) {
             return res.status(400).send(
                 {
