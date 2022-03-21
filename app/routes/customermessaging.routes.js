@@ -37,12 +37,12 @@ module.exports = function(app) {
         customerController.wocmanContactCustomer
     );
     app.get(
-        Helpers.apiVersion7() + "customer/chat/log", 
+        Helpers.apiVersion7() + "chat/log", 
         [authJwt.verifyToken], 
         chatController.chatLog
     );
     app.post(
-        Helpers.apiVersion7() + "customer/chat/send",
+        Helpers.apiVersion7() + "chat/send",
         [authJwt.verifyToken, uploadChat], 
         chatController.chatSave
     );
