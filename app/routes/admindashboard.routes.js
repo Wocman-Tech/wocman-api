@@ -24,7 +24,7 @@ module.exports = function(app) {
         dashboardController.getProjectMetrics
     );
 
-    app.patch(
+    app.put(
         Helpers.apiVersion7() + "admin/dashboard/projects/amount/:id", 
         [authJwt.verifyToken, authJwt.isAdmin],
         dashboardController.addProjectAmount
@@ -42,7 +42,7 @@ module.exports = function(app) {
         dashboardController.getSingleProject
     );
 
-    app.patch(
+    app.put(
         Helpers.apiVersion7() + "admin/dashboard/projects/approve/:id", 
         [authJwt.verifyToken, authJwt.isAdmin],
         dashboardController.approveProject
