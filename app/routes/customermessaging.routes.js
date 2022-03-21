@@ -38,7 +38,7 @@ module.exports = function(app) {
     );
     app.get(
         Helpers.apiVersion7() + "customer/chat/log", 
-        [authJwt.verifyToken, authJwt.isCustomer], 
+        [authJwt.verifyToken], 
         chatController.chatLog
     );
     app.post(

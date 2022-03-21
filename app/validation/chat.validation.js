@@ -11,3 +11,11 @@ exports.createChatValidation = async (body) => {
     return result;
 };
 
+exports.getChatValidation = async (body) => {
+    const schema = Joi.object({
+        receiverId: Joi.number().integer().min(1).required(),
+        projectId: Joi.number().integer().min(1).required(),
+    });
+    const result = schema.validate(body);
+    return result;
+};

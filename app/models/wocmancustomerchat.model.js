@@ -11,15 +11,37 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
+            WcChat.belongsTo(models.User, {
+                foreignKey: 'senderid',
+                as: 'sender'
+            });
+
+            WcChat.belongsTo(models.User, {
+                foreignKey: 'receiverid',
+                as: 'receiver'
+            });
+
+            WcChat.belongsTo(models.Projects, {
+                foreignKey: 'projectid',
+                as: 'project'
+            });
         }
     }
 
     WcChat.init({
         senderid: {
-            type: DataTypes.INTEGER
+            type: DataTypes.INTEGER,
+            references: {
+                model: 'users',
+                key: 'id',
+            },
         },
         receiverid: {
-            type: DataTypes.INTEGER
+            type: DataTypes.INTEGER,
+            references: {
+                model: 'users',
+                key: 'id',
+            },
         },
         message: {
             type: DataTypes.STRING
@@ -40,7 +62,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING
         },
         projectid: {
-            type: DataTypes.STRING
+            type: DataTypes.INTEGER,
+            references: {
+                model: 'projects',
+                key: 'id',
+            },
         }
     }, {
         sequelize,

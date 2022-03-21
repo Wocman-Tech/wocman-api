@@ -126,7 +126,6 @@ exports.wocmanProfile = (req, res, next) => {
                                 if (!wskills) {}else{
                                     if ('dataValues' in wskills) {
                                         var skillsId = wskills.id;
-                                        var description = wskills.description;
                                         Category.findOne({
                                             where: {id: category_id}
                                         })
@@ -138,7 +137,6 @@ exports.wocmanProfile = (req, res, next) => {
                                                             id: skillsId,
                                                             category: wcategory.name,
                                                             name: skillname,
-                                                            description:description
                                                         }
                                                     );
                                                 }
@@ -441,7 +439,6 @@ exports.wocmanProfile = (req, res, next) => {
                                                     var ppp = (projects[i].images).split(Helpers.padTogether());
                                                     for (let i = 0; i <  ppp.length; i++) {
                                                         var linkExist =  urlExistSync(projects[i].images);
-
                                                         if (linkExist === true) {
                                                             var theimage = projects[i].images;
                                                             project_images.push(
@@ -478,7 +475,7 @@ exports.wocmanProfile = (req, res, next) => {
                                                 );
                                             }
                                             if (parseInt(projects[i].wocmanaccept, 10) == 1) {
-                                                
+                                                console.log('dodo6');
                                                 wpRejected.push(
                                                     [{
                                                         project_id: projects[i].id, 
