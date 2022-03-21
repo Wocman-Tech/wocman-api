@@ -41,7 +41,7 @@ module.exports = function(app) {
         getApprovedProjects
     );
 
-    app.patch(
+    app.put(
         Helpers.apiVersion7() + "wocman/project/accept/:id", 
         [authJwt.verifyToken, authJwt.isWocman], 
         acceptJob
