@@ -83,7 +83,6 @@ const getWocman = async (params) => {
 const suspendOrActivateWocman = async (params, query) => {
     const { status } = query;
     const renameStatus = status === 'suspend' ? 'suspended' : status;
-console.log('hoho');
     await User.update(
         {
             status: renameStatus,
@@ -95,7 +94,6 @@ console.log('hoho');
             },
         },
     );
-    console.log('gogo');
 };
 
 const wocmanServices = {

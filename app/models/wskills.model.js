@@ -11,17 +11,33 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
+            Wskills.belongsTo(models.Projecttype, {
+                foreignKey: 'skillid',
+                as: 'project_subcategory'
+            });
+            Wskills.belongsTo(models.User, {
+                foreignKey: 'userid',
+                as: 'wocman'
+            });
         }
     }
 
     Wskills.init({
         userid: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            references: {
+                model: 'users',
+                key: 'id',
+            },
         },
         skillid: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            references: {
+                model: 'projecttypes',
+                key: 'id',
+            },
         },
     }, {
         sequelize,
