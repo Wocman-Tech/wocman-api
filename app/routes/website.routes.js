@@ -228,7 +228,6 @@ module.exports = function(app) {
         [
             verifyWocmanSignIn.isEmailVerify,
             verifyWocmanSignIn.checkRole,
-            verifyWocmanUser.isWocman
         ],
         isOtpVC.activateIs2FA
     );

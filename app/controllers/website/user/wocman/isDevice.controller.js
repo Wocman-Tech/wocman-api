@@ -183,6 +183,14 @@ exports.isDevice = (req, res, next) => {
                                 .then(  sentMails => {
                                     var sentMail = true;
                                 })
+                                User.update(
+                                    {
+                                        weblogin2fa: otp
+                                    },
+                                    {
+                                        where: {id: user.id}
+                                    }
+                                );
                                 return res.status(202).send({//return response
                                     statusCode: 202,
                                     status: true,
