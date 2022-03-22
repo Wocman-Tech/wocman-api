@@ -30,6 +30,34 @@ const acceptJob = async (req, res, next) => {
     }
 };
 
+const completeJob = async (req, res, next) => {
+    try {
+        const { error } = await approveStatusValidation(req.query, 'completed');
+        if (error) {
+            return res.status(400).send(
+                {
+                    statusCode: 400,
+                    status: false,
+                    message: error.message.replace(/[\"]/gi, ''),
+                    data: []
+                });
+        };
+            
+        await JobServices.completeJob(req.params, req.query, req.userId);
+
+        const message = 'Job completed successfully';
+        return res.status(200).json({
+            statusCode: 200,
+            status: true,
+            message,
+            data: {},
+        });
+    } catch (error) {
+        logger.error('Controller::Wocman::Auth::jobControllers::completeJob', error);
+        next(error);
+    }
+};
+
 const getApprovedProjects = async (req, res, next) => {
     try {
         if (!req.query.limit) req.query.limit = 10;
@@ -62,7 +90,8 @@ const getApprovedProjects = async (req, res, next) => {
 
 const jobControllers = {
     acceptJob,
-    getApprovedProjects
+    getApprovedProjects,
+    completeJob
 };
 
 module.exports = jobControllers;

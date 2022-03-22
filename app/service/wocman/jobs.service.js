@@ -73,11 +73,43 @@ const acceptJob = async (params, query, userId) => {
             data: []
         };
     }
-    console.log('jojo', userId);
     await Projects.update(
         {
             status,
             wocmanid: userId,
+            wocmanstartdatetime: fn('now'),
+            updatedAt: fn('now'),
+        },
+        {
+            where: {
+                id: params.id
+            },
+        },
+    );
+};
+
+const completeJob = async (params, query, userId) => {
+    const { status } = query;
+    const project = await Projects.findOne({
+        where: {
+            id: params.id,
+            status: 'in-progress',
+            wocmanid: userId
+        }
+    })
+    if (!project) {
+        throw {
+            statusCode: 400,
+            status: false,
+            message: "You cannot complete job right now, contact support",
+            data: []
+        };
+    }
+    await Projects.update(
+        {
+            status,
+            wocmanid: userId,
+            wocmanstopdatetime: fn('now'),
             updatedAt: fn('now'),
         },
         {
@@ -90,7 +122,8 @@ const acceptJob = async (params, query, userId) => {
 
 const jobServices = {
     getApprovedJobs,
-    acceptJob
+    acceptJob,
+    completeJob
 };
 
 module.exports = jobServices;
