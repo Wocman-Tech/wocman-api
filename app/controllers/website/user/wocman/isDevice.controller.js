@@ -471,11 +471,11 @@ exports.activateIsDevice = (req, res) => {
                     where: {ip: ip, userid: user.id, ipotp: otpToken}
                 }).then(newfindip => {
                     if (!newfindip) {
-                        return res.status(502).send({
-                            statusCode: 502,
+                        return res.status(400).send({
+                            statusCode: 400,
                             status: false,
                             accessToken: null,
-                            message: "Bad Request",
+                            message: "Invalid Token",
                             data: []
                         });
                     }
