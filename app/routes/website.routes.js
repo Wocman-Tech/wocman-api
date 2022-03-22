@@ -208,7 +208,6 @@ module.exports = function(app) {
             verifyWocmanSignIn.isEmailVerify, 
             verifyWocmanSignIn.isPasswordVerify, 
             verifyWocmanSignIn.checkRole,
-            verifyWocmanUser.isWocman,
             isOtpVC.is2FA
         ],
         isDeviceVC.activateIsDevice
