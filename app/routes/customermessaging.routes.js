@@ -37,7 +37,7 @@ module.exports = function(app) {
         customerController.wocmanContactCustomer
     );
     app.get(
-        Helpers.apiVersion7() + "chat/log", 
+        Helpers.apiVersion7() + "chat/:projectId/log/:receiverId", 
         [authJwt.verifyToken], 
         chatController.chatLog
     );

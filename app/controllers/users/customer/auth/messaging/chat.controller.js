@@ -12,15 +12,15 @@ const { createChatValidation, getChatValidation } = require("../../../../../vali
 
 const Op = db.Sequelize.Op;
 exports.chatLog = async (req, res, next) => {
-    const receiverId = req.body.receiverId;
-    const projectId = req.body.projectId;
+    const receiverId = req.params.receiverId;
+    const projectId = req.params.projectId;
 
-    const body = {
+    const params = {
         receiverId,
         projectId,
     }
 
-    const { error } = await getChatValidation(body);
+    const { error } = await getChatValidation(params);
     if (error) {
         return res.status(400).send(
             {
