@@ -3,7 +3,7 @@ const { s3Upload } = require("../../helpers/s3.upload.helper");
 const { Projects } = require('../../models');
 
 exports.createProject = async (body, userId, files) => {
-    const { description, topic, address, city, projecttypeid } = body;
+    const { description, topic, address, city, projecttypeid, startDate } = body;
     let images = '';
     const data = files.map(async(item, index, array) => {
         const image = await s3Upload(item);
@@ -24,6 +24,7 @@ exports.createProject = async (body, userId, files) => {
         city: city,
         projectid: projecttypeid,
         customerid: userId,
-        images
+        images,
+        startDate
     });
 };

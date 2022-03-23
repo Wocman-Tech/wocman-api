@@ -6,7 +6,8 @@ exports.createProject = async (body) => {
         address: Joi.string().required(),
         city: Joi.string().required(),
         topic: Joi.string().required(),
-        projecttypeid: Joi.number().required()
+        projecttypeid: Joi.number().required(),
+        startDate: Joi.date().required()
     });
     const result = schema.validate(body);
     return result;

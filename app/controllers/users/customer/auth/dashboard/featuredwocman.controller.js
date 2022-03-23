@@ -26,7 +26,8 @@ exports.uploadProject = async (req, res, next) => {
             address: req.body.address,
             city: req.body.city,
             topic: req.body.topic,
-            projecttypeid: req.body.projecttypeid
+            projecttypeid: req.body.projecttypeid,
+            startDate: req.body.startDate
         }
         const { error } = await validator.createProject(body);
         if (error) {
