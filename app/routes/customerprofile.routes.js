@@ -41,13 +41,13 @@ module.exports = function(app) {
         userProfileController.profileController
     );
 
-    app.patch(
+    app.put(
         Helpers.apiVersion7()+"customer/profile/complete",
         [authJwt.verifyToken, authJwt.isCustomer],
         completeController.checkCompleteProfile
     );
 
-    app.patch(
+    app.put(
         Helpers.apiVersion7()+"customer/profile/update",
         [authJwt.verifyToken, authJwt.isCustomer],
         updateprofileController.ProfileUpdate
@@ -65,19 +65,19 @@ module.exports = function(app) {
         profilepictureController.uploadProfilePicture
     );
 
-    app.patch(
+    app.put(
         Helpers.apiVersion7() + "customer/profile/reuse/picture", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         reusepictureController.ReuseProfilePicture
     );
 
-    app.patch(
+    app.put(
         Helpers.apiVersion7() + "customer/profile/remove/picture", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         removepictureController.removeProfilePicture
     );
 
-    app.patch(
+    app.put(
         Helpers.apiVersion7() + "customer/logout", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         logoutController.customerLogout

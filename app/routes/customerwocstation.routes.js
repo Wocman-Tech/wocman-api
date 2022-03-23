@@ -53,25 +53,25 @@ module.exports = function(app) {
         scheduleController.book_appointment
     );
 
-    app.patch(
+    app.put(
         Helpers.apiVersion7() + "customer/wocstation/activities/start_project/:projectid", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         activitiesController.startProject
     );
 
-    app.patch(
+    app.put(
         Helpers.apiVersion7() + "customer/wocstation/activities/complete_project/:projectid", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         activitiesController.completeProject
     );
 
-    app.patch(
+    app.put(
         Helpers.apiVersion7() + "customer/wocstation/activities/rate_project", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         activitiesController.rateProject
     );
 
-    app.patch(
+    app.put(
         Helpers.apiVersion7() + "customer/wocstation/activities/report_project", 
         [authJwt.verifyToken, authJwt.isCustomer], 
         activitiesController.reportProject
