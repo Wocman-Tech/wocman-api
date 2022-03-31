@@ -4,7 +4,7 @@ exports.createProject = async (body) => {
     const schema = Joi.object({
         description: Joi.string().required(),
         address: Joi.string().required(),
-        city: Joi.string().required(),
+        city: Joi.string().trim().lowercase({ convert: true }).required(),
         topic: Joi.string().required(),
         projecttypeid: Joi.number().required(),
         startDate: Joi.date().required()

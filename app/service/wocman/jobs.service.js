@@ -12,7 +12,8 @@ const getApprovedJobs = async (query, userId) => {
         FROM projects p
         LEFT JOIN projecttypes ON projecttypes.id = p.projectid
         INNER JOIN wskills ON wskills.skillid = projecttypes.id
-        WHERE p.status = 'approved' AND userid = ${userId} AND p.wocmanid is null
+        LEFT JOIN users ON users.id = wskills.userid
+        WHERE (LOWER(users.state) = LOWER(p.city)) AND p.status = 'approved' AND userid = ${userId} AND p.wocmanid is null 
         ORDER BY p.createdAt DESC
     `;
 
@@ -23,7 +24,8 @@ const getApprovedJobs = async (query, userId) => {
         FROM projects p
         LEFT JOIN projecttypes ON projecttypes.id = p.projectid
         INNER JOIN wskills ON wskills.skillid = projecttypes.id
-        WHERE p.status = 'approved' AND userid = ${userId} AND p.wocmanid is null
+        LEFT JOIN users ON users.id = wskills.userid
+        WHERE (LOWER(users.state) = LOWER(p.city)) AND p.status = 'approved' AND userid = ${userId} AND p.wocmanid is null
         ORDER BY p.createdAt DESC
         LIMIT ${limit} OFFSET ${fetch}
     `;
