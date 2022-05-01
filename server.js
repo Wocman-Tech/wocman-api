@@ -78,21 +78,22 @@ const Skills = db.Skills;
 const Competency = db.Competency;
 const Category = db.Category;
 
-// db.sequelize.sync();
-// force: true will drop the table if it already exists
-// db.sequelize.sync({force: true}).then(() => {
-//   console.log('Drop and Resync Database with { force: true }');
-//   initial();
-//   initial1();
-//   initial2();
-// });
-
 
 // set port, listen for requests
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}.`);
-});
+const PORT = process.env.PORT || 4000;
+
+db.sequelize
+  .authenticate()
+  .then(() => {
+    logger.info('Connection has been established successfully.');
+    app.listen(PORT, () => {
+      logger.info(`Server is running on port ${PORT}.`);
+    });
+  })
+  .catch((error) => {
+    logger.error(error.message);
+  });
+
 process.env.TZ = 'Africa/Lagos';
 
 // Role.drop();
@@ -181,7 +182,7 @@ function initial2() {
 
 // simple route
 app.get("/", (req, res) => {
-    res.json({ message: "Testing a web app api with node by justice" });
+    res.json({ message: "Welcome to Wocman API" });
 });
 
 

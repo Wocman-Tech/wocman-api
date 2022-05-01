@@ -5,6 +5,7 @@
     "main": "server.js",
     "nodemon": "nodemon server.js",
     "scripts": {
+        "start": "node server.js",
         "test": "echo \"Error: no test specified\" && exit 1",
         "migrate:create": "sequelize migration:generate --name",
         "migrate:up": "sequelize db:migrate",
