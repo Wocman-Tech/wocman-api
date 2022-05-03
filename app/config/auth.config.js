@@ -1,52 +1,73 @@
-const { workstation }  = require("./env.config");
+require('dotenv').config();
 
-
-//auth.config.js
-
-if (workstation.toLowerCase() === "web") {
+if (process.env.NODE_ENV === "production") {
     module.exports = {
-        secret: "wocman-technology-api-justice-auth-0-security",
+        secret: process.env.JWT_SECRET,
+        resolve: process.env.WOCMAN_API_URL,
+        port: '/',
+        version: "/api/v1/",
+        coreRootFolder: "",
+        coreImageFloder: "app/uploads/",
+        split: "/XX98XX",
+        email: process.env.WOCMAN_EMAIL,//create your account with the transport for mailing, put your email here
+        message_server: process.env.WOCMAN_MESSAGE_SERVER,
+        password: process.env.WOCMAN_EMAIL_PASSWORD,//put your transport password here
+        name: "Wocman Technology",
+        website: process.env.WOCMAN_WEB_URL,
+        otpId: process.env.WOCMAN_OTP_ID,
+        googleAppClientID: process.env.WOCMAN_GOOGLE_CLIENT_ID,
+        googleAppClientSecret: process.env.WOCMAN_GOOGLE_CLIENT_SECRET,
+        awsS3AccessKeyId: process.env.WOCMAN_AWS_S3_ID,
+        awsS3SecretAccessKey: process.env.WOCMAN_AWS_S3_SECRET,
+        awsS3BucketName: process.env.WOCMAN_AWS_S3_BUCKET,
+        companyPassword: process.env.WOCMAN_BCRYPT_SECRET
+    }
+}
+
+if (process.env.NODE_ENV === "development") {
+    module.exports = {
+        secret: process.env.JWT_SECRET,
         resolve: "https://wocman-node-api-8080.herokuapp.com",
         port: '/',
         version: "/api/v1/",
         coreRootFolder: "",
         coreImageFloder: "app/uploads/",
         split: "/XX98XX",
-        email: "ugboguj@yahoo.com",//create your account with the transport for mailing, put your email here
-        message_server: "Yahoo",
-        password: "rrilmtbqmsduewpy",//put your transport password here
+        email: process.env.WOCMAN_EMAIL,//create your account with the transport for mailing, put your email here
+        message_server: process.env.WOCMAN_MESSAGE_SERVER,
+        password: process.env.WOCMAN_EMAIL_PASSWORD,//put your transport password here
         name: "Wocman Technology",
         website: "https://wocman.netlify.app",
-        otpId: "8C5YFUT5NWJo8TD7tVQ20o4QF",
-        googleAppClientID: "832018209601-v1h3d5qgu10p3m4pv6l1jvgq9gcrl9v1.apps.googleusercontent.com",
-        googleAppClientSecret: "o1pyycovPehN0loXowHRh0aR",
-        awsS3AccessKeyId: "AKIAUPJAS3S6WTQ37DUN",
-        awsS3SecretAccessKey: "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",
-        awsS3BucketName: "wocmantechnologyuploads",
-        companyPassword: 'rathH-5Rhsa-sa755bB0o!d'
+        otpId: process.env.WOCMAN_OTP_ID,
+        googleAppClientID: process.env.WOCMAN_GOOGLE_CLIENT_ID,
+        googleAppClientSecret: process.env.WOCMAN_GOOGLE_CLIENT_SECRET,
+        awsS3AccessKeyId: process.env.WOCMAN_AWS_S3_ID,
+        awsS3SecretAccessKey: process.env.WOCMAN_AWS_S3_SECRET,
+        awsS3BucketName: process.env.WOCMAN_AWS_S3_BUCKET,
+        companyPassword: process.env.WOCMAN_BCRYPT_SECRET
     }
 }
 
-if(workstation.toLowerCase() === "localhost"){
+if (process.env.NODE_ENV === "localhost"){
     module.exports = {
-        secret: "wocman-technology-api-justice-auth-0-security",
+        secret: process.env.JWT_SECRET,
         resolve: "http://localhost",
         port: ':8080/',
         version: "/api/v1/",
         coreRootFolder: "",
         coreImageFloder: "app/uploads/",
         split: "/XX98XX",
-        email: "ugboguj@yahoo.com",
-        message_server: "Yahoo",
-        password: "rrilmtbqmsduewpy",
+        email: process.env.WOCMAN_EMAIL,//create your account with the transport for mailing, put your email here
+        message_server: process.env.WOCMAN_MESSAGE_SERVER,
+        password: process.env.WOCMAN_EMAIL_PASSWORD,//put your transport password here
         name: "Wocman Technology",
         website: "https://wocman.netlify.app",
-        otpId: "8C5YFUT5NWJo8TD7tVQ20o4QF",
-        googleAppClientID: "195099622008-8thdppg008minmb2vlmq4q3nd6obbfjv.apps.googleusercontent.com",
-        googleAppClientSecret: "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",
-        awsS3AccessKeyId: "AKIAUPJAS3S6WTQ37DUN",
-        awsS3SecretAccessKey: "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",
-        awsS3BucketName: "wocmantechnologyuploads",
-        companyPassword: 'rathH-5Rhsa-sa755bB0o!d'
+        otpId: process.env.WOCMAN_OTP_ID,
+        googleAppClientID: process.env.WOCMAN_GOOGLE_CLIENT_ID,
+        googleAppClientSecret: process.env.WOCMAN_GOOGLE_CLIENT_SECRET,
+        awsS3AccessKeyId: process.env.WOCMAN_AWS_S3_ID,
+        awsS3SecretAccessKey: process.env.WOCMAN_AWS_S3_SECRET,
+        awsS3BucketName: process.env.WOCMAN_AWS_S3_BUCKET,
+        companyPassword: process.env.WOCMAN_BCRYPT_SECRET
     }
 }

@@ -72,11 +72,11 @@ app.use(passport.session());
 // database
 const db = require("./app/models");
 const { errorResponse } = require("./app/helpers/error.helper");
-const Role = db.Role;
-const WCchat = db.WcChat;
-const Skills = db.Skills;
-const Competency = db.Competency;
-const Category = db.Category;
+const Role = db.role;
+const WCchat = db.wcChat;
+const Skills = db.skills;
+const Competency = db.competency;
+const Category = db.category;
 
 
 // set port, listen for requests

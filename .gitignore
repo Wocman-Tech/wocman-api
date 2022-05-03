@@ -5,3 +5,4 @@ package-lock.json
 gitignore.js
 logs
 .env
+server.log
