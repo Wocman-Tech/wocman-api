@@ -11,43 +11,6 @@ const {v4 : uuidv4} = require('uuid');
 const Helpers = require(pathRoot+"helpers/helper.js");
 const { verifySignUp } = require(pathRoot+"middleware");
 
-let nodeGeocoder = require('node-geocoder');
- 
-let options = {
-  provider: 'openstreetmap'
-};
-
-
-const nodemailer = require("nodemailer");
-const Mailgen = require("mailgen");
-const Joi = require('joi'); 
-
-const { EMAIL, PASSWORD, MAIN_URL } = require(pathRoot+"helpers/helper.js");
-
-let transporter = nodemailer.createTransport({
-  service: config.message_server,
-  secure: true,
-  auth: {
-    user: EMAIL,
-    pass: PASSWORD,
-  },
-});
-
-let MailGenerator = new Mailgen({
-  theme: "default",
-  product: {
-    name: config.name,
-    link: config.website,
-  },
-});
-
-
-
-
-const Op = db.Sequelize.Op;
-
-var jwt = require("jsonwebtoken");
-var bcrypt = require("bcryptjs");
 
 // chat routes
 exports.wocmanChatContact = (req, res, next) => {

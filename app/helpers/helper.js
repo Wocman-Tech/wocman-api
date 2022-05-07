@@ -23,7 +23,8 @@ let options = {
 };
 
 let transporter = nodemailer.createTransport({
-    service: config.message_server,
+    host: config.message_server,
+    port: 465,
     secure: true,
     auth: {
         user: config.email,

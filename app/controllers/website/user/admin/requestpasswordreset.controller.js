@@ -33,11 +33,12 @@ let options = {
 };
 
 let transporter = nodemailer.createTransport({
-  service: config.message_server,
-  secure: true,
-  auth: {
-    user: EMAIL,
-    pass: PASSWORD,
+    host: config.message_server,
+    port: 465,
+    secure: true,
+    auth: {
+        user: EMAIL,
+        pass: PASSWORD,
   },
 });
 

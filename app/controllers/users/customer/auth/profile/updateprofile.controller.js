@@ -15,28 +15,6 @@ const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
- 
-let options = {
-    provider: 'openstreetmap'
-};
-
-let transporter = nodemailer.createTransport({
-    service: config.message_server,
-    secure: true,
-    auth: {
-        user: EMAIL,
-        pass: PASSWORD,
-    },
-});
-
-let MailGenerator = new Mailgen({
-    theme: "default",
-    product: {
-        name: config.name,
-        link: config.website,
-    },
-});
-
 
 const Op = db.Sequelize.Op;
 

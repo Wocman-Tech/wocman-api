@@ -25,22 +25,6 @@ let options = {
 
 const urlExistSync = require("url-exist-sync");
 
-let transporter = nodemailer.createTransport({
-  service: config.message_server,
-  secure: true,
-  auth: {
-    user: EMAIL,
-    pass: PASSWORD,
-  },
-});
-
-let MailGenerator = new Mailgen({
-  theme: "default",
-  product: {
-    name: config.name,
-    link: config.website,
-  },
-});
 
 
 const Op = db.Sequelize.Op;

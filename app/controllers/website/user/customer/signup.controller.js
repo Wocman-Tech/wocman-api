@@ -37,7 +37,8 @@ const otp = Math.floor(100000 + Math.random() * 900000);
 
 
 let transporter = nodemailer.createTransport({
-    service: config.message_server,
+    host: config.message_server,
+    port: 465,
     secure: true,
     auth: {
         user: EMAIL,

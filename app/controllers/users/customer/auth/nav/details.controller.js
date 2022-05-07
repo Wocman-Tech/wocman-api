@@ -11,41 +11,6 @@ const Wrate = db.Wrate;
 const urlExistSync = require("url-exist-sync");
 
 const Helpers = require(pathRoot+"helpers/helper.js");
-const { verifySignUp } = require(pathRoot+"middleware");
-const { EMAIL, PASSWORD, MAIN_URL } = require(pathRoot+"helpers/helper.js");
-
-const {v4 : uuidv4} = require('uuid');
-const Joi = require('joi'); 
-let nodeGeocoder = require('node-geocoder');
-const nodemailer = require("nodemailer");
-const Mailgen = require("mailgen");
-var jwt = require("jsonwebtoken");
-var bcrypt = require("bcryptjs");
- 
-let options = {
-  provider: 'openstreetmap'
-};
-
-let transporter = nodemailer.createTransport({
-  service: config.message_server,
-  secure: true,
-  auth: {
-    user: EMAIL,
-    pass: PASSWORD,
-  },
-});
-
-let MailGenerator = new Mailgen({
-  theme: "default",
-  product: {
-    name: config.name,
-    link: config.website,
-  },
-});
-
-
-const Op = db.Sequelize.Op;
-
 
 exports.customerNav = (req, res, next) => {
     if (typeof req.userId == "undefined") {
@@ -119,7 +84,6 @@ exports.customerNav = (req, res, next) => {
                     if (parseInt(user_role.roleid, 10) == 2) {
 
                         const user_rate = await Wrate.findAll({ where: {'userid': each_userc.id} });
-                        console.log("🚀 ~ file: details.controller.js ~ line 123 ~ forawait ~ user_rate", user_rate)
                         for await (const each_rate of user_rate){
                             rateUserCount = rateUserCount + 1;
                             rateUser = rateUser + parseInt(each_rate.rateUser, 10);

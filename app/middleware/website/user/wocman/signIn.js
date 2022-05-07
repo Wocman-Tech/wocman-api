@@ -125,7 +125,6 @@ const checkRolesExisted = (req, res, next) => {
                 next();
             })
             .catch(err => {
-            console.log("🚀 ~ file: signIn.js ~ line 130 ~ checkRolesExisted ~ err", err)
                 res.status(500).send({
                     statusCode: 500,
                     status: false, 

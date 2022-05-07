@@ -38,11 +38,12 @@ const otp = Math.floor(100000 + Math.random() * 900000);
 
 
 let transporter = nodemailer.createTransport({
-  service: config.message_server,
-  secure: true,
-  auth: {
-    user: EMAIL,
-    pass: PASSWORD,
+    host: config.message_server,
+    port: 465,
+    secure: true,
+    auth: {
+        user: EMAIL,
+        pass: PASSWORD,
   },
 });
 
@@ -129,10 +130,13 @@ exports.signUpWocman = (req, res, next) => {
                 subject: "Signup Successful",
                 html: mail,
             };
-            var sentMail = false;
+            let sentMail = false;
             transporter.sendMail(message)
-            .then(() => {
-                var sentMail = true;
+            .then((data) => {
+                logger.info('Signup Successful Snt Successfully', data)
+                sentMail = true;
+            }).catch((err) => {
+                logger.error('Signup email Error', err)                
             })
              res.status(200).send({
                 statusCode: 200,
