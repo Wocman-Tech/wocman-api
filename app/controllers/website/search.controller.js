@@ -2,30 +2,18 @@ const pathRoot = '../../';
 const db = require(pathRoot+"models");
 const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
-const User = db.User;
-const UserRole = db.UserRole;
-const Role = db.Role;
-const Cert = db.Cert;
-const Nletter = db.Nletter;
-const Contactus = db.Contactus;
+const User = db.user;
+const UserRole = db.userRole;
 
-
-const Projects = db.Projects;
-const Project = db.Projecttype;
-const Wshear = db.Wshear;
-const WAChat = db.WaChat;
-const WCChat = db.WcChat;
-const WWallet = db.WWallet;
+const Projects = db.projects;
 
 const Helpers = require(pathRoot+"helpers/helper.js");
-const { verifySignUp } = require(pathRoot+"middleware");
-const { EMAIL, PASSWORD, MAIN_URL } = require(pathRoot+"helpers/helper.js");
 
-const {v4 : uuidv4} = require('uuid');
-const Joi = require('joi'); 
 let nodeGeocoder = require('node-geocoder');
 
-
+let options = {
+    provider: 'openstreetmap'
+  };
 
 const Op = db.Sequelize.Op;
 
