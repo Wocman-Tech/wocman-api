@@ -15,6 +15,8 @@ const getAllWocman = async (query) => {
         users u
         LEFT JOIN userroles ur ON ur.userid = u.id
         LEFT JOIN roles r ON r.id = ur.roleid
+        LEFT JOIN wskills ws ON ws.userid = u.id
+        LEFT JOIN skills s ON s.id = ws.skillid
         WHERE r.name = 'wocman' AND (u.firstname LIKE '%${condition}%' OR u.lastname LIKE '%${condition}%' 
         OR u.email LIKE '%${condition}%' OR u.username LIKE '%${condition}%' OR '%${condition}%' is null)
         ORDER BY u.createdAt DESC
@@ -32,11 +34,15 @@ const getAllWocman = async (query) => {
             state,
             phone,
             image,
-            r.name as role
+            status,
+            r.name as role,
+            p.name as skill
         FROM
         users u
         LEFT JOIN userroles ur ON ur.userid = u.id
         LEFT JOIN roles r ON r.id = ur.roleid
+        LEFT JOIN wskills ws ON ws.userid = u.id
+        LEFT JOIN projecttypes p ON p.id = ws.skillid
         WHERE r.name = 'wocman' AND (u.firstname LIKE '%${condition}%' OR u.lastname LIKE '%${condition}%' 
         OR u.email LIKE '%${condition}%' OR u.username LIKE '%${condition}%' OR '%${condition}%' is null)
         ORDER BY u.createdAt DESC
@@ -60,24 +66,35 @@ const getAllWocman = async (query) => {
 };
 
 const getWocman = async (params) => {
-    return User.findOne({
-        where: {
-            id: params.id
-        },
-        attributes: [
-            'id', 
-            'firstname', 
-            'lastname', 
-            'email', 
-            'username', 
-            'address',
-            'country',
-            'state',
-            'phone',
-            'image',
-            'status'
-        ],
+    const sql = `
+        SELECT
+            u.id,
+            email,
+            username,
+            firstname,
+            lastname,
+            address,
+            country,
+            state,
+            phone,
+            image,
+            status,
+            r.name as role,
+            p.name as skill
+        FROM
+        users u
+        LEFT JOIN userroles ur ON ur.userid = u.id
+        LEFT JOIN roles r ON r.id = ur.roleid
+        LEFT JOIN wskills ws ON ws.userid = u.id
+        LEFT JOIN projecttypes p ON p.id = ws.skillid
+        WHERE u.id = ${params.id} 
+    `;
+
+    const [result] = await sequelize.query(sql, {
+        type: QueryTypes.SELECT,
     });
+
+    return result;
 };
 
 const suspendOrActivateWocman = async (params, query) => {
