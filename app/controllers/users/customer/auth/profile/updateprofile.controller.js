@@ -119,8 +119,8 @@ exports.ProfileUpdate = (req, res, next) => {
 
         //schema
         const joiCleanSchema = Joi.object().keys({ 
-            firstname: Joi.string().alphanum().min(3).max(225).required(), 
-            lastname: Joi.string().alphanum().min(3).max(225).required(), 
+            firstname: Joi.string().min(3).max(225).required(), 
+            lastname: Joi.string().min(3).max(225).required(), 
             address: Joi.string().min(10).max(225).required(), 
             phone: Joi.string().min(6).max(225).required(), 
             country: Joi.string().min(3).max(225).required(),

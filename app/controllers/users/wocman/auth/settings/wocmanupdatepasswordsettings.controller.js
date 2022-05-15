@@ -82,8 +82,8 @@ exports.wocmanChangePassword = (req, res, next) => {
         // });
         //schema
         const joiCleanSchema = Joi.object({
-            password: Joi.string().alphanum().min(8).max(30).required(),
-            oldpassword: Joi.string().alphanum().min(8).max(30).required(),
+            password: Joi.string().min(8).max(30).required(),
+            oldpassword: Joi.string().min(8).max(30).required(),
             confirmpassword: Joi.ref('password')
         });
 
@@ -95,7 +95,7 @@ exports.wocmanChangePassword = (req, res, next) => {
             return res.status(422).json({
                 statusCode: 422,
                 status: false,
-                message: 'Minimun of 8 alphanumeric characters and maximun of 30 alphanumeric characters  is required in password field',
+                message: 'Minimun of 8 characters and maximun of 30 characters  is required in password field',
                 data: []
             })
         }else{
