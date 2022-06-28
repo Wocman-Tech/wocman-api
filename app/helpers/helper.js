@@ -211,9 +211,12 @@ const notice_pusher = (userId, noticeBody, noticeType) => {
 
                         let response = {
                             body: {
-                              name: pusherUsername,
-                              intro: noticeBody,
-                            },
+                                name: pusherUsername,
+                                intro: noticeBody,
+                                action: {
+                                    button: {}
+                                },
+                            }
                         };
                         let mail = MailGenerator.generate(response);
 
@@ -263,9 +266,12 @@ const notice_pusher = (userId, noticeBody, noticeType) => {
 
                         let response = {
                             body: {
-                              name: pusherUsername,
-                              intro: noticeBody,
-                            },
+                                name: pusherUsername,
+                                intro: noticeBody,
+                                action: {
+                                    button: {}
+                                },
+                            }
                         };
                         let mail = MailGenerator.generate(response);
 

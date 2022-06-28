@@ -87,9 +87,13 @@ exports.adminResetPassword = (req, res, next) => {
             .then(tht => {
                 let response = {
                     body: {
-                      name: dfg43.username,
-                      intro: "You have requested that your password be changed. If not you, kindly disregard this message.  <br/>Copy this digits to complete the password reset process: <br><div style='font-weight:bolder;'>" + verify_email+"</div><br/>",
-                    },
+                        name: dfg43.username,
+                        intro: "You have requested that your password be changed. If not you, kindly disregard this message.",
+                        action: {
+                            instructions: `Copy this digits to complete the password reset process: ${verify_email}`,
+                            button: {}
+                        },
+                    }
                 };
                 var sentMail = false;
 

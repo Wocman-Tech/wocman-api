@@ -201,8 +201,12 @@ exports.resendEmail = (req, res) => {
             let response = {
                 body: {
                     name: "Customer",
-                    intro: "Welcome to Wocman Technology! We're very excited to have you on board as a customer. <br/ >Copy this OTP to process your registration: <div style='font-weight:bolder;'>" + verification_link + "</div><br/>",
-                },
+                    intro: "Welcome to Wocman Technology! We're very excited to have you on board as a customer.",
+                    action: {
+                        instructions: `Copy this OTP to process your registration: ${verification_link}`,
+                        button: {}
+                    },
+                }
             };
 
             let mail = MailGenerator.generate(response);

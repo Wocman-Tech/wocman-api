@@ -330,9 +330,13 @@ exports.is2FA = (req, res, next) => {
 
                 let response = {
                     body: {
-                      name: user.username,
-                      intro: "Welcome to Wocman Technology! You requested an OTP to login. Copy this OTP  to continue   Login: <br /><div style='font-weight:bolder;'>" + otp + "</div><br/>",
-                    },
+                        name: user.username,
+                        intro: "Welcome to Wocman Technology! You requested an OTP to login.",
+                        action: {
+                            instructions: `Copy this OTP to continue Login: ${otp}`,
+                            button: {}
+                        },
+                    }
                 };
 
                 let mail = MailGenerator.generate(response);
@@ -436,9 +440,13 @@ exports.resendIs2FA = (req, res) => {
 
                 let response = {
                     body: {
-                      name: user.username,
-                      intro: "Welcome to Wocman Technology! You requested an OTP to login. Copy this OTP  to continue   Login: <br /><div style='font-weight:bolder;'>" + otp + "</div><br/>",
-                    },
+                        name: user.username,
+                        intro: "Welcome to Wocman Technology! You requested an OTP to login.",
+                        action: {
+                            instructions: `Copy this OTP to continue Login: ${otp}`,
+                            button: {}
+                        },
+                    }
                 };
 
                 let mail = MailGenerator.generate(response);

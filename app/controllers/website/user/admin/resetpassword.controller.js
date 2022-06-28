@@ -98,9 +98,17 @@ exports.adminStartResetPassword = (req, res, next) => {
             var verification_link = config.website + "/login?admin=1";
             let response = {
                 body: {
-                  name: users.username,
-                  intro: "Welcome to Wocman Technology! We're very excited to have you on board. <br/>Your password reset process was Completed. Click or Copy this link below to any browser to login: <br/><div style='font-weight:bolder;'>"+verification_link + "</div><br/>",
-                },
+                    name: users.username,
+                    intro: "Welcome to Wocman Technology! We're very excited to have you on board.",
+                    action: {
+                        instructions: `Your password reset process was Completed. Click or Copy this link below to any browser to login`,
+                        button: {
+                            color: '#22BC66', // Optional action button color
+                            text: 'Click Here to Login',
+                            link: verification_link
+                        }
+                    },
+                }
             };
 
             let mail = MailGenerator.generate(response);

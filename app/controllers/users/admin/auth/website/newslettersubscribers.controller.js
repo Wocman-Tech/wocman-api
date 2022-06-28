@@ -184,7 +184,10 @@ exports.sendNewsletter = (req, res, next) => {
                     body: {
                         name: subscriber,
                         intro: subscriber_email,
-                    },
+                        action: {
+                            button: {}
+                        },
+                    }
                 };
 
                 let mail = MailGenerator.generate(response);

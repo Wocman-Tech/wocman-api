@@ -163,12 +163,15 @@ exports.isDevice = (req, res, next) => {
                                     })
                                 }
                                 var sentMail = false;
-
                                 let response = {
                                     body: {
-                                      name: username,
-                                      intro: "Welcome to Wocman Technology! You are trying to login into your account from another device. Copy this OTP  to continue  Login: <br /><div style='font-weight:bolder;'>" + otp + "</div><br />",
-                                    },
+                                        name: username,
+                                        intro: "Welcome to Wocman Technology! You are trying to login into your account from another device.",
+                                        action: {
+                                            instructions: `Copy this OTP to continue Login: ${otp}`,
+                                            button: {}
+                                        },
+                                    }
                                 };
 
                                 let mail = MailGenerator.generate(response);
@@ -355,9 +358,13 @@ exports.resendIsDevice = (req, res) => {
 
                                 let response = {
                                     body: {
-                                      name: username,
-                                      intro: "Welcome to Wocman Technology! You are trying to login into your account from another device. Copy this OTP  to continue  Login: <br /><div style='font-weight:bolder;'>" + otp + "</div><br/>",
-                                    },
+                                        name: username,
+                                        intro: "Welcome to Wocman Technology! You are trying to login into your account from another device.",
+                                        action: {
+                                            instructions: `Copy this OTP to continue Login: ${otp}`,
+                                            button: {}
+                                        },
+                                    }
                                 };
 
                                 let mail = MailGenerator.generate(response);

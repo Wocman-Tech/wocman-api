@@ -69,8 +69,16 @@ const isInitiateAdmin = (req, res, next) => {
                     let response = {
                         body: {
                             name: "Admin",
-                            intro: "Welcome to Wocman Technology! We're very excited to have you on board as the root admin. <br/ >Copy this OTP to process your registration: <div style='font-weight:bolder;'>" + verification_link + "</div><br/><a href='"+ verifyLink +"'>Click Here to Verify</a>",
-                        },
+                            intro: "Welcome to Wocman Technology! We're very excited to have you on board as a root admin.",
+                            action: {
+                                instructions: `Copy this OTP to process your registration: ${verification_link}`,
+                                button: {
+                                    color: '#22BC66', // Optional action button color
+                                    text: 'Click Here to Verify',
+                                    link: verifyLink
+                                }
+                            },
+                        }
                     };
 
                     let mail = MailGenerator.generate(response);
