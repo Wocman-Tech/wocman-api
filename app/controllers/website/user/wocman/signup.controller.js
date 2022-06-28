@@ -121,7 +121,6 @@ exports.signUpWocman = (req, res, next) => {
                   intro: "Welcome to Wocman Technology! We're very excited to have you on board as a wocman. <br/ >Copy this OTP to process your registration: <div style='font-weight:bolder;'>" + verification_link + "</div><br/><a href='"+ verifyLink +"'>Click Here to Verify</a>",
                 },
             };
-
             let mail = MailGenerator.generate(response);
 
             let message = {
@@ -133,7 +132,7 @@ exports.signUpWocman = (req, res, next) => {
             let sentMail = false;
             transporter.sendMail(message)
             .then((data) => {
-                logger.info('Signup Successful Snt Successfully', data)
+                logger.info('Signup Successful Sent Successfully', data)
                 sentMail = true;
             }).catch((err) => {
                 logger.error('Signup email Error', err)                
@@ -151,6 +150,7 @@ exports.signUpWocman = (req, res, next) => {
             });
         })
         .catch(err => {
+            logger.error("singup.controller:signupWocman:CreateUser", err)
             return res.status(500).send({ 
                 statusCode: 500,
                 status: false, 
@@ -161,6 +161,7 @@ exports.signUpWocman = (req, res, next) => {
        
     })
     .catch(err => {
+        logger.error("singup.controller:signupWocman:FindUser", err)
         return res.status(500).send({
             statusCode: 500,
             status: false, 
