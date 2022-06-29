@@ -3,6 +3,7 @@ const db = require(pathRoot+"models");
 const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
 const User = db.User;
+const Joi = require('joi'); 
 
 const Helpers = require(pathRoot+"helpers/helper.js");
 

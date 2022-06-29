@@ -4,6 +4,7 @@ const config = require(pathRoot+"config/auth.config");
 const fs = require('fs');
 const User = db.User;
 const Projects = db.Projects;
+const Joi = require('joi'); 
 
 const Helpers = require(pathRoot+"helpers/helper.js");
 
