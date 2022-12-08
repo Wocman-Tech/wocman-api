@@ -19,10 +19,5 @@ module.exports = {
     password: process.env.PROD_DATABASE_PASSWORD,
     database: process.env.PROD_DATABASE_NAME,
     dialect: process.env.PROD_DATABASE_DIALECT,
-    dialectOptions: {
-      ssl: {
-        require: "true",
-      },
-    },
   },
 };
