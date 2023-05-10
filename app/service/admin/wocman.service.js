@@ -35,7 +35,7 @@ const getAllWocman = async (query) => {
             phone,
             image,
             status,
-            certificatesupdate
+            certificatesupdate,
             r.name as role,
             p.name as skill
         FROM
