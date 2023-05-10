@@ -23,33 +23,37 @@ const getAllWocman = async (query) => {
     `;
 
     const sql = `
-        SELECT
-            u.id,
-            email,
-            username,
-            firstname,
-            lastname,
-            address,
-            country,
-            state,
-            phone,
-            image,
-            status,
-            c.name as certificate,
-            r.name as role,
-            p.name as skill
-        FROM
+    SELECT
+        u.id,
+        email,
+        username,
+        firstname,
+        lastname,
+        address,
+        country,
+        state,
+        phone,
+        image,
+        u.status as user_status,
+        c.name as certificate,
+        r.name as role,
+        p.name as skill
+    FROM
         users u
         LEFT JOIN userroles ur ON ur.userid = u.id
         LEFT JOIN roles r ON r.id = ur.roleid
         LEFT JOIN wskills ws ON ws.userid = u.id
         LEFT JOIN projecttypes p ON p.id = ws.skillid
         LEFT JOIN wcerts c ON c.userid = u.id
-        WHERE r.name = 'wocman' AND (u.firstname LIKE '%${condition}%' OR u.lastname LIKE '%${condition}%' 
+    WHERE
+        r.name = 'wocman'
+        AND (u.firstname LIKE '%${condition}%' OR u.lastname LIKE '%${condition}%' 
         OR u.email LIKE '%${condition}%' OR u.username LIKE '%${condition}%' OR '%${condition}%' is null)
-        ORDER BY u.createdAt DESC
-        LIMIT ${limit} OFFSET ${fetch}
-    `;
+    ORDER BY
+        u.createdAt DESC
+    LIMIT ${limit} OFFSET ${fetch}
+`;
+
 
     const [count] = await sequelize.query(countSql, {
         type: QueryTypes.SELECT,
