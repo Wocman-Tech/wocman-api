@@ -35,6 +35,7 @@ const getAllWocman = async (query) => {
             phone,
             image,
             status,
+            certificatesupdate
             r.name as role,
             p.name as skill
         FROM
@@ -79,6 +80,7 @@ const getWocman = async (params) => {
             phone,
             image,
             status,
+            certificatesupdate,
             r.name as role,
             p.name as skill
         FROM
