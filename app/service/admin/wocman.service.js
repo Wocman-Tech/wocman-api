@@ -44,7 +44,7 @@ const getAllWocman = async (query) => {
         LEFT JOIN roles r ON r.id = ur.roleid
         LEFT JOIN wskills ws ON ws.userid = u.id
         LEFT JOIN projecttypes p ON p.id = ws.skillid
-        LEFT JOIN cert c ON c.userid = u.id
+        LEFT JOIN wcerts c ON c.userid = u.id
         WHERE r.name = 'wocman' AND (u.firstname LIKE '%${condition}%' OR u.lastname LIKE '%${condition}%' 
         OR u.email LIKE '%${condition}%' OR u.username LIKE '%${condition}%' OR '%${condition}%' is null)
         ORDER BY u.createdAt DESC
