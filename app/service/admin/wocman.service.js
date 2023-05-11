@@ -37,6 +37,7 @@ const getAllWocman = async (query) => {
         u.status as user_status,
         c.name as certificate,
         c.picture as cert_url,
+        t.name as competency
         r.name as role,
         p.name as skill
     FROM
@@ -46,6 +47,7 @@ const getAllWocman = async (query) => {
         LEFT JOIN wskills ws ON ws.userid = u.id
         LEFT JOIN projecttypes p ON p.id = ws.skillid
         LEFT JOIN wcerts c ON c.userid = u.id
+        LEFT JOIN competencies t ON t.userid = u.id
     WHERE
         r.name = 'wocman'
         AND (u.firstname LIKE '%${condition}%' OR u.lastname LIKE '%${condition}%' 
