@@ -37,9 +37,9 @@ const getAllWocman = async (query) => {
         u.status as user_status,
         c.name as certificate,
         c.picture as cert_url,
-        t.name as competency,
         r.name as role,
-        p.name as skill
+        p.name as skill,
+        comp.name as competency
     FROM
         users u
         LEFT JOIN userroles ur ON ur.userid = u.id
@@ -47,7 +47,8 @@ const getAllWocman = async (query) => {
         LEFT JOIN wskills ws ON ws.userid = u.id
         LEFT JOIN projecttypes p ON p.id = ws.skillid
         LEFT JOIN wcerts c ON c.userid = u.id
-        LEFT JOIN competencies t ON t.userid = u.id
+        LEFT JOIN wcompetencies uc ON uc.userid = u.id
+        LEFT JOIN competencies comp ON comp.id = uc.competencyid
     WHERE
         r.name = 'wocman'
         AND (u.firstname LIKE '%${condition}%' OR u.lastname LIKE '%${condition}%' 
@@ -56,6 +57,7 @@ const getAllWocman = async (query) => {
         u.createdAt DESC
     LIMIT ${limit} OFFSET ${fetch}
 `;
+
 
 
     const [count] = await sequelize.query(countSql, {
