@@ -37,7 +37,7 @@ const getAllWocman = async (query) => {
         u.status as user_status,
         c.name as certificate,
         c.picture as cert_url,
-        t.name as competency
+        t.name as competency,
         r.name as role,
         p.name as skill
     FROM
