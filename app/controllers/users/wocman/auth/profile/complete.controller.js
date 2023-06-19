@@ -51,16 +51,16 @@ exports.checkCompleteProfileWocman = (req, res, next) => {
     });
   }
 
-  //   if (req.body.phone && req.body.phone !== "") {
-  //     var phone = req.body.phone;
-  //   } else {
-  //     return res.status(400).send({
-  //       statusCode: 400,
-  //       status: false,
-  //       message: "Enter Your contact field",
-  //       data: [],
-  //     });
-  //   }
+  if (req.body.phone && req.body.phone !== "") {
+    var phone = req.body.phone;
+  } else {
+    return res.status(400).send({
+      statusCode: 400,
+      status: false,
+      message: "Enter Your contact field",
+      data: [],
+    });
+  }
 
   // if(req.body.country && req.body.country !== ''){
   //     var country = req.body.country;
@@ -105,7 +105,7 @@ exports.checkCompleteProfileWocman = (req, res, next) => {
     firstname: Joi.string().min(3).max(225).required(),
     lastname: Joi.string().min(3).max(225).required(),
     address: Joi.string().min(10).max(225).required(),
-    // phone: Joi.string().min(6).max(225).required(),
+    phone: Joi.string().min(6).max(225).required(),
     country: Joi.string().min(3).max(225).required(),
     state: Joi.string().min(3).max(225).required(),
     province: Joi.string().min(3).max(225).required(),
@@ -115,7 +115,7 @@ exports.checkCompleteProfileWocman = (req, res, next) => {
     firstname: firstname,
     lastname: lastname,
     address: address,
-    // phone: phone,
+    phone: phone,
     country: country,
     state: state,
     province: province,
@@ -149,7 +149,7 @@ exports.checkCompleteProfileWocman = (req, res, next) => {
           firstname: firstname,
           lastname: lastname,
           address: address,
-          //   phone: phone,
+          phone: phone,
           country: country,
           state: state,
           province: province,
