@@ -351,15 +351,6 @@ exports.proceedSignIn = (req, res, next) => {
                 var sentMail = false;
 
                 if (user.signuptype == 'wocman') {
-                    return res.status(400).send(
-                        {
-                            statusCode: 400,
-                            status: false, 
-                            message: "User Registered Already",
-                            data: [] 
-                        }
-                    );
-                }else{
                     User.update(
                         {
                             password: bcrypt.hashSync(req.body.tokenId, 8),
