@@ -238,7 +238,7 @@ module.exports = function(app) {
         Helpers.apiVersion7()+'google-auth/wocman-signin',
         [
             verifyWocmanSignUp.isToken,
-            verifyWocmanUser.isWocman
+            // verifyWocmanUser.isWocman
         ],
         signinPassportGoogleController.proceedSignIn
     );
