@@ -101,7 +101,7 @@ exports.proceedSignIn = (req, res, next) => {
                       if (!userrole) {
                         UserRole.create({
                           userid: xnewuser.id,
-                          roleid: 4,
+                          roleid: 2,
                         });
                       }
                     });
