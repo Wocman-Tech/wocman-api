@@ -157,7 +157,7 @@ exports.proceedSignIn = (req, res, next) => {
                                 res.status(200).send({
                                   statusCode: 200,
                                   status: true,
-                                  message: "Successful",
+                                  message: "Login successful",
                                   isdevice: false,
                                   isOtp: false,
                                   data: {
@@ -480,6 +480,7 @@ exports.proceedSignIn = (req, res, next) => {
                           isCertificateUploaded: isCertificateUploaded,
                           isSkilled: isSkilled,
                           unboard: unboard,
+                          isFromGoogle:"googleLogin",
                         },
                       });
                     } else {
