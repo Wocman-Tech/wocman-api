@@ -179,6 +179,7 @@ exports.proceedSignIn = (req, res, next) => {
                                     isCertificateUploaded: isCertificateUploaded,
                                     isSkilled: isSkilled,
                                     unboard: unboard,
+                                    isFromGoogle:true,
                                   },
                                 });
                               } else {
