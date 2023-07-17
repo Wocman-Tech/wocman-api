@@ -157,7 +157,7 @@ exports.proceedSignIn = (req, res, next) => {
                                 res.status(200).send({
                                   statusCode: 200,
                                   status: true,
-                                  message: "Login successful",
+                                  message: "Successful",
                                   isdevice: false,
                                   isOtp: false,
                                   data: {
