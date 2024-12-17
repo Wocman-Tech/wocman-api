@@ -2,16 +2,20 @@ const pathRoot = '../../../../../';
 const db = require(pathRoot + "models");
 const config = require(pathRoot + "config/auth.config");
 
-const AWS = require('aws-sdk');
 const { createProject } = require('../../../../../service/customer/project.service');
 const validator = require('../../../../../validation/project.validation')
-AWS.config.region = 'us-east-2';
+const { S3Client } = require("@aws-sdk/client-s3");
 
-const s3 = new AWS.S3({
-    sslEnabled: true,
+// Create the S3 client instance
+const s3 = new S3Client({
+  region: "us-east-2",
+  credentials: {
     accessKeyId: config.awsS3AccessKeyId,
-    secretAccessKey: config.awsS3SecretAccessKey
-})
+    secretAccessKey: config.awsS3SecretAccessKey,
+  },
+  forcePathStyle: true, // Optional, if you use path-style URLs
+  tls: true, // Ensures SSL is enabled (same as sslEnabled: true in v2)
+});
 
 const Skills = db.Skills;
 
