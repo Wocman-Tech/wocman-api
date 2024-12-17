@@ -80,7 +80,7 @@ const Category = db.category;
 
 
 // set port, listen for requests
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3306;
 
 db.sequelize
   .authenticate()
