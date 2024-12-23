@@ -2,9 +2,7 @@ const pathRoot = "../../../../../";
 const db = require(pathRoot + "models");
 const config = require(pathRoot + "config/auth.config");
 
-const fs = require("fs");
-
-const { S3Client } = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
 // Create the S3 client instance
 const s3 = new S3Client({
@@ -13,28 +11,18 @@ const s3 = new S3Client({
     accessKeyId: config.awsS3AccessKeyId,
     secretAccessKey: config.awsS3SecretAccessKey,
   },
-  forcePathStyle: true, // Optional, if you use path-style URLs
-  tls: true, // Ensures SSL is enabled (same as sslEnabled: true in v2)
 });
-const ImageStore = db.ImageStore;
 
+const ImageStore = db.ImageStore;
 const Nletter = db.Nletter;
+const { v4: uuidv4 } = require("uuid");
 
 const Helpers = require(pathRoot + "helpers/helper.js");
 const { verifySignUp } = require(pathRoot + "middleware");
 const { EMAIL, PASSWORD, MAIN_URL } = require(pathRoot + "helpers/helper.js");
 
-const { v4: uuidv4 } = require("uuid");
-const Joi = require("joi");
-let nodeGeocoder = require("node-geocoder");
 const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
-var jwt = require("jsonwebtoken");
-var bcrypt = require("bcryptjs");
-
-let options = {
-  provider: "openstreetmap",
-};
 
 let transporter = nodemailer.createTransport({
   host: config.message_server,
@@ -60,7 +48,7 @@ exports.AllNewsletter = (req, res, next) => {
       res.status(200).send({
         statusCode: 200,
         status: true,
-        message: "Found news letters",
+        message: "Found newsletters",
         data: result.rows,
       });
     })
@@ -75,13 +63,13 @@ exports.AllNewsletter = (req, res, next) => {
 };
 
 exports.oneNewsletter = (req, res, next) => {
-  var id = req.params.id;
+  const id = req.params.id;
   Nletter.findByPk(id)
     .then((result) => {
       res.status(200).send({
         statusCode: 200,
         status: true,
-        message: "Found news letters",
+        message: "Found newsletter",
         data: result,
       });
     })
@@ -96,15 +84,15 @@ exports.oneNewsletter = (req, res, next) => {
 };
 
 exports.deleteNewsletter = (req, res, next) => {
-  var ids = req.params.id;
+  const ids = req.params.id;
   Nletter.destroy({
     where: { id: ids },
   })
-    .then((result) => {
+    .then(() => {
       res.status(200).send({
         statusCode: 200,
         status: true,
-        message: "Deleted news letters",
+        message: "Deleted newsletter",
         data: [],
       });
     })
@@ -118,127 +106,124 @@ exports.deleteNewsletter = (req, res, next) => {
     });
 };
 
-exports.sendNewsletter = (req, res, next) => {
-  var text = req.body.text;
-  var subject = req.body.subject;
-
-  if (text && text !== "") {
-  } else {
+exports.sendNewsletter = async (req, res, next) => {
+  const { text, subject } = req.body;
+  if (!text || !subject) {
     return res.status(400).send({
       statusCode: 400,
       status: false,
-      message: "Include text field",
+      message: "Text and subject are required.",
       data: [],
     });
   }
 
-  if (subject && subject !== "") {
-  } else {
-    return res.status(400).send({
-      statusCode: 400,
-      status: false,
-      message: "Include the subject field",
-      data: [],
-    });
-  }
-
-  const file = req.files;
+  const files = req.files;
   const tracker = uuidv4();
-  file.map((item) => {
-    let myFile = item.originalname.split(".");
-    const fileType = myFile[myFile.length - 1];
+  
+  // Upload files to S3 using PutObjectCommand
+  if (files && files.length > 0) {
+    try {
+      await Promise.all(
+        files.map(async (item) => {
+          const fileType = item.originalname.split(".").pop();
+          const uniqueFileName = `${uuidv4()}.${fileType}`;
 
-    var params = {
-      ACL: "public-read-write",
-      Bucket: config.awsS3BucketName,
-      Key: item.originalname,
-      Body: item.buffer,
-    };
+          const params = {
+            Bucket: config.awsS3BucketName,
+            Key: uniqueFileName,
+            Body: item.buffer,
+            ContentType: item.mimetype,
+            ACL: "public-read-write", // Set ACL according to your requirements
+          };
 
-    s3.upload(params, (error, data, res) => {
-      if (error) {
-        // res.status(500).send(error)
-        console.log(error);
-      } else {
-        var fileUrl = data.Location;
-        if (typeof fileUrl === "undefined") {
-          //empty file
-        } else {
-          ImageStore.create({
+          const command = new PutObjectCommand(params);
+          const data = await s3.send(command);
+
+          const fileUrl = `https://${config.awsS3BucketName}.s3.${s3.config.region}.amazonaws.com/${uniqueFileName}`;
+
+          // Save image info in the database
+          await ImageStore.create({
             image: fileUrl,
             tracker: tracker,
           });
-        }
-      }
-    });
-  });
-
-  Nletter.findAll({})
-    .then((result) => {
-      if (result) {
-        for (var i = 0; i < result.length; i++) {
-          let subscriber = result[i].name;
-          let subscriber_email = result[i].email;
-          let response = {
-            body: {
-              name: subscriber,
-              intro: subscriber_email,
-              action: {
-                button: {},
-              },
-            },
-          };
-
-          let mail = MailGenerator.generate(response);
-
-          var attachments = [];
-          ImageStore.findAll({
-            where: { tracker: tracker },
-          }).then((images) => {
-            for (var i = 0; i < images.length; i++) {
-              let image_path = images[i].image;
-              var hh8 = image_path.split("/");
-              var hh9 = hh8.length();
-              var image_name = hh8[hh9 - 1];
-              var addto_attachments = {
-                filename: image_name,
-                path: image_path,
-              };
-              attachments.push({ addto_attachments });
-            }
-
-            let message = {
-              from: EMAIL,
-              to: subscriber_email,
-              subject: subject,
-              html: mail,
-              attachments: attachments,
-            };
-            var sentMail = false;
-            transporter.sendMail(message).then(() => {});
-          });
-        }
-        res.status(200).send({
-          statusCode: 200,
-          status: true,
-          message: "Sent news letters",
-          data: [],
-        });
-      } else {
-        return res.status(403).send({
-          statusCode: 403,
-          status: false,
-          message: "Could not fins subscribers",
-          data: [],
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
+        })
+      );
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      return res.status(500).send({
         statusCode: 500,
         status: false,
-        message: err.message,
+        message: "Error uploading files",
         data: [],
       });
+    }
+  }
+
+  // Send newsletter to subscribers
+  try {
+    const subscribers = await Nletter.findAll({});
+    if (subscribers && subscribers.length > 0) {
+      for (let i = 0; i < subscribers.length; i++) {
+        const subscriber = subscribers[i];
+        const subscriber_email = subscriber.email;
+
+        const response = {
+          body: {
+            name: subscriber.name,
+            intro: subscriber_email,
+            action: {
+              button: {},
+            },
+          },
+        };
+
+        const mail = MailGenerator.generate(response);
+        const attachments = [];
+
+        // Fetch images related to the tracker
+        const images = await ImageStore.findAll({ where: { tracker: tracker } });
+        images.forEach((image) => {
+          const image_path = image.image;
+          const image_name = image_path.split("/").pop();
+
+          attachments.push({
+            filename: image_name,
+            path: image_path,
+          });
+        });
+
+        const message = {
+          from: EMAIL,
+          to: subscriber_email,
+          subject: subject,
+          html: mail,
+          attachments: attachments,
+        };
+
+        await transporter.sendMail(message);
+      }
+
+      res.status(200).send({
+        statusCode: 200,
+        status: true,
+        message: "Sent newsletters",
+        data: [],
+      });
+    } else {
+      res.status(403).send({
+        statusCode: 403,
+        status: false,
+        message: "Could not find subscribers",
+        data: [],
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      statusCode: 500,
+      status: false,
+      message: err.message,
+      data: [],
     });
+  }
 };
+

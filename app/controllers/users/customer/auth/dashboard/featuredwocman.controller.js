@@ -4,7 +4,7 @@ const config = require(pathRoot + "config/auth.config");
 
 const { createProject } = require('../../../../../service/customer/project.service');
 const validator = require('../../../../../validation/project.validation')
-const { S3Client } = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
 // Create the S3 client instance
 const s3 = new S3Client({
@@ -18,10 +18,8 @@ const s3 = new S3Client({
 });
 
 const Skills = db.Skills;
-
 const Projects = db.Projects;
 const Project = db.Projecttype;
-
 
 exports.uploadProject = async (req, res, next) => {
     try {
@@ -35,14 +33,44 @@ exports.uploadProject = async (req, res, next) => {
         }
         const { error } = await validator.createProject(body);
         if (error) {
-            return res.status(400).send(
-                {
-                    statusCode: 400,
-                    status: false,
-                    message: error.message.replace(/[\"]/gi, ''),
-                    data: []
-                });
+            return res.status(400).send({
+                statusCode: 400,
+                status: false,
+                message: error.message.replace(/[\"]/gi, ''),
+                data: []
+            });
         }
+        
+        // Handle file uploads with S3
+        if (req.files && req.files.length > 0) {
+            for (const file of req.files) {
+                const fileExtension = file.originalname.split('.').pop();
+                const fileName = `${Date.now()}.${fileExtension}`;
+
+                const params = {
+                    Bucket: config.awsS3BucketName,
+                    Key: fileName, // Use a unique file name
+                    Body: file.buffer,
+                    ACL: "public-read-write", // Adjust as needed
+                };
+
+                try {
+                    const uploadCommand = new PutObjectCommand(params);
+                    const uploadResult = await s3.send(uploadCommand);
+                    console.log("File uploaded successfully:", uploadResult);
+                    // You can store the file URL or any other necessary information
+                } catch (error) {
+                    console.error("Error uploading file:", error);
+                    return res.status(500).send({
+                        statusCode: 500,
+                        status: false,
+                        message: "Error uploading file",
+                        data: [],
+                    });
+                }
+            }
+        }
+
         const project = await createProject(req.body, req.userId, req.files);
         const message = 'Project created successfully';
         return res.status(201).json({
@@ -62,123 +90,91 @@ exports.uploadProject = async (req, res, next) => {
 };
 
 exports.projectTypes = (req, res, next) => {
-    if (typeof req.userId == "undefined") {
-        return res.status(400).send(
-            {
-                statusCode: 400,
-                status: false,
-                message: "User was not found",
-                data: []
-            });
+    if (typeof req.userId === "undefined") {
+        return res.status(400).send({
+            statusCode: 400,
+            status: false,
+            message: "User was not found",
+            data: []
+        });
     } else {
-        //synchronize project type with skills
-        var skill_names = [];
+        // Synchronize project type with skills
+        let skill_names = [];
         Skills.findAll()
             .then(skills => {
-                if (!skills) { } else {
-                    if (!Array.isArray(skills) || !skills.length) {
-                    } else {
-                        for (let i = 0; i < skills.length; i++) {
+                if (!skills) { 
+                    return;
+                } else {
+                    if (Array.isArray(skills) && skills.length) {
+                        for (let skill of skills) {
                             skill_names.push({
-                                name: skills[i].name,
-                                category: skills[i].categoryid
-                            })
+                                name: skill.name,
+                                category: skill.categoryid
+                            });
                         }
                     }
                 }
 
-                for (var if2 = 0; if2 < skill_names.length; if2++) {
-                    let skill2 = skill_names[if2]['name'];
-                    Project.findOne({
-                        where: { 'name': skill2 }
-                    })
-                        .then(projectTypes => {
-                            if (projectTypes) {//already exist
-                            } else {
-                                //insert
-                                Project.create({
-                                    name: skill2,
-                                    description: skill2
-                                })
-                            }
+                // Insert project types based on skill names
+                skill_names.forEach(async (skill) => {
+                    const projectType = await Project.findOne({
+                        where: { name: skill.name },
+                    });
+
+                    if (!projectType) {
+                        // Insert new project type if not found
+                        await Project.create({
+                            name: skill.name,
+                            description: skill.name,
                         });
-                }
-
-
+                    }
+                });
 
                 let tradesmen = [];
                 let technicians = [];
                 let professionals = [];
 
-
-                for (var if2 = 0; if2 < skill_names.length; if2++) {
-                    let skill2 = skill_names[if2]['name'];
-                    let skill_category_id = parseInt(skill_names[if2]['category'], 10);
+                // Categorize skill names based on their category
+                skill_names.forEach((skill) => {
                     Project.findOne({
-                        where: { 'name': skill2 }
-                    })
-                        .then(projectTypes => {
-                            if (projectTypes) {//already exist
-
-                                if (skill_category_id == 1) {
-                                    tradesmen.push({
-                                        project_type_id: projectTypes.id,
-                                        project_type_name: projectTypes.name
-                                    })
-                                }
-
-                                if (skill_category_id == 2) {
-                                    technicians.push({
-                                        project_type_id: projectTypes.id,
-                                        project_type_name: projectTypes.name
-                                    })
-                                }
-
-                                if (skill_category_id == 3) {
-                                    professionals.push({
-                                        project_type_id: projectTypes.id,
-                                        project_type_name: projectTypes.name
-                                    })
-                                }
+                        where: { name: skill.name },
+                    }).then(projectType => {
+                        if (projectType) {
+                            const category = skill.category;
+                            const projectTypeObj = {
+                                project_type_id: projectType.id,
+                                project_type_name: projectType.name,
+                            };
+                            if (category === 1) {
+                                tradesmen.push(projectTypeObj);
+                            } else if (category === 2) {
+                                technicians.push(projectTypeObj);
+                            } else if (category === 3) {
+                                professionals.push(projectTypeObj);
                             }
-                        });
-                }
+                        }
+                    });
+                });
 
-
-                var customer_id = req.userId;
-
+                // Fetch projects for the user
                 let jobs = [];
+                const userId = req.userId || '';
+                const searchCondition = userId ? { 'customerid': userId } : { 'customerid': { $not: null } };
 
-
-                if (req.userId && req.userId !== '') {
-                    Searchuserid = { 'customerid': req.userId };
-                } else {
-                    Searchuserid = { 'customerid': { $not: null } };
-                }
-
-                Projects.findAll({
-                    where: Searchuserid
-                })
+                Projects.findAll({ where: searchCondition })
                     .then(projects => {
-                        if (!projects) { } else {
-                            if (!Array.isArray(projects) || !projects.length) {
-                            } else {
-                                for (let i = 0; i < projects.length; i++) {
-
-                                    if (typeof projects[i] == "undefined") {
-                                    } else {
-                                        if (parseInt(projects[i].wocmanid, 10) > 0 && parseInt(projects[i].projectcomplete, 10) != 1) {
-                                            jobs.push({
-                                                description: projects[i].description,
-                                                wocmanid: projects[i].wocmanid,
-                                                images: projects[i].images,
-                                                jobTypeid: projects[i].projectid,
-                                                jobid: projects[i].id
-                                            })
-                                        }
-                                    }
+                        if (Array.isArray(projects) && projects.length) {
+                            projects.forEach((project) => {
+                                if (project.wocmanid && project.projectcomplete !== 1) {
+                                    jobs.push({
+                                        description: project.description,
+                                        wocmanid: project.wocmanid,
+                                        images: project.images,
+                                        jobTypeid: project.projectid,
+                                        jobid: project.id
+                                    });
                                 }
-                            }
+                            });
                         }
                         res.status(200).send({
                             statusCode: 200,
@@ -212,3 +208,4 @@ exports.projectTypes = (req, res, next) => {
             });
     }
 };
+

@@ -2,8 +2,7 @@ const pathRoot = "../../../../../";
 const db = require(pathRoot + "models");
 const config = require(pathRoot + "config/auth.config");
 const fs = require("fs");
-
-const { S3Client } = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3"); // Import the PutObjectCommand
 
 // Create the S3 client instance
 const s3 = new S3Client({
@@ -28,6 +27,7 @@ const { v4: uuidv4 } = require("uuid");
 const Joi = require("joi");
 
 const Op = db.Sequelize.Op;
+
 exports.chatLog = (req, res, next) => {
   // Username
   var customerid = req.body.customerid;
@@ -217,7 +217,7 @@ exports.chatLog = (req, res, next) => {
       return res.status(400).send({
         statusCode: 400,
         status: false,
-        message: "Invali Projectid",
+        message: "Invalid Projectid",
         data: [],
       });
     }
@@ -279,8 +279,7 @@ exports.chatSave = (req, res, next) => {
     const nowTime = new Date().toLocaleString("en-US", {
       timeZone: "Africa/Lagos",
     });
-    // var ggTime = nowTime.split("T");
-    // const result = Joi.validate(dataToValidate, joiClean);
+
     const result = joiClean.validate(dataToValidate);
     if (result.error == null) {
       User.findByPk(req.userId)
@@ -313,95 +312,40 @@ exports.chatSave = (req, res, next) => {
                 return;
               }
 
-              const chat_tracker = uuidv4();
-
-              WCChat.create({
-                senderid: parseInt(req.userId, 10),
-                receiverid: parseInt(customerid, 10),
+              const wcchat = {
+                messageType: messageType,
+                senderid: req.userId,
+                receiverid: customerid,
                 message: message,
-                // chattime: ggTime[1],
-                chattime: nowTime,
-                messagetype: messageType,
-                messagelinks: "",
-                seen: seen,
-                tracker: chat_tracker,
-                projectid: parseInt(projectid, 10),
-              })
-                .then((chats) => {
-                  if (!chats) {
+                status: seen,
+                createdAt: nowTime,
+                updatedAt: nowTime,
+                projectid: projectid,
+              };
+
+              WCChat.create(wcchat)
+                .then((chat) => {
+                  if (chat) {
+                    res.status(200).send({
+                      statusCode: 200,
+                      status: true,
+                      message: "message sent",
+                      data: {
+                        accessToken: req.token,
+                        project: project,
+                        message: chat.message,
+                        senderid: chat.senderid,
+                        receiverid: chat.receiverid,
+                      },
+                    });
+                  } else {
                     res.status(404).send({
                       statusCode: 404,
                       status: false,
-                      message: "Chat Not Sent",
+                      message: "Unable to save message",
                       data: [],
                     });
-                    return;
                   }
-
-                  //check on the message type
-                  if (messageType == "media") {
-                    const file = req.files; //this are the files
-
-                    if (typeof file === "undefined") {
-                    } else {
-                      var images = [];
-                      file.map((item) => {
-                        let myFile = item.originalname.split(".");
-                        const fileType = myFile[myFile.length - 1];
-                        const dsf = uuidv4();
-
-                        var params = {
-                          ACL: "public-read-write",
-                          Bucket: config.awsS3BucketName,
-                          Key: item.originalname,
-                          Body: item.buffer,
-                        };
-
-                        s3.upload(params, (error, data, res) => {
-                          if (error) {
-                            // res.status(500).send(error)
-                            console.log(error);
-                          } else {
-                            var fileUrl = data.Location;
-                            if (typeof fileUrl === "undefined") {
-                              //empty file
-                            } else {
-                              images.push({ fileUrl });
-                            }
-                          }
-                          // save project
-                          var all_image_url = "";
-                          for (var i = 0; i < images.length; i++) {
-                            if (i == 0) {
-                              all_image_url = images[i].fileUrl;
-                            } else {
-                              all_image_url =
-                                all_image_url +
-                                Helpers.padTogether() +
-                                images[i].fileUrl;
-                            }
-                          }
-                          // console.log(all_image_url);
-                          WCChat.update(
-                            {
-                              messagelinks: all_image_url,
-                            },
-                            {
-                              where: { tracker: chat_tracker },
-                            }
-                          );
-                        });
-                      });
-                    }
-                  }
-                  res.send({
-                    statusCode: 200,
-                    status: true,
-                    message: "message Sent",
-                    data: {
-                      accessToken: req.token,
-                    },
-                  });
                 })
                 .catch((err) => {
                   res.status(500).send({
@@ -433,9 +377,10 @@ exports.chatSave = (req, res, next) => {
       return res.status(400).send({
         statusCode: 400,
         status: false,
-        message: result.error,
+        message: "Invalid fields or parameters",
         data: [],
       });
     }
   }
 };
+

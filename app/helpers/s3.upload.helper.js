@@ -1,4 +1,4 @@
-const { S3Client } = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
 // Create the S3 client instance
 const s3 = new S3Client({
@@ -7,8 +7,6 @@ const s3 = new S3Client({
     accessKeyId: config.awsS3AccessKeyId,
     secretAccessKey: config.awsS3SecretAccessKey,
   },
-  forcePathStyle: true, // Optional, if you use path-style URLs
-  tls: true, // Ensures SSL is enabled (same as sslEnabled: true in v2)
 });
 
 exports.s3Upload = async (file) => {
@@ -21,9 +19,13 @@ exports.s3Upload = async (file) => {
       ACL: "public-read",
     };
 
-    const data = s3.upload(params).promise();
-    return data.then((result) => result).catch((err) => err);
+    const command = new PutObjectCommand(params);
+    const result = await s3.send(command);
+
+    return result; // The result contains metadata about the upload.
   } catch (error) {
-    return error;
+    console.error("Error uploading to S3:", error);
+    throw error;
   }
 };
+
