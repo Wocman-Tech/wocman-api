@@ -21,6 +21,9 @@
     ],
     "author": "Justice",
     "license": "ISC",
+    "engines": {
+        "node": ">=16.0.0"
+    },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.713.0",
         "async": "^3.2.0",
