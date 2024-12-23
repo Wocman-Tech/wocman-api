@@ -1,5 +1,5 @@
-# Use a lightweight Node.js image
-FROM node:12.18.4-alpine
+# Use the latest LTS version of Node.js (or specify a fixed version if needed)
+FROM node:18-alpine
 
 # Set working directory to /app
 WORKDIR /app
@@ -10,8 +10,8 @@ ENV PATH /app/node_modules/.bin:$PATH
 # Copy only package.json and package-lock.json to leverage Docker cache for dependencies
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install --production
+# Install production dependencies using npm ci for deterministic builds
+RUN npm ci --production
 
 # Copy the application source code
 COPY . .
