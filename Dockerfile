@@ -11,7 +11,8 @@ ENV PATH /app/node_modules/.bin:$PATH
 COPY package*.json ./
 
 # Install production dependencies using npm ci for deterministic builds
-RUN npm ci --production
+RUN npm install --production
+
 
 # Copy the application source code
 COPY . .

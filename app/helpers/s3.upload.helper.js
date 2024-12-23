@@ -1,4 +1,5 @@
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const config = require("../../app/config/auth.config");
 
 // Create the S3 client instance
 const s3 = new S3Client({
@@ -28,4 +29,3 @@ exports.s3Upload = async (file) => {
     throw error;
   }
 };
-
