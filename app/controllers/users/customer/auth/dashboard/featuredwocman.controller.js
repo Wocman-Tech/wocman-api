@@ -48,7 +48,7 @@ exports.uploadProject = async (req, res, next) => {
         for (const file of req.files) {
           let myFile = file.originalname.split(".");
           const fileType = myFile[myFile.length - 1];
-          const dsf = `${Date.now()}.${fileExtension}`;
+          const dsf = `${Date.now()}.${fileType}`;
   
           const params = {
             Bucket: config.awsS3BucketName, // Your S3 bucket name
