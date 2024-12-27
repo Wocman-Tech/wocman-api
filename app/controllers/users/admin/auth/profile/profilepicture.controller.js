@@ -40,24 +40,24 @@ exports.uploadProfilePicture = async (req, res) => {
   }
 
   // Generate unique file name
-  const myFile = file.originalname.split(".");
+  let myFile = file.originalname.split(".");
   const fileType = myFile[myFile.length - 1];
-  const uniqueFileName = `${uuidv4()}.${fileType}`;
+  const dsf = uuidv4();
 
   try {
     // Upload file to S3 using PutObjectCommand
     const params = {
-      Bucket: config.awsS3BucketName,
-      Key: uniqueFileName,
-      Body: file.buffer,
-      ContentType: file.mimetype,
+      Bucket: config.awsS3BucketName, // Your S3 bucket name
+      Key: `${dsf}.${fileType}`, // Unique file key
+      Body: file.buffer, // File content
+      ContentType: file.mimetype, // Ensure correct content type
     };
 
     const command = new PutObjectCommand(params);
     await s3.send(command);
 
     // Construct the file URL (if necessary)
-    const fileUrl = `https://${config.awsS3BucketName}.s3.${s3.config.region}.amazonaws.com/${uniqueFileName}`;
+    const fileUrl = `https://${config.awsS3BucketName}.s3.amazonaws.com/${dsf}.${fileType}`;
 
     // Update user record
     const user = await User.findByPk(user_id);

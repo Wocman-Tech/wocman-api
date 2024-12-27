@@ -173,13 +173,15 @@ exports.replayContact = (req, res, next) => {
         const file = req.files;
         const tracker = uuidv4();
         file.map((item) => {
-          let myFile = item.originalname.split(".");
+          let myFile = file.originalname.split(".");
           const fileType = myFile[myFile.length - 1];
+          const dsf = uuidv4();
 
-          var params = {
-            Bucket: config.awsS3BucketName,
-            Key: item.originalname,
-            Body: item.buffer,
+          const params = {
+            Bucket: config.awsS3BucketName, // Your S3 bucket name
+            Key: `${dsf}.${fileType}`, // Unique file key
+            Body: file.buffer, // File content
+            ContentType: file.mimetype, // Ensure correct content type
           };
 
           s3.upload(params, (error, data, res) => {
@@ -187,7 +189,7 @@ exports.replayContact = (req, res, next) => {
               // res.status(500).send(error)
               console.log(error);
             } else {
-              var fileUrl = data.Location;
+              const fileUrl = `https://${config.awsS3BucketName}.s3.amazonaws.com/${dsf}.${fileType}`;
               if (typeof fileUrl === "undefined") {
                 //empty file
               } else {

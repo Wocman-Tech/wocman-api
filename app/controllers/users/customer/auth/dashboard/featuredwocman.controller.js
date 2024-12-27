@@ -23,70 +23,83 @@ const Project = db.Projecttype;
 
 exports.uploadProject = async (req, res, next) => {
     try {
-        const body = {
-            description: req.body.description,
-            address: req.body.address,
-            city: req.body.city,
-            topic: req.body.topic,
-            projecttypeid: req.body.projecttypeid,
-            startDate: req.body.startDate
-        }
-        const { error } = await validator.createProject(body);
-        if (error) {
-            return res.status(400).send({
-                statusCode: 400,
-                status: false,
-                message: error.message.replace(/[\"]/gi, ''),
-                data: []
+      const body = {
+        description: req.body.description,
+        address: req.body.address,
+        city: req.body.city,
+        topic: req.body.topic,
+        projecttypeid: req.body.projecttypeid,
+        startDate: req.body.startDate,
+      };
+  
+      const { error } = await validator.createProject(body);
+      if (error) {
+        return res.status(400).send({
+          statusCode: 400,
+          status: false,
+          message: error.message.replace(/[\"]/gi, ""),
+          data: [],
+        });
+      }
+  
+      let imageUrls = []; // Collect uploaded file URLs
+  
+      if (req.files && req.files.length > 0) {
+        for (const file of req.files) {
+          let myFile = file.originalname.split(".");
+          const fileType = myFile[myFile.length - 1];
+          const dsf = `${Date.now()}.${fileExtension}`;
+  
+          const params = {
+            Bucket: config.awsS3BucketName, // Your S3 bucket name
+            Key: `${dsf}.${fileType}`, // Unique file key
+            Body: file.buffer, // File content
+            ContentType: file.mimetype, // Ensure correct content type
+          };
+  
+          try {
+            const uploadCommand = new PutObjectCommand(params);
+            await s3.send(uploadCommand);
+  
+            const fileUrl = `https://${config.awsS3BucketName}.s3.amazonaws.com/${dsf}.${fileType}`;
+
+            imageUrls.push(fileUrl);
+          } catch (error) {
+            console.error("Error uploading file:", error);
+            return res.status(500).send({
+              statusCode: 500,
+              status: false,
+              message: "Error uploading file",
+              data: [],
             });
+          }
         }
-        
-        // Handle file uploads with S3
-        if (req.files && req.files.length > 0) {
-            for (const file of req.files) {
-                const fileExtension = file.originalname.split('.').pop();
-                const fileName = `${Date.now()}.${fileExtension}`;
-
-                const params = {
-                    Bucket: config.awsS3BucketName,
-                    Key: fileName, // Use a unique file name
-                    Body: file.buffer,
-                };
-
-                try {
-                    const uploadCommand = new PutObjectCommand(params);
-                    const uploadResult = await s3.send(uploadCommand);
-                    console.log("File uploaded successfully:", uploadResult);
-                    // You can store the file URL or any other necessary information
-                } catch (error) {
-                    console.error("Error uploading file:", error);
-                    return res.status(500).send({
-                        statusCode: 500,
-                        status: false,
-                        message: "Error uploading file",
-                        data: [],
-                    });
-                }
-            }
-        }
-
-        const project = await createProject(req.body, req.userId, req.files);
-        const message = 'Project created successfully';
-        return res.status(201).json({
-            statusCode: 201,
-            status: true,
-            message,
-            data: project,
-        });
+      }
+  
+      // Concatenate image URLs for storage (if needed)
+      const images = imageUrls.join("/XX98XX");
+  
+      // Pass images as part of the project data
+      const projectData = { ...req.body, images };
+      const project = await createProject(projectData, req.userId);
+  
+      const message = "Project created successfully";
+      return res.status(201).json({
+        statusCode: 201,
+        status: true,
+        message,
+        data: project,
+      });
     } catch (error) {
-        return res.status(500).send({
-            statusCode: 500,
-            status: false,
-            message: error.message || 'Internal server error',
-            data: []
-        });
+      return res.status(500).send({
+        statusCode: 500,
+        status: false,
+        message: error.message || "Internal server error",
+        data: [],
+      });
     }
-};
+  };
+  
 
 exports.projectTypes = (req, res, next) => {
     if (typeof req.userId === "undefined") {

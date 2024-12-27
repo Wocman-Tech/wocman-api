@@ -125,21 +125,22 @@ exports.sendNewsletter = async (req, res, next) => {
     try {
       await Promise.all(
         files.map(async (item) => {
-          const fileType = item.originalname.split(".").pop();
-          const uniqueFileName = `${uuidv4()}.${fileType}`;
+          let myFile = file.originalname.split(".");
+          const fileType = myFile[myFile.length - 1];
+          const dsf = uuidv4();
 
           const params = {
-            Bucket: config.awsS3BucketName,
-            Key: uniqueFileName,
-            Body: item.buffer,
-            ContentType: item.mimetype,
+            Bucket: config.awsS3BucketName, // Your S3 bucket name
+            Key: `${dsf}.${fileType}`, // Unique file key
+            Body: file.buffer, // File content
+            ContentType: file.mimetype, // Ensure correct content type
           };
 
           const command = new PutObjectCommand(params);
           const data = await s3.send(command);
 
-          const fileUrl = `https://${config.awsS3BucketName}.s3.${s3.config.region}.amazonaws.com/${uniqueFileName}`;
-
+          const fileUrl = `https://${config.awsS3BucketName}.s3.amazonaws.com/${dsf}.${fileType}`;
+          
           // Save image info in the database
           await ImageStore.create({
             image: fileUrl,
