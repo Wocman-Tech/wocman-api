@@ -48,11 +48,11 @@ exports.uploadProject = async (req, res, next) => {
         for (const file of req.files) {
           let myFile = file.originalname.split(".");
           const fileType = myFile[myFile.length - 1];
-          const dsf = `${Date.now()}.${fileType}`;
+          const uniqueFileName = `${Date.now()}.${fileType}`;
   
           const params = {
             Bucket: config.awsS3BucketName, // Your S3 bucket name
-            Key: `${dsf}.${fileType}`, // Unique file key
+            Key: uniqueFileName, // Unique file key
             Body: file.buffer, // File content
             ContentType: file.mimetype, // Ensure correct content type
           };
@@ -61,8 +61,7 @@ exports.uploadProject = async (req, res, next) => {
             const uploadCommand = new PutObjectCommand(params);
             await s3.send(uploadCommand);
   
-            const fileUrl = `https://${config.awsS3BucketName}.s3.amazonaws.com/${dsf}.${fileType}`;
-
+            const fileUrl = `https://${config.awsS3BucketName}.s3.amazonaws.com/${uniqueFileName}`;
             imageUrls.push(fileUrl);
           } catch (error) {
             console.error("Error uploading file:", error);
@@ -76,21 +75,20 @@ exports.uploadProject = async (req, res, next) => {
         }
       }
   
-      // Concatenate image URLs for storage (if needed)
-      const images = imageUrls.join("/XX98XX");
+      // Pass image URLs directly (do not join as a string unless necessary)
+      const projectData = { ...req.body, images: imageUrls };
+      console.log("Data passed to createProject:", projectData);
   
-      // Pass images as part of the project data
-      const projectData = { ...req.body, images };
       const project = await createProject(projectData, req.userId);
   
-      const message = "Project created successfully";
       return res.status(201).json({
         statusCode: 201,
         status: true,
-        message,
+        message: "Project created successfully",
         data: project,
       });
     } catch (error) {
+      console.error("Error in uploadProject:", error);
       return res.status(500).send({
         statusCode: 500,
         status: false,
@@ -99,6 +97,7 @@ exports.uploadProject = async (req, res, next) => {
       });
     }
   };
+  
   
 
 exports.projectTypes = (req, res, next) => {

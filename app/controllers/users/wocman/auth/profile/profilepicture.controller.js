@@ -1,7 +1,7 @@
 const pathRoot = "../../../../../";
 const db = require(pathRoot + "models");
 const config = require(pathRoot + "config/auth.config");
-const { S3Client } = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
 // Create the S3 client instance
 const s3 = new S3Client({
@@ -56,7 +56,10 @@ exports.uploadProfilePictureWocman = (req, res, next) => {
     ContentType: file.mimetype, // Ensure correct content type
   };
 
-  s3.upload(params, (error, data) => {
+  const command = new PutObjectCommand(params);
+
+
+  s3.send(command, (error, data) => {
     if (error) {
       res.status(500).send(error);
     }
