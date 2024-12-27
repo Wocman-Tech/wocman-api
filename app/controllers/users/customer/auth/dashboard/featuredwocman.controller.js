@@ -44,7 +44,7 @@ exports.uploadProject = async (req, res, next) => {
   
       let imageUrls = []; // Collect uploaded file URLs
   
-      if (req.files && req.files.length > 0) {
+      if (Array.isArray(req.files) && req.files.length > 0) {
         for (const file of req.files) {
           let myFile = file.originalname.split(".");
           const fileType = myFile[myFile.length - 1];
@@ -75,7 +75,6 @@ exports.uploadProject = async (req, res, next) => {
         }
       }
   
-      // Pass image URLs directly (do not join as a string unless necessary)
       const projectData = { ...req.body, images: imageUrls };
       console.log("Data passed to createProject:", projectData);
   
@@ -98,125 +97,118 @@ exports.uploadProject = async (req, res, next) => {
     }
   };
   
-  
-
-exports.projectTypes = (req, res, next) => {
+  exports.projectTypes = (req, res, next) => {
     if (typeof req.userId === "undefined") {
-        return res.status(400).send({
-            statusCode: 400,
-            status: false,
-            message: "User was not found",
-            data: []
-        });
+      return res.status(400).send({
+        statusCode: 400,
+        status: false,
+        message: "User was not found",
+        data: [],
+      });
     } else {
-        // Synchronize project type with skills
-        let skill_names = [];
-        Skills.findAll()
-            .then(skills => {
-                if (!skills) { 
-                    return;
-                } else {
-                    if (Array.isArray(skills) && skills.length) {
-                        for (let skill of skills) {
-                            skill_names.push({
-                                name: skill.name,
-                                category: skill.categoryid
-                            });
-                        }
-                    }
+      let skill_names = [];
+      Skills.findAll()
+        .then(skills => {
+          if (!Array.isArray(skills) || skills.length === 0) {
+            console.log("No skills found or skills is not an array.");
+            return;
+          }
+  
+          skills.forEach(skill => {
+            skill_names.push({
+              name: skill.name,
+              category: skill.categoryid,
+            });
+          });
+  
+          skill_names.forEach(async (skill) => {
+            const projectType = await Project.findOne({
+              where: { name: skill.name },
+            });
+  
+            if (!projectType) {
+              await Project.create({
+                name: skill.name,
+                description: skill.name,
+              });
+            }
+          });
+  
+          let tradesmen = [];
+          let technicians = [];
+          let professionals = [];
+  
+          skill_names.forEach((skill) => {
+            Project.findOne({
+              where: { name: skill.name },
+            }).then(projectType => {
+              if (projectType) {
+                const category = skill.category;
+                const projectTypeObj = {
+                  project_type_id: projectType.id,
+                  project_type_name: projectType.name,
+                };
+                if (category === 1) {
+                  tradesmen.push(projectTypeObj);
+                } else if (category === 2) {
+                  technicians.push(projectTypeObj);
+                } else if (category === 3) {
+                  professionals.push(projectTypeObj);
                 }
-
-                // Insert project types based on skill names
-                skill_names.forEach(async (skill) => {
-                    const projectType = await Project.findOne({
-                        where: { name: skill.name },
+              }
+            });
+          });
+  
+          let jobs = [];
+          const userId = req.userId || '';
+          const searchCondition = userId ? { 'customerid': userId } : { 'customerid': { $not: null } };
+  
+          Projects.findAll({ where: searchCondition })
+            .then(projects => {
+              if (Array.isArray(projects) && projects.length) {
+                projects.forEach((project) => {
+                  if (project.wocmanid && project.projectcomplete !== 1) {
+                    jobs.push({
+                      description: project.description,
+                      wocmanid: project.wocmanid,
+                      images: project.images,
+                      jobTypeid: project.projectid,
+                      jobid: project.id,
                     });
-
-                    if (!projectType) {
-                        // Insert new project type if not found
-                        await Project.create({
-                            name: skill.name,
-                            description: skill.name,
-                        });
-                    }
+                  }
                 });
-
-                let tradesmen = [];
-                let technicians = [];
-                let professionals = [];
-
-                // Categorize skill names based on their category
-                skill_names.forEach((skill) => {
-                    Project.findOne({
-                        where: { name: skill.name },
-                    }).then(projectType => {
-                        if (projectType) {
-                            const category = skill.category;
-                            const projectTypeObj = {
-                                project_type_id: projectType.id,
-                                project_type_name: projectType.name,
-                            };
-                            if (category === 1) {
-                                tradesmen.push(projectTypeObj);
-                            } else if (category === 2) {
-                                technicians.push(projectTypeObj);
-                            } else if (category === 3) {
-                                professionals.push(projectTypeObj);
-                            }
-                        }
-                    });
-                });
-
-                // Fetch projects for the user
-                let jobs = [];
-                const userId = req.userId || '';
-                const searchCondition = userId ? { 'customerid': userId } : { 'customerid': { $not: null } };
-
-                Projects.findAll({ where: searchCondition })
-                    .then(projects => {
-                        if (Array.isArray(projects) && projects.length) {
-                            projects.forEach((project) => {
-                                if (project.wocmanid && project.projectcomplete !== 1) {
-                                    jobs.push({
-                                        description: project.description,
-                                        wocmanid: project.wocmanid,
-                                        images: project.images,
-                                        jobTypeid: project.projectid,
-                                        jobid: project.id
-                                    });
-                                }
-                            });
-                        }
-                        res.status(200).send({
-                            statusCode: 200,
-                            status: true,
-                            message: "Jobs And Job Types",
-                            data: {
-                                accessToken: req.token,
-                                jobs: jobs,
-                                tradesmen_jobTypes: tradesmen,
-                                technicians_jobTypes: technicians,
-                                professionals_jobTypes: professionals
-                            }
-                        });
-                    })
-                    .catch(err => {
-                        res.status(500).send({
-                            statusCode: 500,
-                            status: false,
-                            message: err.message,
-                            data: []
-                        });
-                    });
+              }
+              res.status(200).send({
+                statusCode: 200,
+                status: true,
+                message: "Jobs And Job Types",
+                data: {
+                  accessToken: req.token,
+                  jobs: jobs,
+                  tradesmen_jobTypes: tradesmen,
+                  technicians_jobTypes: technicians,
+                  professionals_jobTypes: professionals,
+                },
+              });
             })
             .catch(err => {
-                res.status(500).send({
-                    statusCode: 500,
-                    status: false,
-                    message: err.message,
-                    data: []
-                });
+              res.status(500).send({
+                statusCode: 500,
+                status: false,
+                message: err.message,
+                data: [],
+              });
             });
+        })
+        .catch(err => {
+          res.status(500).send({
+            statusCode: 500,
+            status: false,
+            message: err.message,
+            data: [],
+          });
+        });
     }
-};
+  };
+  
 
