@@ -66,9 +66,10 @@ exports.wocmanAddCertificate = (req, res, next) => {
   const dsf = uuidv4();
 
   const params = {
-    Bucket: config.awsS3BucketName,
-    Key: `${dsf}.${fileType}`,
-    Body: file.buffer,
+    Bucket: config.awsS3BucketName, // Your S3 bucket name
+    Key: `${dsf}.${fileType}`, // Unique file key
+    Body: file.buffer, // File content
+    ContentType: file.mimetype, // Ensure correct content type
   };
 
   // Use PutObjectCommand to upload file
@@ -76,7 +77,7 @@ exports.wocmanAddCertificate = (req, res, next) => {
 
   s3.send(putObjectCommand)
     .then((data) => {
-      const fileUrl = data.Location;
+      const fileUrl = `https://${config.awsS3BucketName}.s3.amazonaws.com/${dsf}.${fileType}`;
       if (typeof fileUrl === "undefined") {
         return res.status(400).send({
           statusCode: 400,
