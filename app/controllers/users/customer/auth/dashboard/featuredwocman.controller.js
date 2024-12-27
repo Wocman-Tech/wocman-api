@@ -51,7 +51,6 @@ exports.uploadProject = async (req, res, next) => {
                     Bucket: config.awsS3BucketName,
                     Key: fileName, // Use a unique file name
                     Body: file.buffer,
-                    ACL: "public-read-write", // Adjust as needed
                 };
 
                 try {

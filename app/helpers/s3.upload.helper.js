@@ -17,7 +17,6 @@ exports.s3Upload = async (file) => {
       Key: file.originalname,
       Body: file.buffer,
       ContentType: file.mimetype,
-      ACL: "public-read",
     };
 
     const command = new PutObjectCommand(params);

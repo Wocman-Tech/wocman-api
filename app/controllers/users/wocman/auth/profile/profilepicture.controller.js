@@ -50,7 +50,6 @@ exports.uploadProfilePictureWocman = (req, res, next) => {
   const dsf = uuidv4();
 
   const params = {
-    ACL: "private",
     Bucket: config.awsS3BucketName,
     Key: `${dsf}.${fileType}`,
     Body: file.buffer,

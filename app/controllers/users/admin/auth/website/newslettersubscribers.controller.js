@@ -133,7 +133,6 @@ exports.sendNewsletter = async (req, res, next) => {
             Key: uniqueFileName,
             Body: item.buffer,
             ContentType: item.mimetype,
-            ACL: "public-read-write", // Set ACL according to your requirements
           };
 
           const command = new PutObjectCommand(params);

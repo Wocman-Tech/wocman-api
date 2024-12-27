@@ -66,7 +66,6 @@ exports.wocmanAddCertificate = (req, res, next) => {
   const dsf = uuidv4();
 
   const params = {
-    ACL: "public-read-write",
     Bucket: config.awsS3BucketName,
     Key: `${dsf}.${fileType}`,
     Body: file.buffer,

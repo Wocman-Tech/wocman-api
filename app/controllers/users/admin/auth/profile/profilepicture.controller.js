@@ -51,7 +51,6 @@ exports.uploadProfilePicture = async (req, res) => {
       Key: uniqueFileName,
       Body: file.buffer,
       ContentType: file.mimetype,
-      ACL: "private", // Set access control
     };
 
     const command = new PutObjectCommand(params);

@@ -177,7 +177,6 @@ exports.replayContact = (req, res, next) => {
           const fileType = myFile[myFile.length - 1];
 
           var params = {
-            ACL: "public-read-write",
             Bucket: config.awsS3BucketName,
             Key: item.originalname,
             Body: item.buffer,

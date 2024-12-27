@@ -331,7 +331,6 @@ exports.chatSave = (req, res, next) => {
                         const dsf = uuidv4();
 
                         var params = {
-                          ACL: "public-read-write",
                           Bucket: config.awsS3BucketName,
                           Key: item.originalname,
                           Body: item.buffer,
