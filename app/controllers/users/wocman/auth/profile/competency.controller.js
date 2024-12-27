@@ -25,7 +25,7 @@ const { EMAIL, PASSWORD, MAIN_URL } = require(pathRoot + "helpers/helper.js");
 const Op = db.Sequelize.Op;
 
 exports.wocmanAddCompetence = (req, res, next) => {
-    const competenceid = req.body.competenceid;
+    var competenceid = req.body.competenceid;
 
     if (typeof competenceid === "undefined") {
         return res.status(400).send({
@@ -36,8 +36,9 @@ exports.wocmanAddCompetence = (req, res, next) => {
         });
     }
 
-    const user_id = req.userId;
-    if (!user_id) {
+    if (req.userId && req.userId !== '') {
+        var user_id = req.userId;
+    } else {
         return res.status(400).send({
             statusCode: 400,
             status: false,
@@ -56,7 +57,9 @@ exports.wocmanAddCompetence = (req, res, next) => {
             });
         }
 
-        Competency.findOne({ where: { 'id': competenceid } }).then(ds34drsd => {
+        Competency.findOne({
+            where: { 'id': competenceid }
+        }).then(ds34drsd => {
             if (!ds34drsd) {
                 return res.status(404).send({
                     statusCode: 400,
@@ -65,72 +68,53 @@ exports.wocmanAddCompetence = (req, res, next) => {
                     data: []
                 });
             }
-            const comName = ds34drsd.name;
+            var comName = ds34drsd.name;
 
-            // Remove all existing competencies for the user
-            Wcompetency.destroy({ where: { 'userid': user_id } })
-                .then(() => {
-                    // Create new competency entry
-                    Wcompetency.create({
-                        userid: user_id,
-                        competencyid: competenceid
-                    }).then(() => {
-                        // Create the file content (just an example)
-                        const fileName = `competency_${user_id}_${competenceid}.txt`;
-                        const fileContent = `User ${user_id} declared Competency: ${comName}`;
+            // Remove all
+            Wcompetency.destroy({
+                where: { 'userid': user_id }
+            });
 
-                        // Upload file to S3 using PutObjectCommand
-                        const uploadParams = {
-                            Bucket: config.awsS3BucketName,
-                            Key: fileName,
-                            Body: fileContent, // The content you want to upload
-                            ContentType: 'text/plain', // Or the appropriate content type
-                        };
+            // Create one
+            Wcompetency.create({
+                userid: user_id,
+                competencyid: competenceid
+            }).then(hgh => {
+                // Update user profile to "completed"
+                users.update({ profileupdate: 1 }, { where: { id: users.id } }) // Add this step
+                    .then(() => {
+                        const pushUser = user_id;
+                        const pushType = 'service';
+                        const pushBody = 'Dear ' + users.username + ", <br />You have Declared Your " +
+                            " Wocman Competency as " + comName + ". <br /> This would be reviewed soon " +
+                            "<br />A corresponding response would be sent to you<br/>";
 
-                        const command = new PutObjectCommand(uploadParams);
-                        s3.send(command)
-                            .then(() => {
-                                // Send notification after successful file upload
-                                const pushUser = user_id;
-                                const pushType = 'service';
-                                const pushBody = `Dear ${users.username}, <br />You have declared your Wocman Competency as ${comName}. This would be reviewed soon.<br />A corresponding response would be sent to you.`;
+                        Helpers.pushNotice(pushUser, pushBody, pushType);
 
-                                Helpers.pushNotice(pushUser, pushBody, pushType);
-
-                                // Send response to the client
-                                res.status(200).send({
-                                    statusCode: 200,
-                                    status: true,
-                                    message: "Competency was added and file uploaded",
-                                    data: {
-                                        accessToken: req.token
-                                    }
-                                });
-                            })
-                            .catch(err => {
-                                res.status(500).send({
-                                    statusCode: 500,
-                                    status: false,
-                                    message: "File upload failed: " + err.message,
-                                    data: []
-                                });
-                            });
+                        res.status(200).send({
+                            statusCode: 200,
+                            status: true,
+                            message: "Competency was added",
+                            data: {
+                                accessToken: req.token
+                            }
+                        });
                     }).catch(err => {
                         res.status(500).send({
                             statusCode: 500,
                             status: false,
-                            message: err.message,
+                            message: "Error updating user profile status.",
                             data: []
                         });
                     });
-                }).catch(err => {
-                    res.status(500).send({
-                        statusCode: 500,
-                        status: false,
-                        message: err.message,
-                        data: []
-                    });
+            }).catch(err => {
+                res.status(500).send({
+                    statusCode: 500,
+                    status: false,
+                    message: err.message,
+                    data: []
                 });
+            });
         }).catch(err => {
             res.status(500).send({
                 statusCode: 500,
@@ -148,6 +132,7 @@ exports.wocmanAddCompetence = (req, res, next) => {
         });
     });
 };
+
 
 exports.wocmanListCompetencies = (req, res, next) => {
     const user_id = req.userId;
