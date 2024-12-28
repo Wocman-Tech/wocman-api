@@ -1,7 +1,12 @@
 const pathRoot = "../../../../../";
 const db = require(pathRoot + "models");
 const config = require(pathRoot + "config/auth.config");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client } = require("@aws-sdk/client-s3");
+const { Upload } = require("@aws-sdk/lib-storage");
+const { v4: uuidv4 } = require("uuid");
+
+const User = db.User;
+const Helpers = require(pathRoot + "helpers/helper.js");
 
 // Create the S3 client instance
 const s3 = new S3Client({
@@ -10,24 +15,10 @@ const s3 = new S3Client({
     accessKeyId: config.awsS3AccessKeyId,
     secretAccessKey: config.awsS3SecretAccessKey,
   },
-  forcePathStyle: true, // Optional, if you use path-style URLs
-  tls: true, // Ensures SSL is enabled (same as sslEnabled: true in v2)
 });
-const fs = require("fs");
-const User = db.User;
 
-const Helpers = require(pathRoot + "helpers/helper.js");
-const { verifySignUp } = require(pathRoot + "middleware");
-const { EMAIL, PASSWORD, MAIN_URL } = require(pathRoot + "helpers/helper.js");
-
-const { v4: uuidv4 } = require("uuid");
-
-const Op = db.Sequelize.Op;
-
-exports.uploadProfilePictureWocman = (req, res, next) => {
-  if (req.userId && req.userId !== "") {
-    var user_id = req.userId;
-  } else {
+exports.uploadProfilePictureWocman = async (req, res, next) => {
+  if (!req.userId) {
     return res.status(400).send({
       statusCode: 400,
       status: false,
@@ -35,38 +26,40 @@ exports.uploadProfilePictureWocman = (req, res, next) => {
       data: [],
     });
   }
-  const file = req.file; //this is the file name
+
+  const file = req.file; // This is the file uploaded by the user
   if (!file) {
     return res.status(400).send({
       statusCode: 400,
       status: false,
-      message: "avatar filed was undefined",
+      message: "Avatar file was undefined",
       data: [],
     });
   }
-  // console.log(file);
-  let myFile = file.originalname.split(".");
+
+  const userId = req.userId;
+  const myFile = file.originalname.split(".");
   const fileType = myFile[myFile.length - 1];
-  const dsf = uuidv4();
+  const fileKey = `${uuidv4()}.${fileType}`;
 
-  const params = {
-    Bucket: config.awsS3BucketName, // Your S3 bucket name
-    Key: `${dsf}.${fileType}`, // Unique file key
-    Body: file.buffer, // File content
-    ContentType: file.mimetype, // Ensure correct content type
-  };
+  try {
+    // Prepare upload parameters
+    const upload = new Upload({
+      client: s3,
+      params: {
+        Bucket: config.awsS3BucketName,
+        Key: fileKey,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      },
+    });
 
-  const command = new PutObjectCommand(params);
+    // Start the upload process
+    const response = await upload.done();
 
+    const fileUrl = response.Location;
 
-  s3.send(command, (error, data) => {
-    if (error) {
-      res.status(500).send(error);
-    }
-
-    const fileUrl = `https://${config.awsS3BucketName}.s3.amazonaws.com/${dsf}.${fileType}`;
-
-    if (typeof fileUrl === "undefined") {
+    if (!fileUrl) {
       return res.status(400).send({
         statusCode: 400,
         status: false,
@@ -75,48 +68,36 @@ exports.uploadProfilePictureWocman = (req, res, next) => {
       });
     }
 
-    User.findByPk(user_id)
-      .then((users) => {
-        if (!users) {
-          return res.status(404).send({
-            statusCode: 404,
-            status: false,
-            message: "User Not found.",
-            date: [],
-          });
-        }
-        users
-          .update({
-            image: fileUrl,
-            images: users.images + Helpers.padTogether() + fileUrl,
-          })
-          .then(() => {
-            res.send({
-              statusCode: 200,
-              status: true,
-              message: "Profile picture uploaded successfully",
-              data: {
-                imageUrl: fileUrl,
-                accessToken: req.token,
-              },
-            });
-          })
-          .catch((err) => {
-            res.status(500).send({
-              statusCode: 500,
-              status: false,
-              message: err.message,
-              data: [],
-            });
-          });
-      })
-      .catch((err) => {
-        res.status(500).send({
-          statusCode: 500,
-          status: false,
-          message: err.message,
-          data: [],
-        });
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).send({
+        statusCode: 404,
+        status: false,
+        message: "User Not found.",
+        data: [],
       });
-  });
+    }
+
+    await user.update({
+      image: fileUrl,
+      images: user.images + Helpers.padTogether() + fileUrl,
+    });
+
+    res.send({
+      statusCode: 200,
+      status: true,
+      message: "Profile picture uploaded successfully",
+      data: {
+        imageUrl: fileUrl,
+        accessToken: req.token,
+      },
+    });
+  } catch (error) {
+    res.status(500).send({
+      statusCode: 500,
+      status: false,
+      message: error.message,
+      data: [],
+    });
+  }
 };

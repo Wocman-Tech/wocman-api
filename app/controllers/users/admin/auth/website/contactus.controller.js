@@ -3,7 +3,8 @@ const db = require(pathRoot + "models");
 const config = require(pathRoot + "config/auth.config");
 const fs = require("fs");
 
-const { S3Client,PutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client } = require("@aws-sdk/client-s3");
+const { Upload } = require("@aws-sdk/lib-storage");
 
 // Create the S3 client instance
 const s3 = new S3Client({
@@ -15,6 +16,7 @@ const s3 = new S3Client({
   forcePathStyle: true, // Optional, if you use path-style URLs
   tls: true, // Ensures SSL is enabled (same as sslEnabled: true in v2)
 });
+
 const ImageStore = db.ImageStore;
 const Contactus = db.Contactus;
 
@@ -52,91 +54,12 @@ let MailGenerator = new Mailgen({
   },
 });
 
-exports.allContacts = (req, res, next) => {
-  Contactus.findAndCountAll()
-    .then((result) => {
-      res.status(200).send({
-        statusCode: 200,
-        status: true,
-        message: "Found Contact us messages",
-        data: result.rows,
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        statusCode: 500,
-        status: false,
-        message: err.message,
-        data: [],
-      });
-    });
-};
+exports.replayContact = async (req, res, next) => {
+  const text = req.body.text;
+  const subject = req.body.subject;
+  const contactid = req.body.contactid;
 
-exports.oneContact = (req, res, next) => {
-  var id = req.params.id;
-  Contactus.findByPk(id)
-    .then((result) => {
-      ImageStore.findAll({
-        where: { tracker: result.tracker },
-      })
-        .then((images) => {
-          res.status(200).send({
-            statusCode: 200,
-            status: true,
-            message: "Found Contact us messages",
-            data: result,
-            images: images,
-          });
-        })
-        .catch((err) => {
-          res.status(500).send({
-            statusCode: 500,
-            status: false,
-            message: err.message,
-            data: [],
-          });
-        });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        statusCode: 500,
-        status: false,
-        message: err.message,
-        data: [],
-      });
-    });
-};
-
-exports.deleteContact = (req, res, next) => {
-  var ids = req.params.id;
-  Contactus.destroy({
-    where: { id: ids },
-  })
-    .then((result) => {
-      res.status(200).send({
-        statusCode: 200,
-        status: true,
-        message: "Deleted Contact Us Message",
-        data: [],
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        statusCode: 500,
-        status: false,
-        message: err.message,
-        data: [],
-      });
-    });
-};
-
-exports.replayContact = (req, res, next) => {
-  var text = req.body.text;
-  var subject = req.body.subject;
-  var contactid = req.body.contactid;
-
-  if (text && text !== "") {
-  } else {
+  if (!text) {
     return res.status(400).send({
       statusCode: 400,
       status: false,
@@ -145,8 +68,7 @@ exports.replayContact = (req, res, next) => {
     });
   }
 
-  if (subject && subject !== "") {
-  } else {
+  if (!subject) {
     return res.status(400).send({
       statusCode: 400,
       status: false,
@@ -155,8 +77,7 @@ exports.replayContact = (req, res, next) => {
     });
   }
 
-  if (contactid && contactid !== "") {
-  } else {
+  if (!contactid) {
     return res.status(400).send({
       statusCode: 400,
       status: false,
@@ -165,109 +86,99 @@ exports.replayContact = (req, res, next) => {
     });
   }
 
-  Contactus.findOne({
-    where: { id: contactid },
-  })
-    .then((result) => {
-      if (result) {
-        const file = req.files;
-        const tracker = uuidv4();
-        file.map((item) => {
-          let myFile = file.originalname.split(".");
-          const fileType = myFile[myFile.length - 1];
-          const dsf = uuidv4();
+  try {
+    const result = await Contactus.findOne({ where: { id: contactid } });
 
-          const params = {
-            Bucket: config.awsS3BucketName, // Your S3 bucket name
-            Key: `${dsf}.${fileType}`, // Unique file key
-            Body: file.buffer, // File content
-            ContentType: file.mimetype, // Ensure correct content type
-          };
-
-          const command = new PutObjectCommand(params);
-
-
-          s3.send(command, (error, data, res) => {
-            if (error) {
-              // res.status(500).send(error)
-              console.log(error);
-            } else {
-              const fileUrl = `https://${config.awsS3BucketName}.s3.amazonaws.com/${dsf}.${fileType}`;
-              if (typeof fileUrl === "undefined") {
-                //empty file
-              } else {
-                ImageStore.create({
-                  image: fileUrl,
-                  tracker: tracker,
-                });
-              }
-            }
-          });
-        });
-
-        let subscriber = result.name;
-        let subscriber_email = result.email;
-        let email_tracker = result.tracker;
-        let response = {
-          body: {
-            name: subscriber,
-            intro: subscriber_email,
-            action: {
-              button: {},
-            },
-          },
-        };
-
-        let mail = MailGenerator.generate(response);
-
-        var attachments = [];
-        ImageStore.findAll({
-          where: { tracker: tracker },
-        }).then((images) => {
-          for (var i = 0; i < images.length; i++) {
-            let image_path = images[i].image;
-            var hh8 = image_path.split("/");
-            var hh9 = hh8.length();
-            var image_name = hh8[hh9 - 1];
-            var addto_attachments = {
-              filename: image_name,
-              path: image_path,
-            };
-            attachments.push({ addto_attachments });
-          }
-
-          let message = {
-            from: EMAIL,
-            to: subscriber_email,
-            subject: email_tracker + ":" + subject,
-            html: mail,
-            attachments: attachments,
-          };
-          var sentMail = false;
-          transporter.sendMail(message).then(() => {});
-        });
-
-        res.status(200).send({
-          statusCode: 200,
-          status: true,
-          message: "Sent Reply",
-          data: [],
-        });
-      } else {
-        return res.status(403).send({
-          statusCode: 403,
-          status: false,
-          message: "Could not find chat",
-          data: [],
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        statusCode: 500,
+    if (!result) {
+      return res.status(403).send({
+        statusCode: 403,
         status: false,
-        message: err.message,
+        message: "Could not find chat",
         data: [],
       });
+    }
+
+    const tracker = uuidv4();
+    const files = req.files || [];
+
+    // Upload files to S3
+    for (const file of files) {
+      const myFile = file.originalname.split(".");
+      const fileType = myFile[myFile.length - 1];
+      const uniqueFileName = `${uuidv4()}.${fileType}`;
+
+      const uploadParams = {
+        Bucket: config.awsS3BucketName,
+        Key: uniqueFileName,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      };
+
+      try {
+        const upload = new Upload({
+          client: s3,
+          params: uploadParams,
+        });
+
+        const response = await upload.done();
+        const fileUrl = response.Location;
+        await ImageStore.create({
+          image: fileUrl,
+          tracker: tracker,
+        });
+      } catch (err) {
+        console.error("Error uploading file to S3:", err);
+      }
+    }
+
+    const subscriber = result.name;
+    const subscriberEmail = result.email;
+    const emailTracker = result.tracker;
+
+    const responseBody = {
+      body: {
+        name: subscriber,
+        intro: subscriberEmail,
+        action: { button: {} },
+      },
+    };
+
+    const mail = MailGenerator.generate(responseBody);
+    const attachments = [];
+
+    const images = await ImageStore.findAll({ where: { tracker: tracker } });
+    images.forEach((image) => {
+      const imagePath = image.image;
+      const imageName = imagePath.split("/").pop();
+      attachments.push({
+        filename: imageName,
+        path: imagePath,
+      });
     });
+
+    const message = {
+      from: EMAIL,
+      to: subscriberEmail,
+      subject: `${emailTracker}: ${subject}`,
+      html: mail,
+      attachments: attachments,
+    };
+
+    await transporter.sendMail(message);
+
+    res.status(200).send({
+      statusCode: 200,
+      status: true,
+      message: "Sent Reply",
+      data: [],
+    });
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).send({
+      statusCode: 500,
+      status: false,
+      message: err.message,
+      data: [],
+    });
+  }
 };

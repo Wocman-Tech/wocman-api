@@ -2,7 +2,8 @@ const pathRoot = "../../../../../";
 const db = require(pathRoot + "models");
 const config = require(pathRoot + "config/auth.config");
 const { v4: uuidv4 } = require("uuid");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client } = require("@aws-sdk/client-s3");
+const { Upload } = require("@aws-sdk/lib-storage");
 
 const User = db.User;
 const Helpers = require(pathRoot + "helpers/helper.js");
@@ -45,7 +46,6 @@ exports.uploadProfilePicture = async (req, res) => {
   const dsf = uuidv4();
 
   try {
-    // Upload file to S3 using PutObjectCommand
     const params = {
       Bucket: config.awsS3BucketName, // Your S3 bucket name
       Key: `${dsf}.${fileType}`, // Unique file key
@@ -53,11 +53,15 @@ exports.uploadProfilePicture = async (req, res) => {
       ContentType: file.mimetype, // Ensure correct content type
     };
 
-    const command = new PutObjectCommand(params);
-    await s3.send(command);
+    const upload = new Upload({
+      client: s3,
+      params: params,
+    });
+
+    const response = await upload.done();
 
     // Construct the file URL (if necessary)
-    const fileUrl = `https://${config.awsS3BucketName}.s3.amazonaws.com/${dsf}.${fileType}`;
+    const fileUrl = response.Location;
 
     // Update user record
     const user = await User.findByPk(user_id);
@@ -105,5 +109,3 @@ exports.uploadProfilePicture = async (req, res) => {
     });
   }
 };
-
-

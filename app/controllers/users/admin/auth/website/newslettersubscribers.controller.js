@@ -2,7 +2,9 @@ const pathRoot = "../../../../../";
 const db = require(pathRoot + "models");
 const config = require(pathRoot + "config/auth.config");
 
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client } = require("@aws-sdk/client-s3");
+const { Upload } = require("@aws-sdk/lib-storage");
+
 
 // Create the S3 client instance
 const s3 = new S3Client({
@@ -119,8 +121,7 @@ exports.sendNewsletter = async (req, res, next) => {
 
   const files = req.files;
   const tracker = uuidv4();
-  
-  // Upload files to S3 using PutObjectCommand
+
   if (files && files.length > 0) {
     try {
       await Promise.all(
@@ -135,12 +136,15 @@ exports.sendNewsletter = async (req, res, next) => {
             Body: file.buffer, // File content
             ContentType: file.mimetype, // Ensure correct content type
           };
+          const upload = new Upload({
+            client: s3,
+            params: params,
+          });
 
-          const command = new PutObjectCommand(params);
-          const data = await s3.send(command);
+          const response = await upload.done();
 
-          const fileUrl = `https://${config.awsS3BucketName}.s3.amazonaws.com/${dsf}.${fileType}`;
-          
+          const fileUrl = response.Location;
+
           // Save image info in the database
           await ImageStore.create({
             image: fileUrl,
@@ -181,7 +185,9 @@ exports.sendNewsletter = async (req, res, next) => {
         const attachments = [];
 
         // Fetch images related to the tracker
-        const images = await ImageStore.findAll({ where: { tracker: tracker } });
+        const images = await ImageStore.findAll({
+          where: { tracker: tracker },
+        });
         images.forEach((image) => {
           const image_path = image.image;
           const image_name = image_path.split("/").pop();
@@ -226,4 +232,3 @@ exports.sendNewsletter = async (req, res, next) => {
     });
   }
 };
-

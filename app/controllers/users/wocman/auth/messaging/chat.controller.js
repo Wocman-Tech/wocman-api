@@ -2,7 +2,7 @@ const pathRoot = "../../../../../";
 const db = require(pathRoot + "models");
 const config = require(pathRoot + "config/auth.config");
 const fs = require("fs");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3"); // Import the PutObjectCommand
+const { S3Client } = require("@aws-sdk/client-s3"); // Import the PutObjectCommand
 
 // Create the S3 client instance
 const s3 = new S3Client({

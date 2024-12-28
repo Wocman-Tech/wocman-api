@@ -2,7 +2,8 @@ const pathRoot = "../../";
 const db = require(pathRoot + "models");
 const config = require(pathRoot + "config/auth.config");
 
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client } = require("@aws-sdk/client-s3");
+const { Upload } = require("@aws-sdk/lib-storage");
 
 // Create the S3 client instance
 const s3 = new S3Client({
@@ -32,10 +33,9 @@ exports.contactus = async (req, res, next) => {
   }
 
   const files = req.files;
-  
+
   if (files && files.length > 0) {
     try {
-      // Upload images to S3 using PutObjectCommand
       await Promise.all(
         files.map(async (item) => {
           let myFile = file.originalname.split(".");
@@ -49,10 +49,14 @@ exports.contactus = async (req, res, next) => {
             ContentType: file.mimetype, // Ensure correct content type
           };
 
-          const command = new PutObjectCommand(params);
-          const data = await s3.send(command);
+          const upload = new Upload({
+            client: s3,
+            params: params,
+          });
 
-          const fileUrl = `https://${config.awsS3BucketName}.s3.amazonaws.com/${dsf}.${fileType}`;
+          const response = await upload.done();
+
+          const fileUrl = response.Location;
 
           // Save image info in the database
           await ImageStore.create({
@@ -98,4 +102,3 @@ exports.contactus = async (req, res, next) => {
     });
   }
 };
-

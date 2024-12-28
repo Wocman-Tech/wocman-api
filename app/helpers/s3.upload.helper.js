@@ -1,4 +1,5 @@
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client } = require("@aws-sdk/client-s3");
+const { Upload } = require("@aws-sdk/lib-storage");
 const config = require("../../app/config/auth.config");
 
 // Create the S3 client instance
@@ -19,12 +20,15 @@ exports.s3Upload = async (file) => {
       ContentType: file.mimetype,
     };
 
-    const command = new PutObjectCommand(params);
-    const result = await s3.send(command);
+    const upload = new Upload({
+      client: s3,
+      params: params,
+    });
 
-    // Construct the file URL after upload
-    const fileUrl = `https://${config.awsS3BucketName}.s3.amazonaws.com/${params.Key}`;
-    
+    const response = await upload.done();
+
+    const fileUrl = response.Location;
+
     return { Location: fileUrl }; // Return the file URL with a "Location" property, similar to what your existing code expects
   } catch (error) {
     console.error("Error uploading to S3:", error);
