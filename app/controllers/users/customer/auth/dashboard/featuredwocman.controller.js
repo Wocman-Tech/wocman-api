@@ -23,28 +23,11 @@ const Project = db.Projecttype;
 
 exports.uploadProject = async (req, res, next) => {
     try {
-      const body = {
-        description: req.body.description,
-        address: req.body.address,
-        city: req.body.city,
-        topic: req.body.topic,
-        projecttypeid: req.body.projecttypeid,
-        startDate: req.body.startDate,
-      };
-  
-      const { error } = await validator.createProject(body);
-      if (error) {
-        return res.status(400).send({
-          statusCode: 400,
-          status: false,
-          message: error.message.replace(/[\"]/gi, ""),
-          data: [],
-        });
-      }
-  
       let imageUrls = []; // Collect uploaded file URLs
   
+      // Check if files exist in the request
       if (Array.isArray(req.files) && req.files.length > 0) {
+        // Loop through the uploaded files
         for (const file of req.files) {
           let myFile = file.originalname.split(".");
           const fileType = myFile[myFile.length - 1];
@@ -61,8 +44,9 @@ exports.uploadProject = async (req, res, next) => {
             const uploadCommand = new PutObjectCommand(params);
             await s3.send(uploadCommand);
   
+            // Build the file URL
             const fileUrl = `https://${config.awsS3BucketName}.s3.amazonaws.com/${uniqueFileName}`;
-            imageUrls.push(fileUrl);
+            imageUrls.push(fileUrl);  // Add file URL to the imageUrls array
           } catch (error) {
             console.error("Error uploading file:", error);
             return res.status(500).send({
@@ -75,17 +59,33 @@ exports.uploadProject = async (req, res, next) => {
         }
       }
   
+      // Prepare the project data, including images
       const projectData = { ...req.body, images: imageUrls };
       console.log("Data passed to createProject:", projectData);
   
-      const project = await createProject(projectData, req.userId);
+      // Extract relevant data for project creation
+      const { description, topic, address, city, projecttypeid, startDate } = req.body;
   
+      // Create the project in the database
+      const project = await Projects.create({
+        project: topic,
+        description: description,
+        address: address,
+        city: city,
+        projectid: projecttypeid,  // Assuming this is the Projecttype ID
+        customerid: req.userId,    // Assuming the user ID is in req.userId
+        images: imageUrls.join(', '),  // Convert array of image URLs into a comma-separated string
+        startDate,
+      });
+  
+      // Respond with success message and created project data
       return res.status(201).json({
         statusCode: 201,
         status: true,
         message: "Project created successfully",
         data: project,
       });
+  
     } catch (error) {
       console.error("Error in uploadProject:", error);
       return res.status(500).send({
