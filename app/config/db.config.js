@@ -7,12 +7,7 @@ module.exports = {
     password: process.env.DEV_DATABASE_PASSWORD,
     database: process.env.DEV_DATABASE_NAME,
     dialect: process.env.DEV_DATABASE_DIALECT,
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false,
-      },
-    },
+    port: process.env.PROD_DATABASE_PORT || 3306,
   },
   production: {
     host: process.env.PROD_DATABASE_HOST,
@@ -20,11 +15,6 @@ module.exports = {
     password: process.env.PROD_DATABASE_PASSWORD,
     database: process.env.PROD_DATABASE_NAME,
     dialect: process.env.PROD_DATABASE_DIALECT,
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: true
-      },
-    },
+    port: process.env.PROD_DATABASE_PORT || 3306,
   },
 };
