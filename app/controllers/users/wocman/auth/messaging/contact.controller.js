@@ -1,104 +1,102 @@
-const pathRoot = '../../../../../';
+const pathRoot = "../../../../../";
 
-const db = require(pathRoot+"models");
-const config = require(pathRoot+"config/auth.config");
-const fs = require('fs');
+const db = require(pathRoot + "models");
+const config = require(pathRoot + "config/auth.config");
+const fs = require("fs");
 const User = db.User;
-const Projects = db.Projects;
-const Project = db.Projecttype;
+const Project = db.Projects;
+const ProjectType = db.Projecttype;
 
-const {v4 : uuidv4} = require('uuid');
-const Helpers = require(pathRoot+"helpers/helper.js");
-const { verifySignUp } = require(pathRoot+"middleware");
-
+const { v4: uuidv4 } = require("uuid");
+const Helpers = require(pathRoot + "helpers/helper.js");
+const { verifySignUp } = require(pathRoot + "middleware");
 
 // chat routes
-exports.wocmanChatContact = (req, res, next) => {
-    User.findByPk(req.userId).then(user => {
-        if (!user) {
-          res.status(404).send({
-            statusCode: 404,
-            status: false,
-            message: "User Not Found",
-            data: []
-          });
-          return;
-        }
-        var unboard = Helpers.returnBoolean(user.unboard);
-        const customers = [];
-        Projects.findAll({
-            where: {wocmanid: req.userId}
-        }).then(async projectBase => {
-            if (!projectBase) {
-                    res.status(404).send({
-                    statusCode: 404,
-                    status: false,
-                    message: "Project Not Found",
-                    data: []
-                });
-                return;
-            }
+exports.wocmanChatContact = async (req, res, next) => {
+  try {
+    const user = await User.findByPk(req.userId);
+    if (!user) {
+      return res.status(404).send({
+        statusCode: 404,
+        status: false,
+        message: "User Not Found",
+        data: [],
+      });
+    }
 
-            for await (const project of projectBase){
+    const unboard = Helpers.returnBoolean(user.unboard);
 
-                // Make sure to wait on all your sequelize CRUD calls
-                const prod = await Project.findByPk(project.projectid)
-
-                // It will now wait for above Promise to be fulfilled and show the proper details
-                console.log(prod)
-
-                const cust = await User.findByPk(project.customerid)
-
-                // It will now wait for above Promise to be fulfilled and show the proper details
-                console.log(cust)
-
-                let cartItem3 = {}
-                const customer_name = cust.firstname +" "+ cust.lastname
-
-                cartItem3.projectId = project.projectid
-                cartItem3.project = project.description
-                cartItem3.projectType = prod.name
-                cartItem3.customerName = customer_name
-                cartItem3.customerEmail = cust.email
-                cartItem3.customerPhone = cust.phone
-                cartItem3.customerUsername = cust.username,
-                cartItem3.image = cust.image,
-                cartItem3.customerId = project.customerid
-
-               
-                // Simple push will work in this loop, you don't need to return anything
-                if (parseInt(project.wocmanaccept) > 1 && parseInt(project.wocmanaccept) < 5) {
-                    customers.push(cartItem3)
-                }
-            }
-            
-            res.status(200).send({
-                statusCode: 200,
-                status: true,
-                message: "Found Current Projects Customers",
-                data: {
-                    accessToken: req.token,
-                    customers: customers,
-                    unboard: unboard
-                }
-            });
-        })
-        .catch(err => {
-            res.status(500).send({
-                statusCode: 500,
-                status: false, 
-                message: err.message,
-                data: [] 
-            });
-        });
-    })
-    .catch(err => {
-        res.status(500).send({
-            statusCode: 500,
-            status: false, 
-            message: err.message,
-            data: [] 
-        });
+    const projects = await Project.findAll({
+      where: { wocmanid: req.userId },
+      include: [
+        {
+          model: ProjectType,
+          as: "project_subcategory",
+          attributes: ["name"],
+        },
+        {
+          model: User,
+          as: "customer",
+          attributes: [
+            "id",
+            "firstname",
+            "lastname",
+            "email",
+            "phone",
+            "username",
+            "image",
+          ],
+        },
+      ],
     });
-};
 
+    if (!projects || projects.length === 0) {
+      return res.status(404).send({
+        statusCode: 404,
+        status: false,
+        message: "No Projects Found",
+        data: [],
+      });
+    }
+
+
+
+    const customers = projects
+      .filter(
+        (project) =>
+          parseInt(project.wocmanaccept) < 5 &&
+          project.customer &&
+          project.project_subcategory
+      )
+      .map((project) => ({
+        projectId: project.projectid,
+        project: project.description,
+        projectType: project.project_subcategory.name,
+        customerName: `${project.customer.firstname} ${project.customer.lastname}`,
+        customerEmail: project.customer.email,
+        customerPhone: project.customer.phone,
+        customerUsername: project.customer.username,
+        image: project.customer.image,
+        customerId: project.customerid,
+      }));
+
+    return res.status(200).send({
+      statusCode: 200,
+      status: true,
+      message: "Found Current Projects Customers",
+      data: {
+        accessToken: req.token,
+        customers,
+        unboard,
+      },
+    });
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    return res.status(500).send({
+      statusCode: 500,
+      status: false,
+      message: "Internal Server Error: " + err.message,
+      data: [],
+    });
+  }
+};

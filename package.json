@@ -8,7 +8,7 @@
         "node": ">=14.x"
     },
     "scripts": {
-        "start": "node server.js",
+        "start": "nodemon server.js",
         "test": "echo \"Error: no test specified\" && exit 1",
         "migrate:create": "sequelize migration:generate --name",
         "migrate": "sequelize db:migrate",
@@ -57,6 +57,6 @@
         "winston": "^2.3.0"
     },
     "devDependencies": {
-        "nodemon": "^2.0.6"
+        "nodemon": "^2.0.22"
     }
 }
