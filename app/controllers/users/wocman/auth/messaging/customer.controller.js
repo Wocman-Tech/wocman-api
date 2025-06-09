@@ -13,6 +13,7 @@ const {v4 : uuidv4} = require('uuid');
 const Joi = require('joi'); 
 
 const Op = db.Sequelize.Op;
+
 exports.wocmanContactCustomer = (req, res, next) => {
     // Username
     var customerid =  req.body.customerid;

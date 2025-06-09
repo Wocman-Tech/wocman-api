@@ -46,25 +46,36 @@ exports.wocmanChatContact = async (req, res) => {
     }
 
     for (const project of projectBase) {
-      // Optional optimization: Fetch both in parallel
-      const [prod, cust] = await Promise.all([
+      // Skip projects without assigned wocman
+      if (
+        !project.wocmanid ||
+        project.wocmanid === 0 ||
+        project.wocmanid === "0"
+      ) {
+        continue;
+      }
+
+      // Fetch project type and wocman information (not customer)
+      const [prod, wocman] = await Promise.all([
         Project.findByPk(project.projectid),
-        User.findByPk(project.wocmanid),
+        User.findByPk(project.wocmanid), // Get wocman, not customer
       ]);
 
-      if (!prod || !cust) continue;
+      if (!prod || !wocman) continue;
 
       const accept = parseInt(project.wocmanaccept);
-      if (accept > 1 && accept < 5) {
+      // Fixed condition: include projects with accept >= 0 and <= 4
+      if (accept >= 0 && accept <= 4) {
         wocmen.push({
           projectId: project.projectid,
           project: project.description,
           projectType: prod.name,
-          customerName: `${cust.firstname} ${cust.lastname}`,
-          customerEmail: cust.email,
-          customerPhone: cust.phone,
-          customerUsername: cust.username,
-          image: cust.image,
+          // Return wocman information, not customer
+          wocmanName: `${wocman.firstname} ${wocman.lastname}`,
+          wocmanEmail: wocman.email,
+          wocmanPhone: wocman.phone,
+          wocmanUsername: wocman.username,
+          image: wocman.image,
           wocmanid: project.wocmanid,
         });
       }
