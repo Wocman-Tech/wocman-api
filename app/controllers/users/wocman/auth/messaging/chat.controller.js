@@ -1,54 +1,61 @@
 const pathRoot = "../../../../../";
 const db = require(pathRoot + "models");
 const config = require(pathRoot + "config/auth.config");
-const fs = require("fs");
-const { S3Client } = require("@aws-sdk/client-s3"); // Import the PutObjectCommand
+const { S3Client } = require("@aws-sdk/client-s3");
+const Joi = require("joi");
+const { v4: uuidv4 } = require("uuid");
 
-// Create the S3 client instance
+const User = db.User;
+const Projects = db.Projects;
+const WCChat = db.WcChat;
+const Op = db.Sequelize.Op;
+
+// AWS S3 Client
 const s3 = new S3Client({
   region: "us-east-2",
   credentials: {
     accessKeyId: config.awsS3AccessKeyId,
     secretAccessKey: config.awsS3SecretAccessKey,
   },
-  forcePathStyle: true, // Optional, if you use path-style URLs
-  tls: true, // Ensures SSL is enabled (same as sslEnabled: true in v2)
+  forcePathStyle: true,
+  tls: true,
 });
 
-const User = db.User;
-const Projects = db.Projects;
-const WCChat = db.WcChat;
+// Shared project resolver
+const resolveProject = async (projectid, userId) => {
+  let project = await Projects.findOne({
+    where: {
+      id: parseInt(projectid, 10),
+      [Op.or]: [{ wocmanid: userId }, { customerid: userId }],
+    },
+  });
 
-const Helpers = require(pathRoot + "helpers/helper.js");
-const { verifySignUp } = require(pathRoot + "middleware");
-const { EMAIL, PASSWORD, MAIN_URL } = require(pathRoot + "helpers/helper.js");
+  if (!project) {
+    const fallback = await Projects.findAll({
+      where: {
+        [Op.or]: [{ wocmanid: userId }, { customerid: userId }],
+      },
+      order: [["id", "DESC"]],
+    });
 
-const { v4: uuidv4 } = require("uuid");
-const Joi = require("joi");
+    if (!fallback.length) return null;
+    console.warn(`Fallback project used: ${fallback[0].id}`);
+    return fallback[0];
+  }
 
-const Op = db.Sequelize.Op;
+  return project;
+};
 
 exports.chatLog = async (req, res) => {
   try {
     const { customerid, chatLimit, perPage, page, projectid } = req.body;
-
-    if (!customerid || !projectid) {
-      return res.status(400).json({
-        statusCode: 400,
-        status: false,
-        message: !customerid
-          ? "customerid is required"
-          : "projectid is required",
-        data: [],
-      });
-    }
 
     const schema = Joi.object({
       customerid: Joi.string().required(),
       projectid: Joi.string().required(),
       chatLimit: Joi.number().integer().min(1).max(100).required(),
       perPage: Joi.number().integer().min(1).max(100).required(),
-      page: Joi.number().integer().min(1).max(100).required(),
+      page: Joi.number().integer().min(1).required(),
     });
 
     const { error } = schema.validate({
@@ -58,7 +65,6 @@ exports.chatLog = async (req, res) => {
       perPage,
       page,
     });
-
     if (error) {
       return res.status(400).json({
         statusCode: 400,
@@ -68,59 +74,12 @@ exports.chatLog = async (req, res) => {
       });
     }
 
-    const offset = parseInt(perPage) * (parseInt(page) - 1);
-
     const user = await User.findByPk(req.userId);
     if (!user) {
       return res.status(404).json({
         statusCode: 404,
         status: false,
-        message: "User Not Found",
-        data: [],
-      });
-    }
-
-    // Check project ownership
-    let project = await Projects.findOne({
-      where: {
-        id: parseInt(projectid, 10),
-        [Op.or]: [{ wocmanid: req.userId }, { customerid: req.userId }],
-      },
-    });
-
-    // Fallback to most recent project if not found (just like chatSave)
-    if (!project) {
-      const availableProjects = await Projects.findAll({
-        where: {
-          [Op.or]: [{ wocmanid: req.userId }, { customerid: req.userId }],
-        },
-        attributes: ["id", "project", "projectid", "wocmanid", "customerid"],
-        order: [["id", "DESC"]],
-      });
-
-      if (availableProjects.length === 0) {
-        return res.status(404).json({
-          statusCode: 404,
-          status: false,
-          message: "No accessible projects found for this user",
-          data: [],
-        });
-      }
-
-      project = availableProjects[0];
-
-      console.log(
-        `Project ${projectid} not found. Using fallback project ${project.id}`
-      );
-    }
-
-    // Validate the project relationship and status
-    const accept = parseInt(project.wocmanaccept, 10);
-    if (![0, 1, 2, 3, 4].includes(accept)) {
-      return res.status(403).json({
-        statusCode: 403,
-        status: false,
-        message: "No active project relationship",
+        message: "User not found",
         data: [],
       });
     }
@@ -135,25 +94,55 @@ exports.chatLog = async (req, res) => {
       });
     }
 
-    // Fetch chats for the project between user and customer
+    const project = await resolveProject(projectid, req.userId);
+    if (!project) {
+      return res.status(404).json({
+        statusCode: 404,
+        status: false,
+        message: "No accessible projects found",
+        data: [],
+      });
+    }
+
+    const accept = parseInt(project.wocmanaccept, 10);
+    if (![0, 1, 2, 3, 4].includes(accept)) {
+      return res.status(403).json({
+        statusCode: 403,
+        status: false,
+        message: "No active project relationship",
+        data: [],
+      });
+    }
+
+    const parsedPerPage = parseInt(perPage, 10);
+    const parsedChatLimit = parseInt(chatLimit, 10);
+    const offset = parsedPerPage * (page - 1);
     const chats = await WCChat.findAll({
       where: {
         [Op.or]: [
           {
-            senderid: parseInt(req.userId),
-            receiverid: parseInt(customerid),
+            senderid: req.userId,
+            receiverid: customerid,
             projectid: project.id,
           },
           {
-            senderid: parseInt(customerid),
-            receiverid: parseInt(req.userId),
+            senderid: customerid,
+            receiverid: req.userId,
             projectid: project.id,
           },
         ],
       },
       offset,
-      limit: parseInt(chatLimit),
+      limit: parsedChatLimit,
       order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: User,
+          as: "sender",
+          attributes: ["username", "firstname", "lastname", "image"],
+        },
+      ],
+      attributes: ["message", "id", "chattime", "createdAt"],
     });
 
     return res.json({
@@ -183,7 +172,7 @@ exports.chatLog = async (req, res) => {
             wocman_image: user.image,
           },
         ],
-        chat: chats || [],
+        chat: chats,
         project: {
           id: project.id,
           projectid: project.projectid,
@@ -194,7 +183,7 @@ exports.chatLog = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("Chat Log Error:", err);
+    console.error("chatLog error:", err);
     return res.status(500).json({
       statusCode: 500,
       status: false,
@@ -204,34 +193,22 @@ exports.chatLog = async (req, res) => {
   }
 };
 
-exports.chatSave = async (req, res, next) => {
+exports.chatSave = async (req, res) => {
   try {
     const { customerid, message, messageType, projectid } = req.body;
-    const seen = 0;
 
-    if (!customerid || !message || !messageType || !projectid) {
-      return res.status(400).send({
-        statusCode: 400,
-        status: false,
-        message:
-          "All fields (customerid, message, messageType, projectid) are required.",
-        data: [],
-      });
-    }
-
-    // Validate with Joi
-    const joiSchema = Joi.object({
-      customerid: Joi.string().min(1).required(),
+    const schema = Joi.object({
+      customerid: Joi.string().required(),
       message: Joi.string().min(1).max(225).required(),
-      projectid: Joi.string().min(1).required(),
+      projectid: Joi.string().required(),
       messageType: Joi.string().valid("text", "image", "video").required(),
     });
 
-    const { error } = joiSchema.validate({
+    const { error } = schema.validate({
       customerid,
       message,
-      projectid,
       messageType,
+      projectid,
     });
     if (error) {
       return res.status(400).send({
@@ -242,68 +219,40 @@ exports.chatSave = async (req, res, next) => {
       });
     }
 
-    // Check if user exists
     const user = await User.findByPk(req.userId);
     if (!user) {
       return res.status(404).send({
         statusCode: 404,
         status: false,
-        message: "User Not Found",
+        message: "User not found",
         data: [],
       });
     }
 
-    // First check if the specific project exists
-    let project = await Projects.findOne({
-      where: {
-        id: parseInt(projectid, 10),
-        [Op.or]: [{ wocmanid: req.userId }, { customerid: req.userId }],
-      },
+    const nowTime = new Date().toLocaleString("en-US", {
+      timeZone: "Africa/Lagos",
     });
 
-    // If the specific project doesn't exist or user doesn't have access,
-    // find any project that the user has access to
+    const project = await resolveProject(projectid, req.userId);
     if (!project) {
-      const availableProjects = await Projects.findAll({
-        where: {
-          [Op.or]: [{ wocmanid: req.userId }, { customerid: req.userId }],
-        },
-        attributes: ["id", "wocmanid", "customerid"],
-        order: [["id", "DESC"]],
+      return res.status(404).send({
+        statusCode: 404,
+        status: false,
+        message: "No accessible projects found",
+        data: [],
       });
-
-      if (availableProjects.length === 0) {
-        return res.status(404).send({
-          statusCode: 404,
-          status: false,
-          message: "No accessible projects found for this user",
-          data: [],
-        });
-      }
-
-      // Use the most recent accessible project
-      project = availableProjects[0];
-
-      // Log the available options
-      console.log(
-        `Project ${projectid} not found/accessible. Available projects: ${availableProjects
-          .map((p) => p.id)
-          .join(", ")}. Using project ${project.id}.`
-      );
     }
 
-    const nowTime = new Date().toISOString();
-
-    // Create chat message
     const chat = await WCChat.create({
-      messageType,
       senderid: req.userId,
       receiverid: customerid,
       message,
-      status: seen,
-      createdAt: nowTime,
-      updatedAt: nowTime,
-      projectid: project.id, // Use the found project's ID
+      chattime: nowTime,
+      messageType,
+      status: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      projectid: project.id,
     });
 
     return res.status(200).send({
@@ -320,10 +269,11 @@ exports.chatSave = async (req, res, next) => {
       },
     });
   } catch (err) {
+    console.error("chatSave error:", err);
     return res.status(500).send({
       statusCode: 500,
       status: false,
-      message: err.message,
+      message: "Internal server error",
       data: [],
     });
   }
