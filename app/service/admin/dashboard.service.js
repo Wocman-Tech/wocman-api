@@ -6,6 +6,7 @@ const {
   Payment,
   sequelize,
 } = require("../../models");
+const { Op } = require("sequelize");
 
 const getProjectStatusCount = async () => {
   const sql = `
@@ -38,10 +39,6 @@ const getProjects = async (query) => {
     where.status = { [Op.in]: statusArray };
   }
 
-  // If status is 'all', don't include it in the filter
-  // This means all statuses will be included
-  // If you want to filter by specific multiple statuses, you could use:
-  // where.status = { [Op.in]: ['approved', 'in-progress', 'completed'] }
 
   const projects = await Projects.findAndCountAll({
     where,
