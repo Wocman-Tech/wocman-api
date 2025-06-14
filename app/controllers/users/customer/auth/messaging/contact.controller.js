@@ -5,15 +5,13 @@ const config = require(pathRoot + "config/auth.config");
 const User = db.User;
 const Projects = db.Projects;
 const Project = db.Projecttype;
+const RootAdmin = db.RootAdmin;
 
 const { v4: uuidv4 } = require("uuid");
 const Helpers = require(pathRoot + "helpers/helper.js");
 const { verifySignUp } = require(pathRoot + "middleware");
 
 const Op = db.Sequelize.Op;
-
-var jwt = require("jsonwebtoken");
-var bcrypt = require("bcryptjs");
 
 // chat routes
 exports.wocmanChatContact = async (req, res) => {
@@ -30,64 +28,74 @@ exports.wocmanChatContact = async (req, res) => {
     }
 
     const unboard = Helpers.returnBoolean(user.unboard);
-    const wocmen = [];
+    const contacts = [];
 
+    // 1. Get all projects belonging to the customer
     const projectBase = await Projects.findAll({
       where: { customerid: req.userId },
     });
 
-    if (!projectBase || projectBase.length === 0) {
-      return res.status(404).send({
-        statusCode: 404,
-        status: false,
-        message: "No Projects Found",
-        data: [],
-      });
-    }
+    // 2. Get all admins once
+    const admins = await RootAdmin.findAll();
 
-    for (const project of projectBase) {
-      // Skip projects without assigned wocman
-      if (
-        !project.wocmanid ||
-        project.wocmanid === 0 ||
-        project.wocmanid === "0"
-      ) {
-        continue;
-      }
+    // 3. Loop through all customer projects
+    if (projectBase && projectBase.length > 0) {
+      for (const project of projectBase) {
+        // Always add admin contact
+        for (const admin of admins) {
+          contacts.push({
+            projectId: project.id,
+            project: project.description,
+            projectType: "Admin Assistance",
+            wocmanName: "Admin Support",
+            wocmanEmail: admin.email,
+            wocmanPhone: null,
+            wocmanUsername: null,
+            image: null,
+            wocmanid: `admin-${admin.id}`, // avoid clash with numeric IDs
+            role: "admin",
+          });
+        }
 
-      // Fetch project type and wocman information (not customer)
-      const [prod, wocman] = await Promise.all([
-        Project.findByPk(project.projectid),
-        User.findByPk(project.wocmanid), // Get wocman, not customer
-      ]);
+        // Then add wocman contact if available
+        if (
+          project.wocmanid &&
+          project.wocmanid !== 0 &&
+          project.wocmanid !== "0"
+        ) {
+          const [prod, wocman] = await Promise.all([
+            Project.findByPk(project.projectid),
+            User.findByPk(project.wocmanid),
+          ]);
 
-      if (!prod || !wocman) continue;
-
-      const accept = parseInt(project.wocmanaccept);
-      // Fixed condition: include projects with accept >= 0 and <= 4
-      if (accept >= 0 && accept <= 4) {
-        wocmen.push({
-          projectId: project.projectid,
-          project: project.description,
-          projectType: prod.name,
-          // Return wocman information, not customer
-          wocmanName: `${wocman.firstname} ${wocman.lastname}`,
-          wocmanEmail: wocman.email,
-          wocmanPhone: wocman.phone,
-          wocmanUsername: wocman.username,
-          image: wocman.image,
-          wocmanid: project.wocmanid,
-        });
+          if (prod && wocman) {
+            const accept = parseInt(project.wocmanaccept);
+            if (accept >= 0 && accept <= 4) {
+              contacts.push({
+                projectId: project.id,
+                project: project.description,
+                projectType: prod.name,
+                wocmanName: `${wocman.firstname} ${wocman.lastname}`,
+                wocmanEmail: wocman.email,
+                wocmanPhone: wocman.phone,
+                wocmanUsername: wocman.username,
+                image: wocman.image,
+                wocmanid: project.wocmanid,
+                role: "wocman",
+              });
+            }
+          }
+        }
       }
     }
 
     return res.status(200).send({
       statusCode: 200,
       status: true,
-      message: "Found Current Projects Wocman",
+      message: "Found Chat Contacts",
       data: {
         accessToken: req.token,
-        wocmen,
+        contacts,
         unboard,
       },
     });

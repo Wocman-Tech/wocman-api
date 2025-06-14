@@ -4,6 +4,7 @@ const config = require(pathRoot + "config/auth.config");
 const { s3Upload } = require(pathRoot + "helpers/s3.upload.helper");
 const { WcChat, User, Projects } = require(pathRoot + "models");
 const WCChat = db.WcChat;
+const RootAdmin = db.RootAdmin;
 const Helpers = require(pathRoot + "helpers/helper.js");
 const { v4: uuidv4 } = require("uuid");
 const Joi = require("joi");
@@ -41,7 +42,9 @@ exports.chatLog = async (req, res) => {
   try {
     // Validate inputs
     const schema = Joi.object({
-      wocmanid: Joi.number().integer().required(),
+      wocmanid: Joi.alternatives()
+        .try(Joi.number().integer(), Joi.string().pattern(/^admin-\d+$/))
+        .required(),
       projectid: Joi.number().integer().required(),
       chatLimit: Joi.number().integer().min(1).max(100).optional(),
       perPage: Joi.number().integer().min(1).max(100).optional(),
@@ -51,8 +54,6 @@ exports.chatLog = async (req, res) => {
     const { error, value } = schema.validate(req.body);
 
     if (error) {
-      console.log("Validation error:", error);
-      console.log("Request body:", req.body);
       return res.status(400).json({
         statusCode: 400,
         status: false,
@@ -61,27 +62,72 @@ exports.chatLog = async (req, res) => {
       });
     }
 
-    // Use validated values
-    const {
-      wocmanid,
-      projectid,
-      chatLimit = 50,
-      perPage = 20,
-      page = 1,
-    } = value;
+    const originalWocmanId = value.wocmanid;
+    let wocman;
+    let wocmanDisplayData = {};
+    let isAdmin = false;
 
-    if (error) {
-      return res.status(400).json({
-        statusCode: 400,
-        status: false,
-        message: error.details[0].message,
-        data: [],
-      });
+    // Hard-coded admin display data
+    const ADMIN_DISPLAY_DATA = {
+      username: "super_admin",
+      firstname: "Admin",
+      lastname: "Support",
+      wocmanName: "Admin Support",
+      phone: null,
+      image:
+        "https://static.vecteezy.com/system/resources/thumbnails/019/194/935/small_2x/global-admin-icon-color-outline-vector.jpg",
+    };
+
+    // Determine if it's an admin chat
+    if (
+      typeof originalWocmanId === "string" &&
+      /^admin-\d+$/.test(originalWocmanId)
+    ) {
+      isAdmin = true;
+      const adminId = parseInt(originalWocmanId.split("-")[1], 10);
+      wocman = await RootAdmin.findByPk(adminId);
+
+      if (!wocman) {
+        return res.status(404).json({
+          statusCode: 404,
+          status: false,
+          message: "Admin not found",
+          data: [],
+        });
+      }
+
+      wocmanDisplayData = {
+        id: `admin-${wocman.id}`,
+        wocmanid: `admin-${wocman.id}`,
+        ...ADMIN_DISPLAY_DATA,
+      };
+    } else {
+      // Regular wocman
+      wocman = await User.findByPk(originalWocmanId);
+      if (!wocman) {
+        return res.status(404).json({
+          statusCode: 404,
+          status: false,
+          message: "Wocman not found",
+          data: [],
+        });
+      }
+
+      wocmanDisplayData = {
+        id: wocman.id,
+        wocmanid: wocman.id,
+        username: wocman.username,
+        firstname: wocman.firstname,
+        lastname: wocman.lastname,
+        wocmanName: `${wocman.firstname} ${wocman.lastname}`,
+        phone: wocman.phone,
+        image: wocman.image,
+      };
     }
 
     const userId = req.userId;
 
-    // Fetch current user (customer - the logged-in user)
+    // Find the customer (sender/requester)
     const customer = await User.findByPk(userId);
     if (!customer) {
       return res.status(404).json({
@@ -92,19 +138,7 @@ exports.chatLog = async (req, res) => {
       });
     }
 
-    // Fetch wocman by ID from request body
-    const wocman = await User.findByPk(wocmanid);
-    if (!wocman) {
-      return res.status(404).json({
-        statusCode: 404,
-        status: false,
-        message: "Wocman not found",
-        data: [],
-      });
-    }
-
-    // Resolve project ensuring customer has access
-    const project = await resolveProject(projectid, userId);
+    const project = await resolveProject(value.projectid, userId);
     if (!project) {
       return res.status(404).json({
         statusCode: 404,
@@ -114,8 +148,8 @@ exports.chatLog = async (req, res) => {
       });
     }
 
-    // Verify that the wocman is actually assigned to this project
-    if (project.wocmanid !== wocmanid) {
+    // Only check wocman assignment if it's not admin
+    if (!isAdmin && project.wocmanid !== parseInt(originalWocmanId)) {
       return res.status(403).json({
         statusCode: 403,
         status: false,
@@ -124,10 +158,6 @@ exports.chatLog = async (req, res) => {
       });
     }
 
-    // Fetch the wocman associated with this project (redundant now but keeping for consistency)
-    // const wocman = await User.findByPk(project.wocmanid);
-
-    // Optionally check wocman acceptance status (adjust field as needed)
     const acceptedStatus = parseInt(project.wocmanaccept, 10);
     if (![0, 1, 2, 3, 4].includes(acceptedStatus)) {
       return res.status(403).json({
@@ -138,30 +168,19 @@ exports.chatLog = async (req, res) => {
       });
     }
 
-    // Pagination calculation
-    const limit = parseInt(chatLimit, 10);
-    const offset = parseInt(perPage, 10) * (parseInt(page, 10) - 1);
+    const limit = parseInt(value.chatLimit || 50, 10);
+    const offset =
+      parseInt(value.perPage || 20, 10) * (parseInt(value.page || 1, 10) - 1);
 
-    // Fetch chats between customer (logged-in user) and wocman for this project
-    const chats = await WcChat.findAll({
-      where: {
-        [Op.or]: [
-          {
-            senderid: userId, // customer
-            receiverid: wocmanid, // wocman
-            projectid: project.id,
-          },
-          {
-            senderid: wocmanid, // wocman
-            receiverid: userId, // customer
-            projectid: project.id,
-          },
-        ],
-      },
-      offset,
-      limit,
-      order: [["createdAt", "DESC"]],
-      include: [
+    // Use numeric id for querying chats regardless of admin or user
+    const wocmanDbId = wocman.id;
+
+    // For admin chats, skip includes entirely and handle manually
+    let includeModels = [];
+
+    if (!isAdmin) {
+      // Regular user chat - include both sender and receiver
+      includeModels = [
         {
           model: User,
           as: "sender",
@@ -172,10 +191,34 @@ exports.chatLog = async (req, res) => {
           as: "receiver",
           attributes: ["username", "firstname", "lastname", "image"],
         },
-      ],
+      ];
+    }
+    // For admin chats, we don't include any models - we'll manually add the data later
+
+    const chats = await WcChat.findAll({
+      where: {
+        [Op.or]: [
+          {
+            senderid: userId,
+            receiverid: wocmanDbId,
+            projectid: project.id,
+          },
+          {
+            senderid: wocmanDbId,
+            receiverid: userId,
+            projectid: project.id,
+          },
+        ],
+      },
+      offset,
+      limit,
+      order: [["createdAt", "DESC"]],
+      include: includeModels,
       attributes: [
-        "message",
         "id",
+        "message",
+        "senderid",
+        "receiverid",
         "createdAt",
         "chattime",
         "messagetype",
@@ -183,12 +226,52 @@ exports.chatLog = async (req, res) => {
       ],
     });
 
-    // Format messagelinks if needed
     const formattedChats = chats.map((chat) => {
       const plain = chat.get({ plain: true });
       plain.messagelinks = plain.messagelinks
         ? plain.messagelinks.split("/XX98XX").filter(Boolean)
         : [];
+
+      // Handle admin display names
+      if (isAdmin) {
+        // Since we skipped includes for admin chats, manually populate all sender/receiver data
+        if (plain.senderid === wocmanDbId) {
+          // Admin is sender
+          plain.sender = {
+            username: ADMIN_DISPLAY_DATA.username,
+            firstname: ADMIN_DISPLAY_DATA.firstname,
+            lastname: ADMIN_DISPLAY_DATA.lastname,
+            image: ADMIN_DISPLAY_DATA.image,
+          };
+        } else {
+          // Customer is sender
+          plain.sender = {
+            username: customer.username,
+            firstname: customer.firstname,
+            lastname: customer.lastname,
+            image: customer.image,
+          };
+        }
+
+        if (plain.receiverid === wocmanDbId) {
+          // Admin is receiver
+          plain.receiver = {
+            username: ADMIN_DISPLAY_DATA.username,
+            firstname: ADMIN_DISPLAY_DATA.firstname,
+            lastname: ADMIN_DISPLAY_DATA.lastname,
+            image: ADMIN_DISPLAY_DATA.image,
+          };
+        } else {
+          // Customer is receiver
+          plain.receiver = {
+            username: customer.username,
+            firstname: customer.firstname,
+            lastname: customer.lastname,
+            image: customer.image,
+          };
+        }
+      }
+
       return plain;
     });
 
@@ -209,20 +292,11 @@ exports.chatLog = async (req, res) => {
           country: customer.country,
           image: customer.image,
         },
-        wocman: {
-          id: wocman.id,
-          wocmanid: wocman.id, // For frontend compatibility
-          username: wocman.username,
-          firstname: wocman.firstname,
-          lastname: wocman.lastname,
-          wocmanName: `${wocman.firstname} ${wocman.lastname}`, // For frontend compatibility
-          phone: wocman.phone,
-          image: wocman.image,
-        },
+        wocman: wocmanDisplayData,
         chat: formattedChats,
         project: {
           id: project.id,
-          projectId: project.id, // For frontend compatibility
+          projectId: project.id,
           projectid: project.projectid,
           project: project.project,
           wocmanid: project.wocmanid,
@@ -243,15 +317,23 @@ exports.chatLog = async (req, res) => {
 
 exports.chatSave = async (req, res) => {
   try {
-    const { wocmanid, message, messageType } = req.body;
+    const { wocmanid, message, messageType, projectid } = req.body;
 
     const schema = Joi.object({
-      wocmanid: Joi.string().required(),
+      wocmanid: Joi.alternatives()
+        .try(Joi.number().integer(), Joi.string().pattern(/^admin-\d+$/))
+        .required(),
       message: Joi.string().min(1).max(225).required(),
       messageType: Joi.string().valid("text", "image", "video").required(),
+      projectid: Joi.number().integer().required(),
     });
 
-    const { error } = schema.validate({ wocmanid, message, messageType });
+    const { error } = schema.validate({
+      wocmanid,
+      message,
+      messageType,
+      projectid,
+    });
     if (error) {
       return res.status(400).send({
         statusCode: 400,
@@ -261,29 +343,86 @@ exports.chatSave = async (req, res) => {
       });
     }
 
-    const user = await User.findByPk(req.userId);
-    if (!user) {
+    const sender = await User.findByPk(req.userId);
+    if (!sender) {
       return res.status(404).send({
         statusCode: 404,
         status: false,
-        message: "User not found",
+        message: "Sender not found",
         data: [],
       });
     }
 
-    // Find any project belonging to this customer that was accepted by the given wocman
-    const project = await Projects.findOne({
-      where: {
-        customerid: req.userId,
-        wocmanid: wocmanid,
-      },
-    });
+    let receiverIsAdmin = false;
+    let receiverDbId;
+    let adminUser = null;
+    let wocmanUser = null;
 
+    // Hard-coded admin display data
+    const ADMIN_DISPLAY_DATA = {
+      username: null,
+      firstname: "Admin",
+      lastname: "Support",
+      phone: null,
+      image: null,
+    };
+
+    // Detect if receiver is admin ("admin-123" format)
+    if (typeof wocmanid === "string" && /^admin-\d+$/.test(wocmanid)) {
+      receiverIsAdmin = true;
+      const adminId = parseInt(wocmanid.split("-")[1], 10);
+      adminUser = await RootAdmin.findByPk(adminId);
+      if (!adminUser) {
+        return res.status(404).send({
+          statusCode: 404,
+          status: false,
+          message: "Admin not found",
+          data: [],
+        });
+      }
+      receiverDbId = adminUser.id; // Use numeric ID for database operations
+    } else {
+      // Regular wocman
+      receiverDbId = parseInt(wocmanid, 10);
+      wocmanUser = await User.findByPk(receiverDbId);
+      if (!wocmanUser) {
+        return res.status(404).send({
+          statusCode: 404,
+          status: false,
+          message: "Wocman not found",
+          data: [],
+        });
+      }
+    }
+
+    // Validate project access
+    const project = await resolveProject(projectid, req.userId);
     if (!project) {
+      return res.status(404).send({
+        statusCode: 404,
+        status: false,
+        message: "No accessible projects found",
+        data: [],
+      });
+    }
+
+    // Validate project relationship
+    if (!receiverIsAdmin && project.wocmanid !== receiverDbId) {
       return res.status(403).send({
         statusCode: 403,
         status: false,
-        message: "You cannot message this wocman. No valid project found.",
+        message: "Wocman not assigned to this project",
+        data: [],
+      });
+    }
+
+    // Check project status
+    const acceptedStatus = parseInt(project.wocmanaccept, 10);
+    if (![0, 1, 2, 3, 4].includes(acceptedStatus)) {
+      return res.status(403).send({
+        statusCode: 403,
+        status: false,
+        message: "No active project relationship",
         data: [],
       });
     }
@@ -292,29 +431,75 @@ exports.chatSave = async (req, res) => {
       timeZone: "Africa/Lagos",
     });
 
-    const chat = await WCChat.create({
+    // Create chat with numeric receiverDbId
+    const chat = await WcChat.create({
       senderid: req.userId,
-      receiverid: wocmanid,
+      receiverid: receiverDbId,
       message,
       chattime: nowTime,
-      messageType,
+      messagetype: messageType, // Note: using lowercase 't' to match your schema
       status: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
       projectid: project.id,
     });
 
+    // Compose receiver info for response
+    let receiverInfo = {};
+    if (receiverIsAdmin) {
+      receiverInfo = {
+        id: `admin-${adminUser.id}`,
+        wocmanid: `admin-${adminUser.id}`,
+        ...ADMIN_DISPLAY_DATA,
+      };
+    } else {
+      receiverInfo = {
+        id: wocmanUser.id,
+        wocmanid: wocmanUser.id,
+        username: wocmanUser.username,
+        firstname: wocmanUser.firstname,
+        lastname: wocmanUser.lastname,
+        phone: wocmanUser.phone,
+        image: wocmanUser.image,
+      };
+    }
+
     return res.status(200).send({
       statusCode: 200,
       status: true,
-      message: "Message sent",
+      message: "Message sent successfully",
       data: {
         accessToken: req.token || null,
-        project,
-        message: chat.message,
-        senderid: chat.senderid,
-        receiverid: chat.receiverid,
-        actualProjectId: project.id,
+        customer: {
+          id: sender.id,
+          username: sender.username,
+          firstname: sender.firstname,
+          lastname: sender.lastname,
+          phone: sender.phone,
+          email: sender.email,
+          address: sender.address,
+          country: sender.country,
+          image: sender.image,
+        },
+        receiver: receiverInfo,
+        project: {
+          id: project.id,
+          projectId: project.id,
+          projectid: project.projectid,
+          project: project.project,
+          wocmanid: project.wocmanid,
+          customerid: project.customerid,
+        },
+        chat: {
+          id: chat.id,
+          message: chat.message,
+          senderid: chat.senderid,
+          receiverid: chat.receiverid,
+          messagetype: chat.messagetype,
+          chattime: chat.chattime,
+          createdAt: chat.createdAt,
+          projectid: chat.projectid,
+        },
       },
     });
   } catch (err) {

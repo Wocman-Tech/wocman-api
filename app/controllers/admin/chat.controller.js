@@ -3,6 +3,7 @@ const db = require(pathRoot + "models");
 const WCChat = db.WcChat;
 const User = db.User;
 const Project = db.Projects;
+const RootAdmin = db.RootAdmin;
 const Joi = require("joi");
 
 const { Op } = db.Sequelize;
@@ -51,7 +52,6 @@ exports.chatLog = async (req, res) => {
       });
     }
 
-    // Fetch project
     const project = await Project.findOne({
       where: {
         id: projectid,
@@ -157,21 +157,19 @@ exports.chatLog = async (req, res) => {
 
 exports.chatSave = async (req, res) => {
   try {
-    const { receiverId, projectId, message, messageType } = req.body;
+    const validatedBody = {
+      ...req.body,
+      receiverId: String(req.body.receiverId),
+    };
 
     const schema = Joi.object({
-      receiverId: Joi.number().integer().required(),
+      receiverId: Joi.string().required(),
       projectId: Joi.number().integer().required(),
       message: Joi.string().min(1).max(225).required(),
       messageType: Joi.string().valid("text", "image", "video").required(),
     });
 
-    const { error } = schema.validate({
-      receiverId,
-      projectId,
-      message,
-      messageType,
-    });
+    const { error, value } = schema.validate(validatedBody);
     if (error) {
       return res.status(400).send({
         statusCode: 400,
@@ -181,6 +179,9 @@ exports.chatSave = async (req, res) => {
       });
     }
 
+    const { receiverId, projectId, message, messageType } = value;
+
+    // Find sender user
     const sender = await User.findByPk(req.userId);
     if (!sender) {
       return res.status(404).send({
@@ -191,23 +192,33 @@ exports.chatSave = async (req, res) => {
       });
     }
 
-    // Confirm project exists and belongs to the specified customer
-    const project = await Project.findOne({
-      where: {
-        id: projectId,
-        customerid: receiverId,
-      },
+    // Check if sender is an admin (by checking RootAdmin table)
+    const senderIsAdmin = await RootAdmin.findOne({
+      where: { id: req.userId },
     });
 
+    // Find project
+    const project = await Project.findByPk(projectId);
     if (!project) {
       return res.status(403).send({
         statusCode: 403,
         status: false,
-        message: "No valid project found between customer and admin",
+        message: "Project not found",
         data: [],
       });
     }
 
+    // Only admin or customer allowed to send message
+    if (!senderIsAdmin && req.userId !== project.customerid) {
+      return res.status(403).send({
+        statusCode: 403,
+        status: false,
+        message: "Only admin or customer can chat on this project",
+        data: [],
+      });
+    }
+
+    // Save chat message
     const nowTime = new Date().toLocaleString("en-US", {
       timeZone: "Africa/Lagos",
     });
