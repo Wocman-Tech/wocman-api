@@ -6,16 +6,8 @@ module.exports = {
       "roles",
       [
         {
-          id: 1,
-          name: "admin",
-        },
-        {
-          id: 2,
-          name: "wocman",
-        },
-        {
-          id: 3,
-          name: "customer",
+          id: 4,
+          name: "vendor",
         },
       ],
       {}
@@ -23,6 +15,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete("roles", null, {});
+    return queryInterface.bulkDelete("roles", { name: "vendor" }, {});
   },
 };

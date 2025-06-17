@@ -61,18 +61,6 @@ exports.ProfileUpdate = (req, res, next) => {
       });
     }
 
-    // if(req.body.phone && req.body.phone !== ''){
-    //     var phone = req.body.phone;
-    // }else{
-    //     return res.status(400).send(
-    //     {
-    //         statusCode: 400,
-    //         status: false,
-    //         message: "Enter Your phone number",
-    //         data: []
-    //     });
-    // }
-
     if (req.body.country && req.body.country !== "") {
       var country = req.body.country;
     } else {

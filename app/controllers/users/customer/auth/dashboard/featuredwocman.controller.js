@@ -62,10 +62,6 @@ exports.uploadProject = async (req, res, next) => {
       }
     }
 
-    // Prepare the project data, including images
-    const projectData = { ...req.body, images: imageUrls };
-    console.log("Data passed to createProject:", projectData);
-
     // Extract relevant data for project creation
     const { description, topic, address, city, projecttypeid, startDate } =
       req.body;
