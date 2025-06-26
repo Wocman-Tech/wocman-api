@@ -187,3 +187,43 @@ exports.getCustomerOrders = async (req, res) => {
     });
   }
 };
+
+exports.getAllOrdersWithDetails = async (req, res) => {
+  try {
+    const orders = await Order.findAll({
+      include: [
+        {
+          model: User,
+          as: "customer",
+          attributes: ["id", "firstname", "lastname", "email", "phone"],
+        },
+        {
+          model: Resources,
+          as: "resource",
+          include: [
+            {
+              model: User,
+              as: "vendor",
+              attributes: ["id", "firstname", "lastname", "email", "phone"],
+            },
+          ],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    return res.status(200).json({
+      statusCode: 200,
+      status: true,
+      message: "All orders with vendor and customer details",
+      data: orders,
+    });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    return res.status(500).json({
+      statusCode: 500,
+      status: false,
+      message: "Internal server error",
+    });
+  }
+};
