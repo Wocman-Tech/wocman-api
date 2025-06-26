@@ -1,3 +1,4 @@
+const Joi = require("joi");
 const db = require("../../../../../models");
 
 const Resources = db.Resources;
@@ -113,6 +114,100 @@ exports.getResourcesByType = async (req, res) => {
       status: false,
       message: "An error occurred while fetching resources",
       data: [],
+    });
+  }
+};
+
+exports.getResourceById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const resource = await Resources.findByPk(id, {
+      include: [
+        {
+          model: User,
+          as: "vendor",
+          attributes: ["id", "username", "email", "phone"],
+        },
+        { model: ResourceType, as: "resource_type" },
+        { model: ResourceSubType, as: "sub_category" },
+      ],
+    });
+
+    if (!resource) {
+      return res.status(404).json({
+        statusCode: 404,
+        status: false,
+        message: "Resource not found",
+      });
+    }
+
+    res.status(200).json({
+      statusCode: 200,
+      status: true,
+      message: "Resource fetched successfully",
+      data: resource,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      status: false,
+      message: err.message,
+    });
+  }
+};
+
+exports.updateResourceById = async (req, res) => {
+  const { id } = req.params;
+
+  // Define allowed fields to update
+  if ("resourceid" in req.body) {
+    delete req.body.resourceid;
+  }
+  const schema = Joi.object({
+    resource: Joi.string().optional(),
+    description: Joi.string().optional(),
+    city: Joi.string().optional(),
+    images: Joi.string().optional(),
+    country: Joi.string().optional(),
+    state: Joi.string().optional(),
+    subtypeid: Joi.number().optional(),
+    amount: Joi.string().optional(),
+  });
+
+  const { error, value } = schema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      statusCode: 400,
+      status: false,
+      message: error.details[0].message,
+    });
+  }
+
+  try {
+    const resource = await Resources.findByPk(id);
+    if (!resource) {
+      return res.status(404).json({
+        statusCode: 404,
+        status: false,
+        message: "Resource not found",
+      });
+    }
+
+    await resource.update(value);
+
+    res.status(200).json({
+      statusCode: 200,
+      status: true,
+      message: "Resource updated successfully",
+      data: resource,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      status: false,
+      message: err.message,
     });
   }
 };

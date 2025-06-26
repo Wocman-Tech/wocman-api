@@ -109,4 +109,6 @@ db.resources = require("../models/resources.model.js")(sequelize, Sequelize);
 
 db.cart = require("../models/cart.model.js")(sequelize, Sequelize);
 
+db.order = require("../models/order.model.js")(sequelize, Sequelize);
+
 module.exports = db;
