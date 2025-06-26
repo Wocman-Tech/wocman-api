@@ -27,4 +27,9 @@ module.exports = function (app) {
     [authJwt.verifyToken, authJwt.isCustomer],
     vendorOrders.confirmOrderDelivery
   );
+  app.get(
+    Helpers.apiVersion7() + "admin/orders",
+    [authJwt.verifyToken, authJwt.isAdmin],
+    vendorOrders.getAllOrdersWithDetails
+  );
 };
