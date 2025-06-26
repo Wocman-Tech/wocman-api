@@ -3,6 +3,8 @@ const db = require("../../../../../models");
 
 const Cart = db.Cart;
 const Resources = db.Resources;
+const User = db.User;
+const Order = db.Order;
 
 exports.addToCart = async (req, res) => {
   const { resourceid } = req.body;
@@ -182,25 +184,82 @@ exports.checkout = async (req, res) => {
   try {
     const cartItems = await Cart.findAll({
       where: { customerid: req.userId },
-      include: [{ model: Resources, as: "resource" }],
+      include: [
+        {
+          model: Resources,
+          as: "resource",
+          include: [
+            {
+              model: User,
+              as: "vendor",
+              attributes: ["id", "username", "email", "phone"],
+            },
+          ],
+        },
+        {
+          model: User,
+          as: "customer",
+          attributes: ["id", "username", "email", "phone"],
+        },
+      ],
     });
 
     if (!cartItems.length) {
       return res.status(400).json({ message: "Cart is empty" });
     }
 
-    // Step 1: Mark each resource as purchased
     const resourceIds = cartItems.map((item) => item.resourceid);
 
+    // Step 1: Reset resource status as available
     await Resources.update(
-      { status: "purchased" },
+      { status: "available" },
       { where: { id: resourceIds } }
     );
 
-    // Step 2: Optionally create Order records here
+    // Step 2: Create Order records
+    for (const item of cartItems) {
+      await Order.create({
+        customerid: item.customerid,
+        resourceid: item.resourceid,
+        amount: item.resource.amount,
+        status: "pending",
+      });
+    }
 
     // Step 3: Clear cart
     await Cart.destroy({ where: { customerid: req.userId } });
+
+    // Step 4: Notify customer with vendor's number
+    const customer = cartItems[0].customer;
+    const vendorPhone = cartItems[0]?.resource?.vendor?.phone;
+
+    if (customer && vendorPhone) {
+      const customerBody = `
+        Dear ${customer.username},<br />
+        Your checkout was successful.<br />
+        Thank you for your purchase!<br />
+        You can reach the vendor at: <strong>0${vendorPhone}</strong>
+      `;
+      Helpers.pushNotice(customer.id, customerBody, "service");
+    }
+
+    // Step 5: Notify vendors with customer's number
+    const notifiedVendors = new Set();
+    cartItems.forEach((item) => {
+      const vendor = item.resource?.vendor;
+      const customerPhone = item.customer?.phone;
+
+      if (vendor && customerPhone && !notifiedVendors.has(vendor.id)) {
+        const vendorBody = `
+          Dear ${vendor.username},<br />
+          Your item has been purchased.<br />
+          Please prepare for delivery.<br />
+          You can reach the customer at: <strong>0${customerPhone}</strong>
+        `;
+        Helpers.pushNotice(vendor.id, vendorBody, "service");
+        notifiedVendors.add(vendor.id);
+      }
+    });
 
     res.status(200).json({ message: "Checkout successful", items: cartItems });
   } catch (err) {

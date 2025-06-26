@@ -173,6 +173,20 @@ require("./app/routes/vendorresource.routes")(app);
 
 require("./app/routes/customercart.routes")(app);
 
+//*-----------------------------------------*//
+
+// order routes
+
+//*-----------------------------------------*//
+require("./app/routes/vendororder.routes")(app);
+
+//*-----------------------------------------*//
+
+// bank routes
+
+//*-----------------------------------------*//
+require("./app/routes/bank.routes")(app);
+
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
   const err = new Error("Not Found");
